@@ -1,0 +1,181 @@
+# Bridge 1.0 — Project Brief for Claude Code
+
+Read this file fully at the start of every session. It is the source of truth for how this project is built.
+
+## 1. Who you are working with
+
+The project owner is **Aston**, a senior UX/product designer, not a developer. He designed the Bridge brand and website and wants to build the components he designed.
+
+How to work with him:
+
+- Explain what you are doing in plain language. Avoid jargon; when a technical term is unavoidable, explain it in one sentence.
+- Work **one component or one section at a time**. After each one, tell him how to see it in the browser and what to check, then wait for his approval before moving on.
+- Never make a design decision silently. If something isn't specified here or in his designs, ask, and offer two or three concrete options.
+- Before installing a new library, changing the folder structure, or deleting files, explain why and ask first.
+- When he gives visual feedback ("tighter", "more breathing room", "feels heavy"), translate it into specific changes and say what you changed.
+- Keep a short changelog at the bottom of `PROGRESS.md` after each working session.
+
+## 2. What we are building
+
+A **full working prototype** of the Bridge platform: the public website, with the homepage redeveloped according to *Platform Redevelopment Notes: Bridge 1.0*, section 4.2 (28 October 2026), plus the four dashboards (Student, School, Company, Admin), fully clickable with realistic sample data. The checkpoint plan and prototype scope are in `PROGRESS.md`; work through it one checkpoint at a time.
+
+The dashboards have no written spec. The Student dashboard is built from Aston's existing designs. For the School, Company and Admin dashboards, ask Aston for designs or direction before starting each one.
+
+Bridge is an AI-powered employability ecosystem connecting TVET (technical and vocational) students and graduates in Rwanda with practical learning, verified skills, industry experience and career opportunities. The site must feel premium, credible, human-centred, technology-enabled and distinctly African, with a vision that can scale internationally.
+
+Current live site for reference: https://bridge.co.rw
+
+## 3. Tech stack
+
+- **Next.js** (App Router) with **TypeScript**
+- **Tailwind CSS** for styling, with all brand values defined as design tokens (section 4). Never hard-code a colour, font size or spacing value inside a component.
+- Icons: **lucide-react**, a single consistent line-icon set
+- Font: **Manrope**, loaded with `next/font`.
+- Copy lives in **separate content files** (`/content/*.ts`), never inside components, so copy can be edited without touching layout. Sample records (students, schools, companies, programmes, opportunities, applications, articles) live in **one shared dataset in `/data`**, used by every page and dashboard so the story is consistent across roles.
+- No backend. Sample data is shaped like the real data will be. Login, the database, emails, payments, booking and Bridge AI are simulated and clearly marked (see "Prototype scope" in `PROGRESS.md`). Changes made during a demo are kept in the browser for that session only.
+
+## 4. Design system: Bridge tokens
+
+Visual direction: **the live site's navy-and-green look**, upgraded to feel more premium. The spec's emerald hero with amber highlights is **not** used; its content is kept but rendered in navy and green.
+
+### Colour
+
+Values below come from the live site. Define them as CSS variables and expose them through the Tailwind theme.
+
+| Token | Value | Use |
+|---|---|---|
+| `navy-900` | `#1C3D6A` | Headings, dark sections, footer |
+| `green-500` | `#3AAA6D` | Brand green: decorative use, icons, large display text, accents on white |
+| `green-600` | `#2F8A58` | Text on light-green backgrounds |
+| `green-700` | `#277A4D` | **Proposed** button and link colour (see accessibility note) |
+| `green-50` | `#EBF7F0` | Light section backgrounds, secondary button fill |
+| `gray-800` | `#1F2937` | Body text |
+| `gray-700` | `#374151` | Secondary text, nav links |
+| `gray-500` | `#6B7280` | Captions, metadata |
+| `gray-200` | `#E5E7EB` | Borders, dividers |
+| `white` | `#FFFFFF` | Page background, text on navy |
+
+**Accessibility note (needs Aston's decision):** white text on `#3AAA6D` has a contrast ratio of about 2.9:1, and `#3AAA6D` text on white is the same. Both fail the WCAG AA minimum of 4.5:1 for normal text. The live site's buttons, "Learn More" links and eyebrow labels all use this combination. `green-700 #277A4D` reaches about 5.3:1 while staying close to the brand green. Until Aston decides, use `green-700` for buttons and text links and keep `green-500` for icons, illustrations and large display text.
+
+Navy `#1C3D6A` on white is about 10.9:1, which is excellent.
+
+### Typography
+
+- **Typeface: Manrope**, loaded with `next/font`. Set it in one place only, so it can be swapped later in a single change.
+- Type scale (from the live site; review once Manrope is in place):
+  - Display / H1: 60px, weight 800, line-height 1.0 (mobile: 36–40px)
+  - H2 section titles: 36px, weight 800, line-height 1.1
+  - H3 card titles: 20px, weight 700
+  - Eyebrow labels: 12–13px, weight 700, uppercase, letter-spacing 0.08em
+  - Body large: 20px / 28px
+  - Body: 16px / 24px
+
+### Shape and spacing
+
+- Corner radius: **8px** for buttons, inputs and small elements; 12px for cards (proposed, to confirm).
+- Spacing follows a 4px base scale (Tailwind default).
+- Content max-width: 1200px, centred, with 24px side padding on mobile.
+- Section vertical padding: 96px desktop, 64px mobile.
+- Shadows: soft and minimal, matching the live site's service cards.
+
+### Buttons
+
+| Variant | Style |
+|---|---|
+| Primary | `green-700` fill, white text, semibold |
+| Secondary | `green-50` fill, `green-600` text |
+| Ghost on navy | transparent, white border, white text |
+| Text link | `green-700` text with arrow icon |
+
+Sizes: medium (8px × 24px padding, 16px text) and large (12px × 32px, 18px text).
+Every interactive element needs **hover, focus-visible, active and disabled** states. Focus rings must be clearly visible on both white and navy backgrounds.
+
+## 5. Content rules (non-negotiable)
+
+These come directly from the spec and apply to every section.
+
+1. **Never fabricate** statistics, reviews, ratings, testimonials, partner logos, endorsements, placement outcomes, addresses, phone numbers or social profiles.
+2. Any figure or claim not yet approved by Bridge must be marked in the content file with `// TODO: awaiting Bridge approval` and shown with a visible **"Draft"** badge in development mode only.
+3. Features that are not yet live (e.g. Bridge AI) must be clearly labelled as **"Coming soon"** or **"Preview"**. **No live chat input** anywhere unless it is connected to a working service.
+4. Sample talent profiles must be clearly illustrative (e.g. "Sample profile"). Never imply that a match or placement is guaranteed. Do not show match percentages.
+5. Never display an expired deadline or suggest a closed programme is accepting applications.
+6. Every image needs meaningful alt text.
+7. Spelling: **British English** as used in the spec ("Programme", "personalised"). Confirm with Aston if the live site's "Program" should be kept instead.
+
+## 6. Homepage structure (in order)
+
+| # | Section | Key content |
+|---|---|---|
+| 1 | **Header** | Logo · For Talents, For Schools, For Companies, Ventures Lab, For Ecosystem (dropdowns) · Login (visually secondary) · Book a Discovery Call (primary). Sticky, compact, mobile menu. |
+| 2 | **Hero** | Eyebrow "THE FUTURE OF TVET EMPLOYABILITY" · H1 "From Technical Skills to Real-World Opportunity." · supporting line · CTAs: Join a Programme (primary), Hire Vetted Talent (secondary), Book a Discovery Call (text link) · ecosystem visual: learner profiles, Skills Passport indicators, disciplines, partners and opportunity cards linked by a subtle network graphic. Not a generic AI animation, not an overcrowded map. |
+| 3 | **Trust and credibility** | "Built Around Real Learners. Connected to Industry." · stats: 1,000+ students, 24+ partner schools, 15+ industry firms, 45+ facilitators (**all awaiting approval**) · optional verified logos. |
+| 4 | **The Bridge ecosystem** | Eyebrow "ONE CONNECTED JOURNEY" · "More Than Learning. A Pathway to Opportunity." · 3 service cards: Learn and Build, Prove Your Skills, Connect to Opportunity, each with capabilities list and CTA. |
+| 5 | **Audience pathways** | "One Ecosystem. Different Pathways to Growth." · 4 consistent panels: Talents, Schools, Companies, Ecosystem Partners. |
+| 6 | **Programmes and Ventures Lab** | "Opportunities to Learn, Build, and Grow." · programme cards driven by data · Ventures Lab featured when open · CTA Explore All Programmes. |
+| 7 | **Talent discovery** | Eyebrow "SKILLS THAT CONNECT TO WORK" · "Help Employers See What Talent Can Do." · illustrative profile cards · CTAs Hire Vetted Talent, Explore the Skills Passport. |
+| 8 | **Bridge AI** | Eyebrow "INTELLIGENCE FOR THE JOURNEY AHEAD" · "Your AI Companion from the Classroom to Your Career." · capabilities shown as a **product preview**, labelled as in development. |
+| 9 | **Impact and learner stories** | "Progress That Goes Beyond Graduation." · approved stories only · CTA Explore Bridge's Impact. |
+| 10 | **How Bridge works** | "One Connected Journey, from Learning to Opportunity." · 4 steps: Learn, Build, Demonstrate, Connect, with consistent icons · CTA Start Your Journey. Must not imply every student automatically goes through every stage. |
+| 11 | **Insights and resources** | "Ideas for the Future of Technical Talent." · article cards · CTA Explore Resources. |
+| 12 | **Final conversion** | "Let's Connect Technical Talent to Opportunity." · Join a Programme, Book a Discovery Call, Partner with Bridge link. Strong brand section (navy, with green accents). |
+| 13 | **Footer** | Logo and mission line · audience links · About, Programmes and Resources · official contact details · official social links · Privacy Policy, Terms of Use, Cookie preferences. |
+
+Full copy for every section is in the spec PDF. Copy it exactly into the content files; do not rewrite it.
+
+## 7. Component list (build in this order; grouped into Checkpoints 1–4 in `PROGRESS.md`)
+
+Build each one in isolation on a `/components-preview` page first, so Aston can review every state before it is used on the homepage.
+
+1. Design tokens and base typography
+2. Button (all variants, sizes and states)
+3. Eyebrow + section heading block
+4. Header (desktop with dropdowns, mobile menu)
+5. Stat item
+6. Service card (title, description, capability list, CTA, optional "Coming soon" badge)
+7. Audience panel
+8. **Programme card**, with statuses: Open, Upcoming, Closed, Archived. Fields: name, image, description, audience, eligibility, format and location, opening and closing dates, status, CTA. Status must be calculated from the dates, never typed by hand.
+9. Talent profile card: discipline, skills and project evidence, verification indicator, experience, availability (only if consented), suitable opportunities, "Sample profile" label.
+10. Journey step
+11. Article card: category, title, excerpt, date, image, reading time, link
+12. Testimonial / story card
+13. CTA band
+14. Footer
+15. Hero ecosystem visual (last, after the system is stable)
+
+## 8. Quality bar
+
+- Responsive at 375px, 768px, 1024px and 1440px; mobile keeps the same hierarchy and usefulness as desktop.
+- Keyboard navigable; dropdowns work with keyboard and close with Escape.
+- WCAG 2.1 AA contrast.
+- Animations are restrained and turned off when the user has "reduce motion" enabled.
+- Images optimised with Next.js `<Image>`.
+- Every link and CTA points somewhere real or to a clearly marked placeholder route.
+
+## 9. Open decisions (do not invent answers)
+
+| Item | Status |
+|---|---|
+| Typeface | **Decided:** Manrope |
+| Button green (`#3AAA6D` vs proposed `#277A4D`) | Aston to decide |
+| Accent colour (if any) | Amber dropped; decide whether an accent is needed for badges |
+| Nav dropdown contents | Referenced as "shared in slides"; not yet supplied |
+| Booking tool for "Book a Discovery Call" | Not specified |
+| Programme data source | Prototype: shared sample data in `/data`. Real source not specified. |
+| Login destination | Prototype: "Sign in as…" screen with four sample users. Real login not specified. |
+| Approved stats, logos, testimonials, photos | Awaiting Bridge |
+| Official social accounts | Awaiting Bridge (the live footer's GitHub icon looks like a template leftover) |
+| Analytics setup | Not specified |
+| Hosting and deployment | Not specified |
+| Bridge sign-off on navy-and-green instead of the spec's emerald hero | Aston to confirm with Bridge |
+
+## 10. Definition of done (from spec 4.2.16)
+
+1. Agreed sections and hierarchy implemented.
+2. Bridge identity preserved and applied consistently.
+3. Four audience pathways clear and functional.
+4. Programme information reflects the approved source of truth.
+5. Every CTA leads to its intended destination.
+6. Works on desktop, tablet and mobile.
+7. Accessibility, performance and security requirements met.
+8. No fabricated statistics, endorsements or capabilities.
+9. Bridge has approved final content, imagery and journeys.
