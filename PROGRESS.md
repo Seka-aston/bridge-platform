@@ -20,7 +20,7 @@ Read this file with CLAUDE.md at the start of every session. Work on one checkpo
 
 - [x] Next.js + TypeScript + Tailwind project created around the existing CLAUDE.md and PROGRESS.md
       (Next.js 16.4.5, lucide-react installed, `content/site.ts` added, lint and build pass)
-- [ ] Manrope loaded with `next/font` (starter's Geist font is still in place)
+- [x] Manrope loaded with `next/font` (set only in `app/layout.tsx` via `--font-brand`; Geist removed)
 - [x] Git initialised, first commit made
       (pushed to github.com/Seka-aston/bridge-platform, branch `main`; commits use g.seka@alustudent.com, which is linked to the Seka-aston GitHub account)
 - [ ] Project runs locally; Aston knows how to open it in the browser (runs; awaiting Aston's check)
@@ -137,6 +137,10 @@ Built from Aston's existing student dashboard designs. Share Figma frames or scr
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-07 — Manrope added
+- Replaced the starter's Geist fonts with Manrope (self-hosted by Next.js, no requests to Google).
+- Font is chosen in one place, `app/layout.tsx`; `app/globals.css` uses it as the site default. Lint and build pass.
 
 ### 2026-11-07 — CLAUDE.md updated, git and GitHub connected
 - CLAUDE.md updated to match this plan: full prototype including dashboards, Manrope as the typeface, `/data` for shared sample data, "Sign in as…" for prototype login.
