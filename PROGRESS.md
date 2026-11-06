@@ -24,7 +24,10 @@ Read this file with CLAUDE.md at the start of every session. Work on one checkpo
 - [x] Git initialised, first commit made
       (pushed to github.com/Seka-aston/bridge-platform, branch `main`; commits use g.seka@alustudent.com, which is linked to the Seka-aston GitHub account)
 - [ ] Project runs locally; Aston knows how to open it in the browser (runs; awaiting Aston's check)
-- [ ] (Optional) Connected to GitHub and Vercel so every update gets a shareable preview link
+- [x] (Optional) Connected to GitHub and Vercel so every update gets a shareable preview link
+      (Vercel project `bridge-platform-eovr` in team "lineaar's projects"; live at https://bridge-platform-eovr.vercel.app.
+      Pushes to `main` publish the live site; other branches get their own preview link. Preview links only open for
+      people signed in to the Vercel team; share the main link with Bridge. Node 22.x on Vercel, matching Aston's Mac.)
 
 **Aston reviews:** the empty site opens in the browser.
 
@@ -137,6 +140,13 @@ Built from Aston's existing student dashboard designs. Share Figma frames or scr
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-07 — Vercel connected
+- Vercel CLI updated to 65.12.1. Vercel project `bridge-platform-eovr` was already linked to the GitHub repo (imported via the Vercel website).
+- Deleted an empty duplicate Vercel project named `bridge-platform`.
+- Set the Vercel Node version to 22.x to match the local machine.
+- Preview protection left on (previews need a Vercel sign-in); the address keeps its "-eovr" ending until a real domain is chosen.
+- Skipped on purpose from Vercel's agent guide: the Vercel plugin/skills for Claude and the Vercel MCP server (not needed; would widen AI access).
 
 ### 2026-11-07 — Manrope added
 - Replaced the starter's Geist fonts with Manrope (self-hosted by Next.js, no requests to Google).
