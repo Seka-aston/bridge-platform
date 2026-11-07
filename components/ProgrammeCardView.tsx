@@ -16,8 +16,8 @@ import { formatDate, type ProgrammeStatus } from "@/lib/programmes";
   `featured` gives Bridge Ventures Lab a wide, side-by-side layout.
 */
 
-// Programmes created in the admin dashboard this session have no page of their own yet.
-const hrefFor = (p: Programme) => (p.id.startsWith("new-") ? "/programmes" : `/programmes/${p.id}`);
+// Every programme has its own page, including ones created in the admin dashboard this session.
+const hrefFor = (p: Programme) => `/programmes/${p.id}`;
 
 export type ProgrammeCardProps = { programme: Programme; status: ProgrammeStatus; featured?: boolean };
 

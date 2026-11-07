@@ -13,6 +13,11 @@ import { companyText as t, dashboardText } from "@/content/dashboard";
 import { formText } from "@/content/pages";
 import { company, interviews, stages, type Posting, type PostingStatus, type Stage } from "@/data/company";
 import { talentProfiles, type TalentProfile } from "@/data/talent";
+import { defaultPrivacy, readStudentPrivacy, withPrivacy, type StudentPrivacy } from "@/lib/privacy";
+import { addNotice } from "@/lib/prototypeStore";
+import { MESSAGE_STORE } from "@/components/dashboard/student/MessagesView";
+import { messagesText } from "@/content/dashboard";
+import { useEffect } from "react";
 
 /*
   Company dashboard views (Checkpoint 8), in the student dashboard's visual language.
@@ -276,9 +281,16 @@ export function TalentDiscovery() {
   const [discipline, setDiscipline] = useState("");
   const [availability, setAvailability] = useState("");
   const [verifiedOnly, setVerifiedOnly] = useState(false);
-  const disciplines = [...new Set(talentProfiles.map((p) => p.discipline))];
+  // The sample student's current privacy choice decides whether her availability counts as shared.
+  const [privacy, setPrivacy] = useState<StudentPrivacy | null>(null);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- browser-only storage, read after mount
+    setPrivacy(readStudentPrivacy(defaultPrivacy(talentById("sample-1"))));
+  }, []);
+  const profiles = talentProfiles.map((p) => withPrivacy(p, privacy));
+  const disciplines = [...new Set(profiles.map((p) => p.discipline))];
   const query = q.trim().toLowerCase();
-  const shown = talentProfiles.filter(
+  const shown = profiles.filter(
     (p) =>
       (!discipline || p.discipline === discipline) &&
       (!verifiedOnly || p.verification === "verified") &&
@@ -646,10 +658,64 @@ export function ApplicantsView() {
                 <CheckCircle2 aria-hidden className="mt-0.5 size-5 shrink-0 text-green-700" /> {a.stageSaved}
               </p>
             )}
+            {current.talentId === "sample-1" && <MessageApplicant name={talentById(current.talentId).name} />}
             <ProfileDrawerBody profile={talentById(current.talentId)} />
           </div>
         )}
       </DetailDrawer>
     </div>
+  );
+}
+
+// Grace can message the sample student from her application (Checkpoint 13). The message
+// arrives in the student's Messages, in the conversation with Grace, plus a notification.
+function MessageApplicant({ name }: { name: string }) {
+  const m = messagesText;
+  const [text, setText] = useState("");
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+  return (
+    <form
+      noValidate
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!text.trim()) {
+          setError(m.empty);
+          return;
+        }
+        try {
+          const all = JSON.parse(sessionStorage.getItem(MESSAGE_STORE) ?? "{}");
+          all.company = [...(all.company ?? []), { from: "them", text: text.trim(), at: new Date().toISOString() }];
+          sessionStorage.setItem(MESSAGE_STORE, JSON.stringify(all));
+        } catch {}
+        addNotice("student", m.newNotice.replace("{name}", "Grace N."));
+        setText("");
+        setSent(true);
+      }}
+      className="rounded-tile border border-gray-200 p-4"
+    >
+      <label htmlFor="msg-applicant" className="font-semibold text-navy-900">
+        {m.companyAction.replace("{name}", name)}
+      </label>
+      <textarea
+        id="msg-applicant"
+        rows={3}
+        value={text}
+        onChange={(e) => {
+          setText(e.target.value);
+          setError("");
+          setSent(false);
+        }}
+        placeholder={m.companyPlaceholder}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? "msg-applicant-error" : undefined}
+        className={`mt-2 block w-full rounded-control border border-gray-500 px-3 py-2 text-gray-800 ${ring}`}
+      />
+      {error && <p id="msg-applicant-error" className="mt-2 font-semibold text-navy-900">{error}</p>}
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <Button type="submit" variant="navy" shape="pill">{m.send}</Button>
+        <p role="status" className="text-sm font-semibold text-green-700">{sent ? m.companySent.replace("{name}", name) : ""}</p>
+      </div>
+    </form>
   );
 }

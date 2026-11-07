@@ -14,7 +14,7 @@ export function searchItemsFor(role: Role): SearchItem[] {
   switch (role) {
     case "student":
       return [
-        ...courses.map((c) => ({ label: c.title, meta: c.subtitle, href: `${base}/courses#${c.id}` })),
+        ...courses.map((c) => ({ label: c.title, meta: c.subtitle, href: `${base}/courses/${c.id}` })),
         ...assignments.map((a) => ({ label: a.title, meta: dashboardText.searchKinds.assignment, href: `${base}/assignments` })),
         ...opportunities.map((o) => ({ label: o.position, meta: o.company, href: `${base}/opportunities` })),
         ...skills.map((s) => ({ label: s.name, meta: dashboardText.searchKinds.skill, href: `${base}/skills-passport` })),

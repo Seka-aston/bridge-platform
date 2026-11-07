@@ -6,6 +6,7 @@ import { prototypeMode } from "@/content/site";
 import { articleCardText as t } from "@/content/ui";
 import type { Article } from "@/data/articles";
 import { formatDate } from "@/lib/programmes";
+import { readingMinutes } from "@/lib/articles";
 
 /*
   Article card (CLAUDE.md section 7, component 11; spec 4.2.12).
@@ -39,7 +40,7 @@ export function ArticleCard({ article: a, showImage = true }: { article: Article
         <p className="mt-2 text-gray-700">{a.excerpt}</p>
         <p className="mt-auto pt-6 text-gray-500">
           <time dateTime={a.publishedOn}>{formatDate(a.publishedOn)}</time>
-          {a.readingMinutes ? ` · ${t.readingTime.replace("{minutes}", String(a.readingMinutes))}` : null}
+          {readingMinutes(a) ? ` · ${t.readingTime.replace("{minutes}", String(readingMinutes(a)))}` : null}
         </p>
       </div>
     </article>

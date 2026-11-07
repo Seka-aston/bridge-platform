@@ -9,6 +9,7 @@ import { prototypeMode } from "@/content/site";
 import { articleCardText } from "@/content/ui";
 import { articles } from "@/data/articles";
 import { formatDate } from "@/lib/programmes";
+import { readingMinutes } from "@/lib/articles";
 
 export function generateStaticParams() {
   return articles.map((a) => ({ id: a.id }));
@@ -41,13 +42,35 @@ export default async function ArticlePage({ params }: PageProps<"/resources/[id]
         <h1 className="mt-4 text-balance text-h2-mobile text-navy-900 md:text-display-mobile">{a.title}</h1>
         <p className="mt-4 text-gray-500">
           <time dateTime={a.publishedOn}>{formatDate(a.publishedOn)}</time>
-          {a.readingMinutes ? ` · ${articleCardText.readingTime.replace("{minutes}", String(a.readingMinutes))}` : null}
+          {readingMinutes(a) ? ` · ${articleCardText.readingTime.replace("{minutes}", String(readingMinutes(a)))}` : null}
         </p>
         <p className="mt-8 text-body-lg text-gray-800">{a.excerpt}</p>
-        {prototypeMode && (
-          <p className="mt-8 flex flex-wrap items-center gap-3 rounded-card border border-dashed border-gray-500 p-6 text-gray-700">
-            <Badge kind="draft" /> {c.articleBodyPlaceholder}
-          </p>
+        {a.body ? (
+          <div className="mt-10 space-y-8">
+            {a.body.map((b, i) => (
+              <section key={i}>
+                {b.heading && <h2 className="text-h3 text-navy-900 md:text-panel">{b.heading}</h2>}
+                {b.paragraphs?.map((p) => (
+                  <p key={p} className="mt-3 text-body-lg text-gray-800">
+                    {p}
+                  </p>
+                ))}
+                {b.list && (
+                  <ul className="mt-3 list-disc space-y-2 pl-6 text-body-lg text-gray-800">
+                    {b.list.map((li) => (
+                      <li key={li}>{li}</li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            ))}
+          </div>
+        ) : (
+          prototypeMode && (
+            <p className="mt-8 flex flex-wrap items-center gap-3 rounded-card border border-dashed border-gray-500 p-6 text-gray-700">
+              <Badge kind="draft" /> {c.articleBodyPlaceholder}
+            </p>
+          )
         )}
       </article>
       <FinalBand />

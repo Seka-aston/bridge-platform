@@ -1,5 +1,7 @@
 import { ShieldCheck, Users } from "lucide-react";
 import { Button } from "@/components/Button";
+import { SettingsView } from "@/components/dashboard/SettingsView";
+import { settingsText } from "@/content/dashboard";
 import { DashPageHeader } from "@/components/dashboard/parts";
 import {
   ClassesPanel, InstitutionProfileView, PlacementsView, SchoolDataProvider, SchoolProgrammesView, SchoolSnapshot, SchoolToday, SchoolWelcomeLine, StudentsView, VerificationPanel,
@@ -77,4 +79,5 @@ export const schoolScreens: Record<string, () => React.ReactElement> = {
   programmes: screen(t.programmes.title, t.programmes.description, <SchoolProgrammesView />),
   placements: screen(t.placements.title, t.placements.description, <PlacementsView />),
   profile: screen(t.profile.title, t.profile.description, <InstitutionProfileView />),
+  settings: screen(settingsText.title, settingsText.description, <SettingsView role="school" />),
 };

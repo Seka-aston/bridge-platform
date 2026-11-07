@@ -1,6 +1,8 @@
 import { BadgeCheck, Briefcase, FileCheck2, Handshake, Plus, Users } from "lucide-react";
 import { Button } from "@/components/Button";
 import { BarChart, ColumnChart } from "@/components/dashboard/charts";
+import { SettingsView } from "@/components/dashboard/SettingsView";
+import { settingsText } from "@/content/dashboard";
 import { DashPageHeader, Panel, StatCard, StatGrid } from "@/components/dashboard/parts";
 import {
   AdminDataProvider, AdminSnapshot, AdminToday, AdminWelcomeLine, ApprovalsPanel, ContentApprovals, ProgrammeManager, UsersView,
@@ -110,4 +112,5 @@ export const adminScreens: Record<string, () => React.ReactElement> = {
     </section>,
   ),
   reports: ReportsScreen,
+  settings: screen(settingsText.title, settingsText.description, <SettingsView role="admin" />),
 };

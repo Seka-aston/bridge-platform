@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { LiveProgrammeDetail } from "@/components/LiveProgrammes";
+import { LiveProgrammeDetail, SessionProgrammeDetail } from "@/components/LiveProgrammes";
+import { programmeDetail } from "@/content/pages";
 import { prototypeMode } from "@/content/site";
 import { programmes } from "@/data/programmes";
 import { todayInKigali } from "@/lib/programmes";
@@ -22,6 +23,8 @@ export async function generateMetadata({ params }: PageProps<"/programmes/[id]">
 async function Detail({ id }: { id: string }) {
   await connection();
   const p = programmes.find((x) => x.id === id);
+  // Programmes created in the admin dashboard this session live only in the browser.
+  if (!p && id.startsWith("new-")) return <SessionProgrammeDetail id={id} today={todayInKigali()} notFoundText={programmeDetail.sessionNotFound} />;
   if (!p || (!p.approved && !prototypeMode)) notFound();
   return <LiveProgrammeDetail programme={p} today={todayInKigali()} />;
 }

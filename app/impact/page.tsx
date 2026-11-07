@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FeatureGrid } from "@/components/FeatureGrid";
 import { FinalBand } from "@/components/FinalBand";
 import { HomeSection } from "@/components/HomeSection";
 import { PageHeader } from "@/components/PageHeader";
@@ -44,6 +45,20 @@ export default function ImpactPage() {
           </ul>
         </HomeSection>
       )}
+
+      <HomeSection id="process" labelledBy="process-title">
+        <SectionHeading id="process-title" title={c.storiesProcess.title} supporting={c.storiesProcess.supporting} draft />
+        <div className="mt-12">
+          <FeatureGrid items={c.storiesProcess.steps} numbered columns={4} />
+        </div>
+      </HomeSection>
+
+      <HomeSection id="reporting" labelledBy="reporting-title" tone="green">
+        <SectionHeading id="reporting-title" title={c.reporting.title} supporting={c.reporting.supporting} draft />
+        <div className="mt-12">
+          <FeatureGrid items={c.reporting.items} />
+        </div>
+      </HomeSection>
 
       <FinalBand />
     </main>

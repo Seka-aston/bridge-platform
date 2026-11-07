@@ -12,10 +12,12 @@ import { CoursesBrowser } from "@/components/dashboard/student/CoursesBrowser";
 import { OpportunitiesTable } from "@/components/dashboard/student/OpportunitiesTable";
 import { PassportCard, PassportPanel } from "@/components/dashboard/student/PassportPanel";
 import { SkillsSection } from "@/components/dashboard/student/PassportView";
+import { MessagesView } from "@/components/dashboard/student/MessagesView";
+import { SettingsView } from "@/components/dashboard/SettingsView";
 import { CompletedLessons, RangeProvider, RangeSelect } from "@/components/dashboard/student/Range";
 import { GoalLine, TodayPanel } from "@/components/dashboard/student/TodayPanel";
 import { bridgeAi } from "@/content/home";
-import { roleText, studentText as t } from "@/content/dashboard";
+import { messagesText, roleText, settingsText, studentText as t } from "@/content/dashboard";
 import { prototypeMode } from "@/content/site";
 import { articles } from "@/data/articles";
 import { opportunities } from "@/data/opportunities";
@@ -87,7 +89,7 @@ export function StudentOverview() {
             <ul className="grid gap-4 sm:grid-cols-2 min-[87.5rem]:grid-cols-4">
               {active.map((c) => (
                 <li key={c.id}>
-                  <CourseCard course={c} href={`${base}/courses#${c.id}`} />
+                  <CourseCard course={c} href={`${base}/courses/${c.id}`} />
                 </li>
               ))}
             </ul>
@@ -244,6 +246,24 @@ function BridgeAiScreen() {
   );
 }
 
+function MessagesScreen() {
+  return (
+    <div className="space-y-6">
+      <DashPageHeader title={messagesText.title} description={messagesText.description} />
+      <MessagesView />
+    </div>
+  );
+}
+
+function SettingsScreen() {
+  return (
+    <div className="space-y-6">
+      <DashPageHeader title={settingsText.title} description={settingsText.description} />
+      <SettingsView role="student" />
+    </div>
+  );
+}
+
 // Section slug → screen. Slugs not listed fall back to the shared "coming next" state.
 export const studentScreens: Record<string, () => React.ReactElement> = {
   courses: CoursesScreen,
@@ -252,4 +272,6 @@ export const studentScreens: Record<string, () => React.ReactElement> = {
   opportunities: OpportunitiesScreen,
   "skills-passport": PassportScreen,
   "bridge-ai": BridgeAiScreen,
+  messages: MessagesScreen,
+  settings: SettingsScreen,
 };

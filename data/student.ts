@@ -85,3 +85,33 @@ export const passport = { id: "BR-2026-0417", rank: 12 };
 // Build / Connect tab content (Learn is in Aston's design). Illustrative.
 export const currentProject = { title: "Inventory app for a local cooperative", milestone: "Add sales reports", progress: 60 };
 export const nextConnection = { title: "Mentor session with a back-end engineer", when: "Thursday, 14:00", where: "Online" };
+
+// Lesson titles per course (Checkpoint 13: course and lesson pages). Illustrative.
+// The first `lessonsDone` lessons of each course count as completed in the sample data.
+export const lessons: Record<string, string[]> = {
+  backend: [
+    "Introduction to back-end development", "Setting up Node.js", "Working with npm packages", "Your first server with Express",
+    "Routing and request handling", "Reading request data", "Validating input", "Handling errors",
+    "Building a REST endpoint", "Connecting to a database", "Authentication basics", "Deploying your API",
+  ],
+  database: [
+    "What is a database?", "Tables, rows and columns", "Keys and relationships", "Writing SELECT queries", "Filtering and sorting",
+    "Joining tables", "Inserting, updating and deleting", "Designing a schema", "Normalisation basics", "Indexes and performance",
+  ],
+  communication: [
+    "Communicating at work", "Writing clear emails", "Professional phone calls", "Taking part in meetings", "Giving and receiving feedback",
+    "Presenting your work", "Workplace vocabulary", "Writing a short report", "Communicating with customers", "Review and practice",
+  ],
+  workplace: [
+    "Preparing for your internship", "Workplace expectations", "Managing your time", "Working in a team", "Solving problems at work",
+    "Health and safety", "Using workplace tools", "Taking initiative", "Handling feedback", "Building your network",
+    "Recording your achievements", "Reflecting on your internship",
+  ],
+  digital: [
+    "Using a computer confidently", "Files and folders", "Email and calendars", "Word processing", "Spreadsheet basics",
+    "Spreadsheet formulas", "Staying safe online", "Working with cloud tools", "Presentations", "Final project",
+  ],
+};
+
+// Sample lesson length in minutes (12 for the "Up next" lesson, as in Aston's design).
+export const lessonMinutes = (courseId: string, index: number) => (courseId === "backend" && index === 8 ? 12 : 10 + ((index * 7 + courseId.length) % 11));

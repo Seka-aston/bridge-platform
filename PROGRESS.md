@@ -189,11 +189,31 @@ Definition of done (CLAUDE.md section 10), honest status:
 | 8 | No fabricated statistics, endorsements or capabilities | Done: all samples labelled; unapproved items Draft; Bridge AI shown as preview; no match percentages; no real company names |
 | 9 | Bridge has approved content, imagery and journeys | **Not yet**: needs Bridge's review |
 
+## Checkpoint 13: Fill every unfinished page
+
+- [x] Privacy Policy, Terms of Use and Cookie preferences: full Draft template text with [bracketed gaps] for facts only Bridge can supply; working cookie choice
+- [x] Resources: two full Draft articles; reading time calculated from the text
+- [x] Impact page: how stories are collected (with consent) and how figures will be reported, both Draft. Stories themselves stay placeholders (content rule 1)
+- [x] Student course pages with lesson lists, a lesson view and "Mark as complete"
+- [x] Messages (student) with three sample conversations; companies can message an applicant from the applicant drawer
+- [x] Settings for all four roles; the student's Skills Passport privacy choices take effect on the public passport and in company talent search
+- [x] Programmes created in the admin dashboard get their own public page (this browser tab only)
+
+**Aston reviews:** the pages listed above, each role's Settings, and the privacy effects.
+
 ---
 
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-08 — Checkpoint 13: every unfinished page filled
+- New content files: `content/legal.ts` (privacy, terms, cookies), message threads in `data/messages.ts`, article bodies in `data/articles.ts`, lessons in `data/student.ts`. All new wording is marked Draft.
+- New screens: student course page (`/dashboard/student/courses/[course]`), Messages, and Settings for every role. Messages and Settings are no longer "Coming soon" in the dashboard menus.
+- Privacy settings (`lib/privacy.ts`) switch off Diane's public passport link and hide her availability from companies.
+- Footer mission line now uses the live site's wording.
+- Fixed: sending a message crashed the page in recent Chrome (a scroll call returned a value React misread).
+- Settings and cookie switches restyled as toggle switches; the off state meets 3:1 contrast for controls.
 
 ### 2026-11-07 — Checkpoints 11 and 12: connected journeys, QA and demo
 - Aston approved deleting unused files: StudentApplications, CompanyTalentTable, AdminProgrammeTable components and two leftover data blocks removed.

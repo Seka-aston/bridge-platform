@@ -53,7 +53,7 @@ export const dashboardText = {
   noResults: { title: "No matches", body: "Try a different search or filter." },
 };
 
-const settings: NavLink = { label: "Settings", slug: "settings", icon: "settings" };
+const settings: NavLink = { label: "Settings", slug: "settings", icon: "settings", checkpoint: 13 };
 
 export const roleText: Record<Role, { label: string; title: string; welcome: string; nav: NavLink[] }> = {
   student: {
@@ -68,7 +68,7 @@ export const roleText: Record<Role, { label: string; title: string; welcome: str
       { label: "Opportunities", slug: "opportunities", icon: "briefcase", top: true, rail: 2, checkpoint: 7 },
       { label: "Skills Passport", slug: "skills-passport", icon: "award", rail: 2, checkpoint: 7 },
       { label: "Bridge AI (preview)", slug: "bridge-ai", icon: "sparkles", rail: 2, checkpoint: 7 },
-      { label: "Messages", slug: "messages", icon: "message", rail: 2 },
+      { label: "Messages", slug: "messages", icon: "message", rail: 2, checkpoint: 13 },
       settings,
     ],
   },
@@ -542,4 +542,89 @@ export const resetText = {
   body: "Clear everything the demo saved in this browser tab (applications, approvals, verifications, notifications) and start fresh.",
   button: "Reset demo data",
   done: "Demo data cleared.",
+};
+
+// ---------- Checkpoint 13: remaining screens. NEW, Draft. ----------
+export const messagesText = {
+  title: "Messages",
+  description: "Conversations with your facilitators, companies and the Bridge team.",
+  listLabel: "Conversations",
+  you: "You",
+  placeholder: "Write a message",
+  send: "Send",
+  empty: "Write a message before sending.",
+  sentNote: "Prototype: messages are kept in this browser tab only.",
+  back: "All conversations",
+  companyAction: "Message {name}",
+  companySent: "Message sent. {name} will see it in their Messages.",
+  companyPlaceholder: "Write a message to the applicant",
+  newNotice: "New message from {name}",
+};
+
+export const coursePageText = {
+  back: "All courses",
+  lessonsTitle: "Lessons",
+  progress: "Course progress",
+  completed: "Completed",
+  current: "Next lesson",
+  locked: "Not started",
+  minutes: "{n} min",
+  open: "Open lesson",
+  lessonOf: "Lesson {n} of {total}",
+  video: "Lesson video",
+  videoNote: "Prototype: lesson videos and materials will come from Bridge's course content.",
+  notesTitle: "In this lesson",
+  notes: [
+    "Watch the short video and follow along on your own computer or in the workshop.",
+    "Try the practice task, then compare your result with the example.",
+    "Note one question to ask your facilitator in the next session.",
+  ],
+  markComplete: "Mark as complete",
+  markedComplete: "Completed. Your progress is updated. (Prototype: saved in this browser tab.)",
+  nextLesson: "Next lesson",
+  close: "Close lesson",
+};
+
+export const settingsText = {
+  title: "Settings",
+  description: "Your profile, notifications and privacy.",
+  save: "Save changes",
+  saved: "Saved. (Prototype: kept in this browser tab only.)",
+  profile: { title: "Profile", name: "Full name", email: "Email address", phone: "Phone number (optional)" },
+  notificationsTitle: "Email notifications",
+  notifications: {
+    student: ["New assignments and feedback", "Updates on my applications", "Companies viewing my Skills Passport", "Skill verification results"],
+    school: ["New verification requests", "Learners applying to programmes", "Placement updates"],
+    company: ["New applicants", "Profiles matching my open roles", "Messages from applicants"],
+    admin: ["Items waiting for approval", "New users joining", "Programmes opening or closing"],
+  } as Record<string, string[]>,
+  privacy: {
+    title: "Skills Passport privacy",
+    description: "Choose what companies and anyone with your link can see. Your contact details are never shown.",
+    publicLink: "Public Skills Passport link",
+    publicLinkHelp: "When off, your shareable link shows that your passport is private.",
+    shareAvailability: "Share my availability with companies",
+    shareAvailabilityHelp: "Companies see this on your profile only while this is on.",
+    availabilityText: "My availability",
+    privateNotice: "This Skills Passport is private. The learner has chosen not to share it publicly.",
+  },
+  school: {
+    title: "Verification",
+    requireEvidence: "Require evidence before a skill can be verified",
+    whoVerifies: "Who can verify skills",
+    whoOptions: ["Programme coordinators only", "Coordinators and facilitators"],
+  },
+  company: {
+    title: "Company profile",
+    website: "Website",
+    about: "About the company",
+    disciplines: "Disciplines we hire for",
+  },
+  admin: {
+    title: "Platform",
+    prototypeMode: "Prototype mode",
+    prototypeOn: "On: content awaiting approval is shown with a Draft badge. When switched off for launch, it is hidden instead.",
+    prototypeHow: "Changed by a developer in content/site.ts, not from this screen.",
+  },
+  sampleEmail: { student: "diane@sample.example", school: "jean-paul@sample-school.example", company: "grace@sample-tech.example", admin: "eric@bridge.example" } as Record<string, string>,
 };

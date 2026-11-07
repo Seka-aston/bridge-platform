@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
+import { CookiePreferences } from "@/components/CookiePreferences";
 import { LegalPage } from "@/components/LegalPage";
-import { legal } from "@/content/pages";
+import { cookies } from "@/content/legal";
 
-export const metadata: Metadata = { title: legal.cookies.title, robots: { index: false } };
+export const metadata: Metadata = { title: cookies.title, description: cookies.intro, robots: { index: false } };
 
 export default function Page() {
-  return <LegalPage title={legal.cookies.title} />;
+  return (
+    <LegalPage title={cookies.title} intro={cookies.intro} sections={cookies.sections}>
+      <CookiePreferences />
+    </LegalPage>
+  );
 }

@@ -1,4 +1,5 @@
 import { BadgeCheck, Clock } from "lucide-react";
+import { AvailabilityRow } from "@/components/AvailabilityRow";
 import { Badge } from "@/components/Badge";
 import { talentCardText as t } from "@/content/ui";
 import type { TalentProfile } from "@/data/talent";
@@ -64,12 +65,7 @@ export function TalentCard({ profile: p }: { profile: TalentProfile }) {
           <h4 className="font-semibold text-navy-900">{t.experience}</h4>
           <p className="mt-1 text-gray-700">{p.experience}</p>
         </div>
-        {p.availability?.consented && (
-          <div>
-            <h4 className="font-semibold text-navy-900">{t.availability}</h4>
-            <p className="mt-1 text-gray-700">{p.availability.text}</p>
-          </div>
-        )}
+        <AvailabilityRow profileId={p.id} consented={!!p.availability?.consented} text={p.availability?.text ?? ""} label={t.availability} />
         <div>
           <h4 className="font-semibold text-navy-900">{t.suitableFor}</h4>
           <p className="mt-1 text-gray-700">{p.suitableFor.join(" · ")}</p>

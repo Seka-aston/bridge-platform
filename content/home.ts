@@ -220,8 +220,9 @@ export const finalCta = {
 };
 
 export const footer = {
-  // Spec 4.2.14. TODO: mission statement, contact details and social links must come from Bridge.
-  missionStatement: undefined as string | undefined,
+  // Spec 4.2.14. Mission statement: the live bridge.co.rw footer line (live copy).
+  // TODO: official social links must come from Bridge (never invented).
+  missionStatement: "Empowering the next generation of skilled professionals in Rwanda through training, mentorship, and career opportunities." as string | undefined,
   audienceLinks: header.nav,
   otherLinks: [
     { label: "About Bridge", href: "/about" },

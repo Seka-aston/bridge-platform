@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/Button";
 import { ProgressBar } from "@/components/dashboard/parts";
 import { studentText } from "@/content/dashboard";
-import { currentProject, lessonLog, nextConnection, upNext, weeklyGoal } from "@/data/student";
+import { currentProject, lessonLog, lessons, nextConnection, upNext, weeklyGoal } from "@/data/student";
 
 /*
   "What are you doing today?" from Aston's design. Learn (drawn in the design): weekly goal
@@ -118,7 +118,7 @@ export function TodayPanel({ firstName, coursesHref, passportHref, opportunities
                 <p className="font-bold text-navy-900">{upNext.title}</p>
               </div>
               <Link
-                href={`${coursesHref}#${upNext.courseId}`}
+                href={`${coursesHref}/${upNext.courseId}#lesson-${(lessons[upNext.courseId] ?? []).indexOf(upNext.title) + 1}`}
                 aria-label={t.startLesson.replace("{title}", upNext.title)}
                 className="inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-green-700 text-white hover:bg-green-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900"
               >

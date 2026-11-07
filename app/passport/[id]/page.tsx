@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Award, BadgeCheck } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/Badge";
+import { PassportGate } from "@/components/PassportGate";
 import { studentText } from "@/content/dashboard";
 import { certificates, passport, projects, skills } from "@/data/student";
 import { talentProfiles } from "@/data/talent";
@@ -31,6 +32,7 @@ export default async function PublicPassportPage({ params }: PageProps<"/passpor
 
   return (
     <main id="main" className="flex-1 bg-gray-50">
+      <PassportGate>
       <div className="mx-auto max-w-4xl px-gutter py-section-mobile md:py-section">
         <div className="rounded-panel bg-linear-to-br from-green-deep to-green-700 p-6 text-white md:p-10">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -86,6 +88,7 @@ export default async function PublicPassportPage({ params }: PageProps<"/passpor
           </ul>
         </section>
       </div>
+      </PassportGate>
     </main>
   );
 }

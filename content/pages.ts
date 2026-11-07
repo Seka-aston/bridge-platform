@@ -218,6 +218,7 @@ export const programmeDetail = {
   },
   applyTitle: "Apply for this programme", // NEW (Draft)
   detailsLabel: "Programme details", // NEW (Draft), screen-reader label
+  sessionNotFound: "This programme was created in a different browser tab, or the demo was reset.", // NEW (Draft)
 };
 
 // Application form. Labels marked live come from the live site's application flow.
@@ -338,16 +339,30 @@ export const bridgeAiPage = {
     cta: { label: "Book a Discovery Call", href: "/book-a-discovery-call" },
   },
 };
-export const impactPage = { trust };
-
-// ---------- Legal (no invented legal text) ----------
-
-export const legal = {
-  privacy: { title: "Privacy Policy" },
-  terms: { title: "Terms of Use" },
-  cookies: { title: "Cookie preferences" },
-  // NEW (Draft)
-  body: "This page will hold Bridge's official text. It is awaiting Bridge and has not been written for the prototype.",
+export const impactPage = {
+  trust,
+  // NEW (Draft): how stories will be gathered. Stories themselves stay as placeholders until
+  // Bridge supplies approved ones (content rule 1).
+  storiesProcess: {
+    title: "How Stories Are Shared",
+    supporting: "Every story on this page is real, shared with permission, and checked before it is published.",
+    steps: [
+      { title: "Share", description: "A learner, school or partner tells their story to the Bridge team, in their own words." },
+      { title: "Consent", description: "They agree in writing to what is published, including their name and photo, and can withdraw at any time." },
+      { title: "Check", description: "Bridge confirms any outcome mentioned, such as an internship or a verified skill, against its records." },
+      { title: "Publish", description: "The story is approved and published. Until then, this page shows a placeholder." },
+    ] as Block[],
+  },
+  // NEW (Draft), based on spec 4.2.10: every quantitative outcome needs a source, period and method.
+  reporting: {
+    title: "How We Report Outcomes",
+    supporting: "Every figure Bridge publishes about its impact comes with three things, so it can be checked.",
+    items: [
+      { title: "A source", description: "Where the number comes from, such as programme records or partner school data." },
+      { title: "A period", description: "The dates it covers, for example one programme intake or one calendar year." },
+      { title: "A method", description: "How it was counted, including what is included and what is not." },
+    ] as Block[],
+  },
 };
 
 export { finalCta };

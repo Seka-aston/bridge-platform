@@ -64,6 +64,12 @@ What to say once, at the start:
    - The January intake now shows as **Open** with an **Apply now** button.
 5. Optional: back in the admin dashboard, open **Reports**. The figures are labelled *Sample figures, not real data*. Each chart can be shown as a table.
 
+## Optional extras (if there's time)
+
+- **Course and lesson:** as Diane, press **Up next** on the overview. The lesson opens; **Mark as complete** moves the course progress.
+- **Messages:** as Grace (company), open Diane's application and send her a message. Switch to Diane: it's in **Messages**, with a notification.
+- **Privacy:** as Diane, open **Settings** and turn off the public passport link. Her passport page now says it's private, and companies no longer see her availability.
+
 ## Close
 
 > Everything you've seen runs on one shared set of sample data, so the story is the same whichever role you sign in as. Next steps are Bridge's real content: approved figures, programme dates, stories and official contact details. Then the decisions on hosting, booking, analytics and login.

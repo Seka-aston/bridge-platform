@@ -5,8 +5,7 @@ import { CourseCard, coursePercent } from "@/components/dashboard/student/Course
 import { studentText } from "@/content/dashboard";
 import type { Course } from "@/data/student";
 
-// All courses with an Active / Completed / All filter. Each card has an anchor id so
-// "Up next" and search results can jump straight to it.
+// All courses with an Active / Completed / All filter. Each card opens its course page.
 type Filter = "active" | "completed" | "all";
 
 export function CoursesBrowser({ items }: { items: Course[] }) {
@@ -32,8 +31,8 @@ export function CoursesBrowser({ items }: { items: Course[] }) {
       </div>
       <ul className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {items.filter(match).map((c) => (
-          <li key={c.id} id={c.id} className="scroll-mt-32">
-            <CourseCard course={c} href={`#${c.id}`} />
+          <li key={c.id}>
+            <CourseCard course={c} href={`/dashboard/student/courses/${c.id}`} />
           </li>
         ))}
       </ul>

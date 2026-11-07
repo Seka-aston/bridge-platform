@@ -1,5 +1,7 @@
 import { Search } from "lucide-react";
 import { Button } from "@/components/Button";
+import { SettingsView } from "@/components/dashboard/SettingsView";
+import { settingsText } from "@/content/dashboard";
 import { DashPageHeader } from "@/components/dashboard/parts";
 import { CompanyDataProvider } from "@/components/dashboard/company/CompanyData";
 import {
@@ -101,9 +103,19 @@ function ShortlistScreen() {
   );
 }
 
+function SettingsScreen() {
+  return (
+    <div className="space-y-6">
+      <DashPageHeader title={settingsText.title} description={settingsText.description} />
+      <SettingsView role="company" />
+    </div>
+  );
+}
+
 export const companyScreens: Record<string, () => React.ReactElement> = {
   talent: TalentScreen,
   opportunities: OpportunitiesScreen,
   applicants: ApplicantsScreen,
   shortlist: ShortlistScreen,
+  settings: SettingsScreen,
 };

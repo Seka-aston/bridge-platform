@@ -66,3 +66,19 @@ export function LiveProgrammeDetail({ programme, today }: { programme: Programme
   const p = useProgrammes([programme]).find((x) => x.id === programme.id) ?? programme;
   return <ProgrammeDetailView programme={p} status={programmeStatus(p, today)} />;
 }
+
+// Page for a programme created in the admin dashboard during this session (Checkpoint 13).
+// The server doesn't know it, so it is looked up in this browser tab's edits.
+export function SessionProgrammeDetail({ id, today, notFoundText }: { id: string; today: string; notFoundText: string }) {
+  const [p, setP] = useState<Programme | null | undefined>(undefined);
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- browser-only storage, read after mount
+  useEffect(() => setP(readJSON<Record<string, Programme>>(PROGRAMME_EDITS_STORE, {})[id] ?? null), [id]);
+  if (p === undefined) return <div className="min-h-screen" />;
+  if (p === null)
+    return (
+      <div className="mx-auto max-w-content px-gutter py-section-mobile md:py-section">
+        <h1 className="text-h2-mobile text-navy-900 md:text-h2">{notFoundText}</h1>
+      </div>
+    );
+  return <ProgrammeDetailView programme={p} status={programmeStatus(p, today)} />;
+}
