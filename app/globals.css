@@ -14,7 +14,8 @@
   --color-navy-900: #1c3d6a; /* Headings, dark sections, footer */
   --color-green-500: #3aaa6d; /* Brand green: icons, illustrations, large display text */
   --color-green-600: #2f8a58; /* Text on light-green backgrounds (see contrast note on preview page) */
-  --color-green-700: #277a4d; /* Proposed button and link colour (decision pending) */
+  --color-green-700: #277a4d; /* Buttons and text links (decided 7 Nov 2026) */
+  --color-green-800: #1f6340; /* Hover and pressed state for green buttons and links */
   --color-green-50: #ebf7f0; /* Light section backgrounds, secondary button fill */
   --color-gray-800: #1f2937; /* Body text */
   --color-gray-700: #374151; /* Secondary text, nav links */

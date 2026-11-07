@@ -34,14 +34,18 @@ Read this file with CLAUDE.md at the start of every session. Work on one checkpo
 ## Checkpoint 1: Design foundation
 
 - [x] Colour, type, spacing, radius and shadow tokens from CLAUDE.md section 4 (in `app/globals.css`; awaiting Aston's review)
-- [ ] `/components-preview` page showing the type scale, colours and buttons in every state (tokens and type done; buttons next)
+- [x] `/components-preview` page showing the type scale, colours and buttons in every state (awaiting Aston's review of buttons)
 - [ ] Logo added as SVG (waiting for the logo file from Aston)
 - [x] Remove the starter's automatic dark mode
 - [x] Replace the Next.js sample homepage and delete the sample images in `public/` (temporary placeholder homepage)
 - [ ] Add the meta description from the spec to `content/site.ts` (waiting for the spec text)
 
-Decisions raised in this checkpoint:
-- Green-600 text on green-50 is 3.9:1 and fails AA for normal text. CLAUDE.md uses this pair for the Secondary button; green-700 on green-50 (4.8:1) passes. Decide when building buttons.
+Decisions made in this checkpoint (Aston, 7 Nov 2026; recorded in CLAUDE.md):
+- Buttons and text links use green-700 #277A4D (brand green #3AAA6D failed contrast).
+- Secondary button text is green-700, not green-600 (green-600 on green-50 is 3.9:1 and failed).
+- New token green-800 #1F6340 for hover and pressed states.
+- Focus ring: 2px navy with a 2px gap on light backgrounds, 2px white on navy.
+- Aston approved the tokens and typography as built.
 - Mobile H1 set to 40px (the brief says 36–40px); line-height 1.0 as specified.
 - Shadows copied from the live site's cards (Tailwind `shadow-md` / `shadow-lg` values); card radius 12px matches the live site.
 
@@ -145,6 +149,13 @@ Built from Aston's existing student dashboard designs. Share Figma frames or scr
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-07 — Component 2: buttons
+- `components/Button.tsx`: Primary, Secondary, Ghost (on navy) and Text link variants; medium and large sizes; hover, pressed, keyboard focus and disabled states. Renders a link when given `href`, otherwise a button.
+- Added green-800 token. Secondary hover fill is green-500 at 15% (no new hex).
+- Buttons section added to the top of `/components-preview`, with every state side by side and "Try it" rows.
+- CLAUDE.md updated with the four button decisions.
+- Lint and build pass; checked at 375px and 1440px.
 
 ### 2026-11-07 — Component 1: design tokens and base typography
 - CLAUDE.md hosting row updated to Vercel.

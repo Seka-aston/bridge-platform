@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Check, X } from "lucide-react";
+import { Button, type ButtonVariant, type PreviewState } from "@/components/Button";
 
 // Internal review page for Aston. Not linked from the public navigation.
 export const metadata: Metadata = {
@@ -12,7 +13,8 @@ const colours = [
   { token: "navy-900", hex: "#1C3D6A", use: "Headings, dark sections, footer", swatch: "bg-navy-900" },
   { token: "green-500", hex: "#3AAA6D", use: "Brand green: icons, illustrations, large display text", swatch: "bg-green-500" },
   { token: "green-600", hex: "#2F8A58", use: "Text on light-green backgrounds", swatch: "bg-green-600" },
-  { token: "green-700", hex: "#277A4D", use: "Proposed button and link colour (decision pending)", swatch: "bg-green-700" },
+  { token: "green-700", hex: "#277A4D", use: "Buttons and text links", swatch: "bg-green-700" },
+  { token: "green-800", hex: "#1F6340", use: "Hover and pressed state for green buttons and links", swatch: "bg-green-800" },
   { token: "green-50", hex: "#EBF7F0", use: "Light section backgrounds, secondary button fill", swatch: "bg-green-50" },
   { token: "gray-800", hex: "#1F2937", use: "Body text", swatch: "bg-gray-800" },
   { token: "gray-700", hex: "#374151", use: "Secondary text, nav links", swatch: "bg-gray-700" },
@@ -31,6 +33,8 @@ const contrast = [
   { pair: "Green-700 on white", ratio: 5.3, sample: "bg-white text-green-700" },
   { pair: "White on green-700", ratio: 5.3, sample: "bg-green-700 text-white" },
   { pair: "Green-700 on green-50", ratio: 4.8, sample: "bg-green-50 text-green-700" },
+  { pair: "White on green-800", ratio: 7.2, sample: "bg-green-800 text-white" },
+  { pair: "Green-800 on secondary hover fill", ratio: 6.2, sample: "bg-green-500/15 text-green-800" },
   { pair: "Green-600 on white", ratio: 4.3, sample: "bg-white text-green-600" },
   { pair: "Green-600 on green-50", ratio: 3.9, sample: "bg-green-50 text-green-600" },
   { pair: "Green-500 on navy-900", ratio: 3.7, sample: "bg-navy-900 text-green-500" },
@@ -56,6 +60,106 @@ function Section({ title, intro, children }: { title: string; intro?: string; ch
       {intro && <p className="mt-3 max-w-3xl text-gray-700">{intro}</p>}
       <div className="mt-8">{children}</div>
     </section>
+  );
+}
+
+// Button labels are CTAs from CLAUDE.md section 6.
+const buttonStates: { label: string; state?: PreviewState; disabled?: boolean }[] = [
+  { label: "Rest" },
+  { label: "Hover", state: "hover" },
+  { label: "Pressed", state: "active" },
+  { label: "Keyboard focus", state: "focus" },
+  { label: "Disabled", disabled: true },
+];
+
+const lightVariants: { variant: ButtonVariant; name: string; note: string; label: string }[] = [
+  { variant: "primary", name: "Primary", note: "green-700 fill, white text. Hover and pressed: green-800.", label: "Join a Programme" },
+  { variant: "secondary", name: "Secondary", note: "green-50 fill, green-700 text. Hover and pressed: deeper fill, green-800 text.", label: "Hire Vetted Talent" },
+  { variant: "text", name: "Text link", note: "green-700 with arrow. Hover: green-800, underline, arrow nudges right.", label: "Book a Discovery Call" },
+];
+
+function StateRow({ variant, label, onDark = false }: { variant: ButtonVariant; label: string; onDark?: boolean }) {
+  return (
+    <ul className="flex flex-wrap items-end gap-x-8 gap-y-6">
+      {buttonStates.map((s) => (
+        <li key={s.label} className="flex flex-col items-start gap-3">
+          <Button variant={variant} previewState={s.state} disabled={s.disabled} onDark={onDark}>
+            {label}
+          </Button>
+          <span className={onDark ? "text-white" : "text-gray-500"}>{s.label}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function ButtonsSection() {
+  return (
+    <Section
+      title="Buttons"
+      intro="Component 2. Every variant in every state. The states are shown side by side; use the 'Try it' rows to hover, click and press Tab for real."
+    >
+      <div className="space-y-12">
+        {lightVariants.map((v) => (
+          <div key={v.variant}>
+            <h3 className="text-h3 text-navy-900">{v.name}</h3>
+            <p className="mb-6 text-gray-700">{v.note}</p>
+            <StateRow variant={v.variant} label={v.label} />
+          </div>
+        ))}
+
+        <div className="space-y-10 rounded-card bg-navy-900 p-6 md:p-10">
+          <div>
+            <h3 className="text-h3 text-white">Ghost on navy</h3>
+            <p className="mb-6 text-white">Transparent with a white border. Hover: faint white fill. Focus ring is white on navy.</p>
+            <StateRow variant="ghost" label="Partner with Bridge" onDark />
+          </div>
+          <div>
+            <h3 className="text-h3 text-white">Primary on navy</h3>
+            <p className="mb-6 text-white">For the final conversion band. Same button, with a white focus ring.</p>
+            <StateRow variant="primary" label="Join a Programme" onDark />
+          </div>
+          <p className="text-white">
+            Text links are not used on navy: green-700 on navy is too low in contrast. Use a ghost button instead.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="text-h3 text-navy-900">Sizes</h3>
+          <p className="mb-6 text-gray-700">Medium: 8 × 24px padding, 16px text. Large: 12 × 32px padding, 18px text.</p>
+          <ul className="flex flex-wrap items-end gap-x-8 gap-y-6">
+            {(["primary", "secondary", "text"] as const).map((variant) =>
+              (["md", "lg"] as const).map((size) => (
+                <li key={variant + size} className="flex flex-col items-start gap-3">
+                  <Button variant={variant} size={size}>
+                    Join a Programme
+                  </Button>
+                  <span className="text-gray-500">
+                    {variant} · {size === "md" ? "medium" : "large"}
+                  </span>
+                </li>
+              )),
+            )}
+          </ul>
+        </div>
+
+        <div className="rounded-card border border-gray-200 p-6">
+          <h3 className="text-h3 text-navy-900">Try it</h3>
+          <p className="mb-6 text-gray-700">
+            Hover, click, and press Tab to move between buttons. These buttons don&apos;t go anywhere.
+          </p>
+          <div className="flex flex-wrap items-center gap-4">
+            <Button variant="primary" size="lg">Join a Programme</Button>
+            <Button variant="secondary" size="lg">Hire Vetted Talent</Button>
+            <Button variant="text" size="lg">Book a Discovery Call</Button>
+          </div>
+          <div className="mt-6 flex flex-wrap items-center gap-4 rounded-card bg-navy-900 p-6">
+            <Button variant="primary" size="lg" onDark>Join a Programme</Button>
+            <Button variant="ghost" size="lg">Partner with Bridge</Button>
+          </div>
+        </div>
+      </div>
+    </Section>
   );
 }
 
@@ -88,10 +192,12 @@ export default function ComponentsPreview() {
         <p className="text-eyebrow uppercase text-green-700">Internal review page</p>
         <h1 className="mt-3 text-display-mobile text-navy-900 md:text-display">Design system preview</h1>
         <p className="mt-6 max-w-3xl text-body-lg text-gray-700">
-          Component 1: design tokens and base typography. Every value on this page comes from{" "}
+          Component 1: design tokens and base typography. Component 2: buttons. Every value on this page comes from{" "}
           <code className="font-mono text-body">app/globals.css</code>.
         </p>
       </header>
+
+      <ButtonsSection />
 
       <Section title="Colour" intro="The only colours available in the project. Tailwind's own palette is switched off.">
         <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">

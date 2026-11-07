@@ -46,8 +46,9 @@ Values below come from the live site. Define them as CSS variables and expose th
 |---|---|---|
 | `navy-900` | `#1C3D6A` | Headings, dark sections, footer |
 | `green-500` | `#3AAA6D` | Brand green: decorative use, icons, large display text, accents on white |
-| `green-600` | `#2F8A58` | Text on light-green backgrounds |
-| `green-700` | `#277A4D` | **Proposed** button and link colour (see accessibility note) |
+| `green-600` | `#2F8A58` | Large text and icons on light-green backgrounds only (3.9:1 on `green-50`, fails for normal text) |
+| `green-700` | `#277A4D` | Button and link colour (**decided**, see accessibility note) |
+| `green-800` | `#1F6340` | Hover and pressed state for green buttons and links |
 | `green-50` | `#EBF7F0` | Light section backgrounds, secondary button fill |
 | `gray-800` | `#1F2937` | Body text |
 | `gray-700` | `#374151` | Secondary text, nav links |
@@ -55,7 +56,7 @@ Values below come from the live site. Define them as CSS variables and expose th
 | `gray-200` | `#E5E7EB` | Borders, dividers |
 | `white` | `#FFFFFF` | Page background, text on navy |
 
-**Accessibility note (needs Aston's decision):** white text on `#3AAA6D` has a contrast ratio of about 2.9:1, and `#3AAA6D` text on white is the same. Both fail the WCAG AA minimum of 4.5:1 for normal text. The live site's buttons, "Learn More" links and eyebrow labels all use this combination. `green-700 #277A4D` reaches about 5.3:1 while staying close to the brand green. Until Aston decides, use `green-700` for buttons and text links and keep `green-500` for icons, illustrations and large display text.
+**Accessibility note (decided by Aston, 7 November 2026):** white text on `#3AAA6D` has a contrast ratio of about 2.9:1, and `#3AAA6D` text on white is the same. Both fail the WCAG AA minimum of 4.5:1 for normal text. The live site's buttons, "Learn More" links and eyebrow labels all use this combination. `green-700 #277A4D` reaches about 5.3:1 while staying close to the brand green. Use `green-700` for buttons and text links and keep `green-500` for icons, illustrations and large display text.
 
 Navy `#1C3D6A` on white is about 10.9:1, which is excellent.
 
@@ -83,12 +84,14 @@ Navy `#1C3D6A` on white is about 10.9:1, which is excellent.
 | Variant | Style |
 |---|---|
 | Primary | `green-700` fill, white text, semibold |
-| Secondary | `green-50` fill, `green-600` text |
+| Secondary | `green-50` fill, `green-700` text (`green-600` failed contrast) |
 | Ghost on navy | transparent, white border, white text |
 | Text link | `green-700` text with arrow icon |
 
 Sizes: medium (8px × 24px padding, 16px text) and large (12px × 32px, 18px text).
-Every interactive element needs **hover, focus-visible, active and disabled** states. Focus rings must be clearly visible on both white and navy backgrounds.
+Every interactive element needs **hover, focus-visible, active and disabled** states. Focus rings must be clearly visible on both white and navy backgrounds: 2px `navy-900` ring with a 2px gap on light backgrounds, 2px white ring on navy.
+
+Hover and pressed: green buttons and links turn `green-800`; the Secondary fill deepens to `green-500` at 15%; buttons move down 1px when pressed. The component is `components/Button.tsx`.
 
 ## 5. Content rules (non-negotiable)
 
@@ -156,7 +159,7 @@ Build each one in isolation on a `/components-preview` page first, so Aston can 
 | Item | Status |
 |---|---|
 | Typeface | **Decided:** Manrope |
-| Button green (`#3AAA6D` vs proposed `#277A4D`) | Aston to decide |
+| Button green (`#3AAA6D` vs proposed `#277A4D`) | **Decided:** `#277A4D` (green-700) |
 | Accent colour (if any) | Amber dropped; decide whether an accent is needed for badges |
 | Nav dropdown contents | Referenced as "shared in slides"; not yet supplied |
 | Booking tool for "Book a Discovery Call" | Not specified |
