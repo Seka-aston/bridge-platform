@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Bridge spec PDF (internal; kept out of the public repo)
+/Bridge 1.0.pdf

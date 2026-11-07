@@ -2,8 +2,10 @@
 
 export const site = {
   name: "Bridge",
-  // TODO: add the meta description from the spec PDF (section 4.2), copied exactly.
-  description: undefined as string | undefined,
+  // The spec has no meta description; this is the hero supporting statement (spec 4.2.3), copied exactly.
+  // At 173 characters, search results may cut off the end. Replace if Bridge supplies a shorter one.
+  description:
+    "Bridge connects TVET students and graduates to practical learning, verified skills, industry experience, and career opportunities through one intelligent employability ecosystem.",
 };
 
 // Temporary homepage shown until Checkpoint 3 assembles the real one.

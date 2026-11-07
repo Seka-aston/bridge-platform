@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Check, X } from "lucide-react";
 import { Button, type ButtonVariant, type PreviewState } from "@/components/Button";
 import { Logo } from "@/components/Logo";
+import { SectionHeading } from "@/components/SectionHeading";
+import { ecosystem, talent, trust, finalCta, howItWorks } from "@/content/home";
 
 // Internal review page for Aston. Not linked from the public navigation.
 export const metadata: Metadata = {
@@ -91,6 +93,44 @@ function StateRow({ variant, label, onDark = false }: { variant: ButtonVariant; 
         </li>
       ))}
     </ul>
+  );
+}
+
+function HeadingSection() {
+  return (
+    <Section
+      title="Section heading"
+      intro="Component 3. Eyebrow, title and supporting copy, using real copy from the spec. Shown left-aligned and centred, on white, light green and navy."
+    >
+      <div className="space-y-6">
+        <div className="rounded-card border border-gray-200 p-6 md:p-10">
+          <p className="mb-6 text-gray-500">Left · with eyebrow and supporting copy (Ecosystem, spec 4.2.5)</p>
+          <SectionHeading eyebrow={ecosystem.eyebrow} title={ecosystem.headline} supporting={ecosystem.supporting} />
+        </div>
+        <div className="rounded-card border border-gray-200 p-6 md:p-10">
+          <p className="mb-6 text-gray-500">Centred · with eyebrow and supporting copy (Talent discovery, spec 4.2.8)</p>
+          <SectionHeading eyebrow={talent.eyebrow} title={talent.headline} supporting={talent.supporting} align="center" />
+        </div>
+        <div className="rounded-card bg-green-50 p-6 md:p-10">
+          <p className="mb-6 text-gray-700">Left · no eyebrow, on green-50 (Trust, spec 4.2.4)</p>
+          <SectionHeading title={trust.heading} supporting={trust.supporting} />
+        </div>
+        <div className="rounded-card border border-gray-200 p-6 md:p-10">
+          <p className="mb-6 text-gray-500">Centred · title only (How Bridge works, spec 4.2.11)</p>
+          <SectionHeading title={howItWorks.headline} align="center" />
+        </div>
+        <div className="rounded-card bg-navy-900 p-6 md:p-10">
+          <p className="mb-6 text-white">Centred · on navy (Final conversion, spec 4.2.13). Eyebrows turn white on navy.</p>
+          <SectionHeading
+            eyebrow="Example eyebrow on navy"
+            title={finalCta.headline}
+            supporting={finalCta.supporting}
+            align="center"
+            tone="dark"
+          />
+        </div>
+      </div>
+    </Section>
   );
 }
 
@@ -236,10 +276,12 @@ export default function ComponentsPreview() {
         <p className="text-eyebrow uppercase text-green-700">Internal review page</p>
         <h1 className="mt-3 text-display-mobile text-navy-900 md:text-display">Design system preview</h1>
         <p className="mt-6 max-w-3xl text-body-lg text-gray-700">
-          The logo, component 1 (design tokens and base typography) and component 2 (buttons). Every value on this page comes from{" "}
+          Section heading (component 3), logo, buttons (component 2), and design tokens and typography (component 1). Newest first. Every value on this page comes from{" "}
           <code className="font-mono text-body">app/globals.css</code>.
         </p>
       </header>
+
+      <HeadingSection />
 
       <LogoSection />
 

@@ -38,7 +38,7 @@ Read this file with CLAUDE.md at the start of every session. Work on one checkpo
 - [x] Logo added as SVG (green, amber and white versions in `public/brand/`, shown with `components/Logo.tsx`)
 - [x] Remove the starter's automatic dark mode
 - [x] Replace the Next.js sample homepage and delete the sample images in `public/` (temporary placeholder homepage)
-- [ ] Add the meta description from the spec to `content/site.ts` (waiting for the spec text)
+- [x] Add the meta description from the spec to `content/site.ts` (spec has none; using the hero supporting statement, 173 characters)
 
 Decisions made in this checkpoint (Aston, 7 Nov 2026; recorded in CLAUDE.md):
 - Buttons and text links use green-700 #277A4D (brand green #3AAA6D failed contrast).
@@ -54,7 +54,15 @@ Decisions made in this checkpoint (Aston, 7 Nov 2026; recorded in CLAUDE.md):
 
 ## Checkpoint 2: Shared components
 
-- [ ] Section heading block (eyebrow, title, intro)
+- [x] Section heading block (eyebrow, title, intro) (`components/SectionHeading.tsx`; awaiting Aston's review)
+
+Spec notes (from `Bridge 1.0.pdf`, kept out of git because the repo is public):
+- All homepage copy is now in `content/home.ts`, copied exactly from spec 4.2. Link destinations are placeholder routes until Checkpoint 5.
+- Spec 4.2.13 asks for "a visually strong green section" for the final conversion band; CLAUDE.md says navy with green accents. Needs Aston's call.
+- Spec 4.2.2 suggests a transparent or integrated header over the hero where appropriate.
+- The hero eyebrow is written with a full stop in the spec ("THE FUTURE OF TVET EMPLOYABILITY."); the others have none.
+- Footer "Programmes and Resources" is treated as two links.
+- Analytics: spec 4.2.15 wants important actions trackable; no setup agreed yet.
 - [ ] Header with dropdowns and mobile menu
 - [ ] Footer
 - [ ] Cards: service, audience panel, programme (with automatic Open, Upcoming, Closed and Archived status), talent profile, article, testimonial
@@ -150,6 +158,14 @@ Built from Aston's existing student dashboard designs. Share Figma frames or scr
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-07 — Spec copy, meta description, section heading
+- Aston added the spec PDF. It is git-ignored so it stays out of the public repo.
+- `content/home.ts`: all homepage copy from spec 4.2, copied exactly (ligature characters in "Different", "Official" fixed). Stats marked as awaiting Bridge approval; footer mission, contact and social left empty for Bridge to supply.
+- Meta description set to the hero supporting statement (the spec has no separate one).
+- `components/SectionHeading.tsx` (component 3): eyebrow, title, supporting copy; left or centred; light or navy tone; H1 or H2. Eyebrows turn white on navy for contrast.
+- Section heading examples added to the top of `/components-preview`.
+- Checkpoint 1 complete.
 
 ### 2026-11-07 — Logo
 - Added Aston's three logo versions (green, amber, white wordmark), first as PNGs, then replaced with his SVG exports copied exactly; PNGs removed.
