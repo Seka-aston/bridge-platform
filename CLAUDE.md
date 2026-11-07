@@ -54,6 +54,10 @@ Values below come from the live site. Define them as CSS variables and expose th
 | `gray-700` | `#374151` | Secondary text, nav links |
 | `gray-500` | `#6B7280` | Captions, metadata |
 | `gray-200` | `#E5E7EB` | Borders, dividers |
+| `gray-50` | `#F4F6F5` | Dashboard page background (from Aston's dashboard design) |
+| `green-deep` | `#027A48` | Logo green: course tiles, passport gradient start (white text 5.4:1) |
+| `amber-500` | `#F8AC36` | Logo amber, **decorative accent**: rank chip, notification dot. Navy text only (5.7:1) |
+| `amber-600` | `#D58916` | Course tile colour, **decoration only** (white text fails, 2.8:1) |
 | `white` | `#FFFFFF` | Page background, text on navy |
 
 **Accessibility note (decided by Aston, 7 November 2026):** white text on `#3AAA6D` has a contrast ratio of about 2.9:1, and `#3AAA6D` text on white is the same. Both fail the WCAG AA minimum of 4.5:1 for normal text. The live site's buttons, "Learn More" links and eyebrow labels all use this combination. `green-700 #277A4D` reaches about 5.3:1 while staying close to the brand green. Use `green-700` for buttons and text links and keep `green-500` for icons, illustrations and large display text.
@@ -87,6 +91,7 @@ Navy `#1C3D6A` on white is about 10.9:1, which is excellent.
 | Primary | `green-700` fill, white text, semibold |
 | Secondary | `green-50` fill, `green-700` text (`green-600` failed contrast) |
 | Outline | white fill, `green-700` border and text. Secondary actions on light-green backgrounds, where the Secondary fill disappears (added 7 Nov 2026, Checkpoint 5) |
+| Navy | `navy-900` fill, white text. Dashboard actions such as "Apply" (Aston's dashboard design) |
 | Ghost on navy | transparent, white border, white text |
 | Text link | `green-700` text with arrow icon |
 
@@ -162,7 +167,7 @@ Build each one in isolation on a `/components-preview` page first, so Aston can 
 |---|---|
 | Typeface | **Decided:** Manrope |
 | Button green (`#3AAA6D` vs proposed `#277A4D`) | **Decided:** `#277A4D` (green-700) |
-| Accent colour (if any) | Amber dropped; decide whether an accent is needed for badges |
+| Accent colour (if any) | Amber returns as a decorative accent in the dashboards (Aston's design, 7 Nov 2026); not used for text on white or for badges |
 | Nav dropdown contents | Referenced as "shared in slides"; not yet supplied |
 | Booking tool for "Book a Discovery Call" | Not specified |
 | Programme data source | Prototype: shared sample data in `/data`. Real source not specified. |

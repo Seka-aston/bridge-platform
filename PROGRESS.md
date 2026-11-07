@@ -121,11 +121,13 @@ Built and self-tested; awaiting Aston's review.
 
 ## Checkpoint 7: Student dashboard
 
-- [ ] Overview: progress, next tasks, recommended opportunities
-- [ ] Courses and assignments
-- [ ] Skills Passport (skills, project evidence, verification status, certificates, shareable view)
-- [ ] Opportunities and application tracking
-- [ ] Bridge AI shown as a labelled preview only
+- [x] Overview: progress, next tasks, recommended opportunities (built from Aston's design)
+- [x] Courses and assignments
+- [x] Skills Passport (skills, project evidence, verification status, certificates, shareable view)
+- [x] Opportunities and application tracking
+- [x] Bridge AI shown as a labelled preview only
+
+Built and self-tested; awaiting Aston's review.
 
 Built from Aston's existing student dashboard designs. Share Figma frames or screenshots before this checkpoint starts.
 
@@ -170,6 +172,18 @@ Built from Aston's existing student dashboard designs. Share Figma frames or scr
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-07 — Checkpoint 7: student dashboard (Aston's design)
+- Aston supplied the student dashboard design. Decisions: his frame (top pill menu, white icon rail, grey-green background) for all four roles, replacing the navy sidebar; sample employers and matched skills in words instead of real company names, logos and match percentages (content rules 1 and 4); design colours kept accessible (green buttons use green-700, navy "Apply" buttons, amber back as a decorative accent, new grey-green background and deep-green tokens); every control works with sample data.
+- New tokens: gray-50, green-deep, amber-500, amber-600, text-panel (26px panel titles), radius-tile (16px), radius-panel (28px). CLAUDE.md colour and button tables updated. Passport gradient ends at green-700 (not brand green) so white text passes; module chips sit on a navy overlay so white text passes on amber.
+- Button: `shape="pill"` and a Navy variant.
+- New frame `DashboardShell` for all roles: search dialog (focuses the field), notifications menu, account menu, icon rail with tooltips and accessible names, mobile menu dialog.
+- Student screens: overview (courses, Skills Passport card with rank labelled as sample, opportunities, "what are you doing today?" with Build / Learn / Connect tabs, weekly goal ring, up next, date-range selector that updates completed lessons), Courses (filter), Assignments (filter, drawer, submit), Resources, Opportunities (apply dialog + application tracker that also shows programme applications from the website), Skills Passport (skills with verifier and evidence, projects, certificates, Add New Skill, copy shareable link), Bridge AI preview. Messages and Settings show "not in the prototype yet".
+- Public shareable passport at `/passport/BR-2026-0417`: verified skills, projects, certificates only; never contact details.
+- Sample data: `data/student.ts`, `data/opportunities.ts` (incl. notifications); Diane M.'s public skills aligned with the design's back-end story.
+- Tested: crawl from sign-in (44 pages, no dead ends); axe 0 issues on 13 screens at 1440, 1024 and 375px; no sideways scrolling at 375, 1024, 1280, 1440 for all roles; date range (25 / 16 / 7 lessons); tabs with arrow keys; search; notifications; apply → Applied → tracker; assignment error and submit; Add New Skill auto-opens from #add; public passport has no email or phone.
+- Fixed during testing: page overflow at 1024–1440 (grid columns, top-bar width), cramped table (Match merged into Skills), 2×2 course grid at 1440, search box not taking focus.
+- Left in place for Aston's decision: `components/dashboard/StudentApplications.tsx` (unused, replaced by ApplicationsTracker) and `studentCourses` in `data/dashboard.ts` (unused).
 
 ### 2026-11-07 — Checkpoint 6: platform shell
 - Decisions (Aston): navy dashboard sidebar; delete the unused placeholder-page template (`app/[slug]`, `content/placeholders.ts`), done.

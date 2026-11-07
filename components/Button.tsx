@@ -17,7 +17,7 @@ import type { ReactNode } from "react";
   (hover, pressed, focus) without the mouse or keyboard.
 */
 
-export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "text" | "textOnDark";
+export type ButtonVariant = "primary" | "secondary" | "outline" | "navy" | "ghost" | "text" | "textOnDark";
 export type ButtonSize = "md" | "lg";
 export type PreviewState = "hover" | "active" | "focus";
 
@@ -30,18 +30,21 @@ type ButtonProps = {
   type?: "button" | "submit";
   disabled?: boolean;
   onDark?: boolean;
+  // "pill" = fully rounded, as in Aston's dashboard design. Default 8px corners.
+  shape?: "default" | "pill";
   previewState?: PreviewState;
   className?: string;
 };
 
 const base =
-  "group inline-flex items-center justify-center gap-2 rounded-control font-semibold transition-[color,background-color,transform] duration-150 select-none";
+  "group inline-flex items-center justify-center gap-2 font-semibold transition-[color,background-color,transform] duration-150 select-none";
 
 // Padding is left off text buttons so they line up with body copy.
 const sizes: Record<ButtonVariant, Record<ButtonSize, string>> = {
   primary: { md: "border px-6 py-2 text-body", lg: "border px-8 py-3 text-lg" },
   secondary: { md: "border px-6 py-2 text-body", lg: "border px-8 py-3 text-lg" },
   outline: { md: "border px-6 py-2 text-body", lg: "border px-8 py-3 text-lg" },
+  navy: { md: "border px-6 py-2 text-body", lg: "border px-8 py-3 text-lg" },
   ghost: { md: "border px-6 py-2 text-body", lg: "border px-8 py-3 text-lg" },
   // -mx-1 px-1 gives the focus ring room without shifting the link's alignment.
   text: { md: "-mx-1 px-1 text-body", lg: "-mx-1 px-1 text-lg" },
@@ -66,6 +69,12 @@ const looks: Record<ButtonVariant, { enabled: string; disabled: string }> = {
       "border-green-700 bg-white text-green-700 hover:bg-green-50 hover:text-green-800 active:bg-green-50 active:text-green-800 data-[preview-state=hover]:bg-green-50 data-[preview-state=hover]:text-green-800 data-[preview-state=active]:bg-green-50 data-[preview-state=active]:text-green-800",
     disabled: "border-gray-200 bg-gray-200 text-gray-500",
   },
+  // Navy action button from Aston's dashboard design ("Apply"). White on navy 10.9:1; hover lightens slightly.
+  navy: {
+    enabled:
+      "border-transparent bg-navy-900 text-white hover:bg-navy-900/85 active:bg-navy-900/85 data-[preview-state=hover]:bg-navy-900/85 data-[preview-state=active]:bg-navy-900/85",
+    disabled: "border-transparent bg-gray-200 text-gray-500",
+  },
   ghost: {
     enabled:
       "border-white bg-transparent text-white hover:bg-white/10 active:bg-white/20 data-[preview-state=hover]:bg-white/10 data-[preview-state=active]:bg-white/20",
@@ -89,6 +98,7 @@ const press: Record<ButtonVariant, string> = {
   primary: "active:translate-y-px data-[preview-state=active]:translate-y-px",
   secondary: "active:translate-y-px data-[preview-state=active]:translate-y-px",
   outline: "active:translate-y-px data-[preview-state=active]:translate-y-px",
+  navy: "active:translate-y-px data-[preview-state=active]:translate-y-px",
   ghost: "active:translate-y-px data-[preview-state=active]:translate-y-px",
   text: "",
   textOnDark: "",
@@ -108,12 +118,14 @@ export function Button({
   type = "button",
   disabled = false,
   onDark = false,
+  shape = "default",
   previewState,
   className = "",
 }: ButtonProps) {
   const dark = onDark || variant === "ghost" || variant === "textOnDark";
   const classes = [
     base,
+    variant === "text" || variant === "textOnDark" ? "" : shape === "pill" ? "rounded-full" : "rounded-control",
     sizes[variant][size],
     disabled ? `${looks[variant].disabled} cursor-not-allowed` : `${looks[variant].enabled} ${press[variant]}`,
     dark ? focusDark : focusLight,

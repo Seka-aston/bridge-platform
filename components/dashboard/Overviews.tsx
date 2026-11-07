@@ -1,17 +1,17 @@
-import { BadgeCheck, BookOpen, CalendarClock, Clock, FileCheck2, FolderCheck, Gauge, Hourglass, ListChecks, Send, Star, Users } from "lucide-react";
+import { BadgeCheck, BookOpen, CalendarClock, Clock, FileCheck2, Gauge, Hourglass, Star, Users } from "lucide-react";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { Badge } from "@/components/Badge";
 import { ProgrammeCard, StatusPill } from "@/components/ProgrammeCard";
 import { AdminProgrammeTable } from "@/components/dashboard/AdminProgrammeTable";
 import { CompanyTalentTable } from "@/components/dashboard/CompanyTalentTable";
-import { ApplicationCount, StudentApplications } from "@/components/dashboard/StudentApplications";
+import { StudentOverview } from "@/components/dashboard/student/StudentScreens";
 import { DashPageHeader, DataTable, EmptyState, ListItem, Panel, ProgressBar, StatCard, StatGrid } from "@/components/dashboard/parts";
 import { footer, trust } from "@/content/home";
 import { overviewText, roleText } from "@/content/dashboard";
 import { talentCardText } from "@/content/ui";
 import { articles } from "@/data/articles";
-import { learnerProgress, studentCourses } from "@/data/dashboard";
+import { learnerProgress } from "@/data/dashboard";
 import { programmes } from "@/data/programmes";
 import { stories } from "@/data/stories";
 import { talentProfiles } from "@/data/talent";
@@ -27,57 +27,13 @@ function welcome(role: Role) {
   return roleText[role].welcome.replace("{name}", sampleUsers[role].name.split(" ")[0]);
 }
 
-async function OpenProgrammeCount() {
-  await connection();
-  const today = todayInKigali();
-  return <>{programmes.filter((p) => programmeStatus(p, today) === "open").length}</>;
-}
-
-function StudentOverview() {
-  const t = overviewText.student;
-  const me = talentProfiles.find((p) => p.id === sampleUsers.student.talentId)!;
-  return (
-    <div className="space-y-8">
-      <DashPageHeader title={welcome("student")} description={sampleUsers.student.detail} />
-      <StatGrid>
-        <StatCard label={t.stats.skills} value={me.skills.length} icon={ListChecks} />
-        <StatCard label={t.stats.evidence} value={me.projectEvidence.length} icon={FolderCheck} />
-        <StatCard
-          label={t.stats.openProgrammes}
-          value={
-            <Suspense fallback="–">
-              <OpenProgrammeCount />
-            </Suspense>
-          }
-          icon={CalendarClock}
-        />
-        <StatCard label={t.stats.applications} value={<ApplicationCount />} icon={Send} />
-      </StatGrid>
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Panel title={t.coursesTitle} id="courses-title">
-          <ul className="space-y-5">
-            {studentCourses.map((c) => (
-              <li key={c.id}>
-                <ProgressBar label={c.title} value={c.progress} />
-              </li>
-            ))}
-          </ul>
-        </Panel>
-        <Panel title={t.applicationsTitle} id="applications-title">
-          <StudentApplications />
-        </Panel>
-      </div>
-    </div>
-  );
-}
-
 function SchoolOverview() {
   const t = overviewText.school;
   const verified = talentProfiles.filter((p) => p.verification === "verified").length;
   const avg = Math.round(talentProfiles.reduce((s, p) => s + (learnerProgress[p.id] ?? 0), 0) / talentProfiles.length);
   return (
     <div className="space-y-8">
-      <DashPageHeader title={welcome("school")} description={sampleUsers.school.detail} />
+      <DashPageHeader large title={welcome("school")} description={sampleUsers.school.detail} />
       <StatGrid>
         <StatCard label={t.stats.learners} value={talentProfiles.length} icon={Users} />
         <StatCard label={t.stats.verified} value={verified} icon={BadgeCheck} />
@@ -122,7 +78,7 @@ function CompanyOverview() {
   const t = overviewText.company;
   return (
     <div className="space-y-8">
-      <DashPageHeader title={welcome("company")} description={sampleUsers.company.detail} />
+      <DashPageHeader large title={welcome("company")} description={sampleUsers.company.detail} />
       <StatGrid>
         <StatCard label={t.stats.profiles} value={talentProfiles.length} icon={Users} />
         <StatCard label={t.stats.verified} value={talentProfiles.filter((p) => p.verification === "verified").length} icon={BadgeCheck} />
@@ -190,7 +146,7 @@ function AdminOverview() {
   ];
   return (
     <div className="space-y-8">
-      <DashPageHeader title={welcome("admin")} description={sampleUsers.admin.detail} />
+      <DashPageHeader large title={welcome("admin")} description={sampleUsers.admin.detail} />
       <Suspense fallback={<div className="min-h-96" />}>
         <AdminProgrammes />
       </Suspense>

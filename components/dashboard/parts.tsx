@@ -7,26 +7,53 @@ import { Button } from "@/components/Button";
   Interactive pieces (drawer, filters) live in their own client files.
 */
 
-export function DashPageHeader({ title, description, actions }: { title: string; description?: string; actions?: ReactNode }) {
+export function DashPageHeader({
+  title,
+  description,
+  actions,
+  large = false,
+}: {
+  title: ReactNode;
+  description?: ReactNode;
+  actions?: ReactNode;
+  large?: boolean; // the overview's big welcome line
+}) {
   return (
-    <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <div className="flex flex-col gap-4 px-1 md:flex-row md:items-end md:justify-between">
       <div>
-        <h1 className="text-h2-mobile text-navy-900 md:text-h2">{title}</h1>
-        {description && <p className="mt-2 max-w-2xl text-gray-700">{description}</p>}
+        <h1 className={`text-navy-900 ${large ? "text-display-mobile md:text-display" : "text-h2-mobile md:text-h2"}`}>{title}</h1>
+        {description && <p className={`mt-2 max-w-2xl text-gray-700 ${large ? "text-body-lg" : ""}`}>{description}</p>}
       </div>
-      {actions && <div className="flex shrink-0 gap-3">{actions}</div>}
+      {actions && <div className="flex shrink-0 flex-wrap gap-3">{actions}</div>}
     </div>
   );
 }
 
 // A titled white panel that groups a table, list or chart.
-export function Panel({ title, id, children, action }: { title: string; id: string; children: ReactNode; action?: ReactNode }) {
+export function Panel({
+  title,
+  id,
+  children,
+  action,
+  subtitle,
+  className = "",
+}: {
+  title: string;
+  id: string;
+  children: ReactNode;
+  action?: ReactNode;
+  subtitle?: ReactNode;
+  className?: string;
+}) {
   return (
-    <section aria-labelledby={id} className="rounded-card border border-gray-200 bg-white p-5 md:p-6">
-      <div className="mb-5 flex items-center justify-between gap-4">
-        <h2 id={id} className="text-h3 text-navy-900">
-          {title}
-        </h2>
+    <section aria-labelledby={id} className={`min-w-0 rounded-panel bg-white p-5 md:p-8 ${className}`}>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h2 id={id} className="text-h3 text-navy-900 md:text-panel">
+            {title}
+          </h2>
+          {subtitle && <p className="mt-1 text-gray-700">{subtitle}</p>}
+        </div>
         {action}
       </div>
       {children}
@@ -36,7 +63,7 @@ export function Panel({ title, id, children, action }: { title: string; id: stri
 
 export function StatCard({ label, value, icon: Icon, hint }: { label: string; value: ReactNode; icon: LucideIcon; hint?: string }) {
   return (
-    <div className="rounded-card border border-gray-200 bg-white p-5">
+    <div className="rounded-panel bg-white p-6">
       <div className="flex items-center justify-between gap-3">
         <p className="font-semibold text-gray-700">{label}</p>
         <span className="inline-flex size-9 items-center justify-center rounded-control bg-green-50">
@@ -92,7 +119,7 @@ export function EmptyState({
   action?: { label: string; href: string };
 }) {
   return (
-    <div className="flex flex-col items-center rounded-card border border-dashed border-gray-500 px-6 py-12 text-center">
+    <div className="flex flex-col items-center rounded-panel border border-dashed border-gray-500 bg-white px-6 py-12 text-center">
       <span className="inline-flex size-12 items-center justify-center rounded-full bg-green-50">
         <Icon aria-hidden className="size-6 text-green-700" />
       </span>
@@ -100,7 +127,7 @@ export function EmptyState({
       <p className="mt-2 max-w-md text-gray-700">{body}</p>
       {action && (
         <div className="mt-6">
-          <Button href={action.href} variant="outline">
+          <Button href={action.href} variant="outline" shape="pill">
             {action.label}
           </Button>
         </div>

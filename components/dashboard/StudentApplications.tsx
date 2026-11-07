@@ -3,15 +3,19 @@
 import { Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { EmptyState, ListItem } from "@/components/dashboard/parts";
-import { overviewText } from "@/content/dashboard";
+import { studentText } from "@/content/dashboard";
 import { readSession } from "@/lib/prototypeStore";
 
 /*
-  Connected journey (first step): applications submitted on the public site during this
+  UNUSED since Checkpoint 7 (replaced by student/ApplicationsTracker). Kept until Aston
+  approves deleting it. Connected journey (first step): applications submitted on the public site during this
   browser session appear on the student dashboard. Read from session storage after mount.
 */
 
-const t = overviewText.student;
+const t = {
+  applicationsEmpty: studentText.opportunitiesPage.applicationsEmpty,
+  appliedOn: studentText.opportunitiesPage.appliedOn,
+};
 type Saved = { programmeId: string; programmeName: string; savedAt: string };
 
 export function useSessionApplications() {

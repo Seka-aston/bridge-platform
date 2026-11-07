@@ -22,7 +22,7 @@ export const talentProfiles: TalentProfile[] = [
     name: "Diane M.",
     discipline: "Software Development",
     level: "TVET Level 5 graduate",
-    skills: ["JavaScript", "React", "REST APIs", "Git"],
+    skills: ["Node.js", "REST APIs", "SQL", "Git"],
     projectEvidence: ["Inventory app for a local cooperative", "School attendance tracker"],
     verification: "verified",
     experience: "6-month internship as a junior web developer",

@@ -21,6 +21,12 @@
   --color-gray-700: #374151; /* Secondary text, nav links */
   --color-gray-500: #6b7280; /* Captions, metadata */
   --color-gray-200: #e5e7eb; /* Borders, dividers */
+  --color-gray-50: #f4f6f5; /* Dashboard page background (Aston's dashboard design) */
+
+  /* From Aston's student dashboard design (7 Nov 2026). Decorative accents, see notes. */
+  --color-green-deep: #027a48; /* Course tiles, passport gradient start (logo green). White text 5.4:1 */
+  --color-amber-500: #f8ac36; /* Rank chip (logo amber). Navy text only (5.7:1) */
+  --color-amber-600: #d58916; /* Course tile, decoration only: white text fails (2.8:1) */
 
   /* ---------- Type scale ----------
      Sizes from the live site; review once Manrope is in place. */
@@ -44,6 +50,10 @@
   --text-h3--line-height: 1.75rem;
   --text-h3--font-weight: 700;
 
+  --text-panel: 1.625rem; /* 26px, dashboard panel titles (dashboard design) */
+  --text-panel--line-height: 1.2;
+  --text-panel--font-weight: 700;
+
   --text-eyebrow: 0.8125rem; /* 13px, uppercase labels */
   --text-eyebrow--line-height: 1.25rem;
   --text-eyebrow--font-weight: 700;
@@ -58,6 +68,8 @@
   /* ---------- Shape ---------- */
   --radius-control: 8px; /* Buttons, inputs, small elements */
   --radius-card: 12px; /* Cards (matches the live site's service cards) */
+  --radius-tile: 16px; /* Dashboard tiles and inner cards (dashboard design) */
+  --radius-panel: 28px; /* Dashboard panels and top bar (dashboard design) */
 
   /* ---------- Shadows ----------
      Copied from the live site: soft, neutral, minimal. */

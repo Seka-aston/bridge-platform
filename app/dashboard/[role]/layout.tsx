@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { roleText } from "@/content/dashboard";
 import { roles, sampleUsers, type Role } from "@/data/users";
+import { notificationsFor, searchItemsFor } from "@/lib/dashboardSearch";
 
 export function generateStaticParams() {
   return roles.map((role) => ({ role }));
@@ -15,7 +16,10 @@ export default async function RoleLayout({ children, params }: LayoutProps<"/das
   if (!roles.includes(role as Role)) notFound();
   const r = role as Role;
   return (
-    <DashboardShell base={`/dashboard/${r}`} title={roleText[r].title} roleLabel={roleText[r].label} user={sampleUsers[r]} nav={roleText[r].nav}>
+    <DashboardShell base={`/dashboard/${r}`} title={roleText[r].title} roleLabel={roleText[r].label} user={sampleUsers[r]} nav={roleText[r].nav}
+      searchItems={searchItemsFor(r)}
+      notifications={notificationsFor(r)}
+    >
       {children}
     </DashboardShell>
   );
