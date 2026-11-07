@@ -32,9 +32,13 @@
   --text-display-mobile--line-height: 1;
   --text-display-mobile--font-weight: 800;
 
-  --text-h2: 2.25rem; /* 36px, section titles */
+  --text-h2: 2.25rem; /* 36px, section titles from 768px up */
   --text-h2--line-height: 1.1;
   --text-h2--font-weight: 800;
+
+  --text-h2-mobile: 1.875rem; /* 30px, section titles on mobile */
+  --text-h2-mobile--line-height: 1.1;
+  --text-h2-mobile--font-weight: 800;
 
   --text-h3: 1.25rem; /* 20px, card titles */
   --text-h3--line-height: 1.75rem;

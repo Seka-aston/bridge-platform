@@ -49,7 +49,8 @@ const contrast = [
 const typeStyles = [
   { token: "display", spec: "60px · 800 · line-height 1.0 (desktop H1)", className: "text-display text-navy-900", sample: "From Technical Skills to Real-World Opportunity." },
   { token: "display-mobile", spec: "40px · 800 · line-height 1.0 (mobile H1)", className: "text-display-mobile text-navy-900", sample: "From Technical Skills to Real-World Opportunity." },
-  { token: "h2", spec: "36px · 800 · line-height 1.1", className: "text-h2 text-navy-900", sample: "More Than Learning. A Pathway to Opportunity." },
+  { token: "h2", spec: "36px · 800 · line-height 1.1 (from 768px)", className: "text-h2 text-navy-900", sample: "More Than Learning. A Pathway to Opportunity." },
+  { token: "h2-mobile", spec: "30px · 800 · line-height 1.1 (mobile)", className: "text-h2-mobile text-navy-900", sample: "More Than Learning. A Pathway to Opportunity." },
   { token: "h3", spec: "20px · 700 · line-height 28px", className: "text-h3 text-navy-900", sample: "Learn and Build" },
   { token: "eyebrow", spec: "13px · 700 · uppercase · letter-spacing 0.08em", className: "text-eyebrow uppercase text-green-700", sample: "The future of TVET employability" },
   { token: "body-lg", spec: "20px / 28px · 400", className: "text-body-lg text-gray-700", sample: "Bridge is an AI-powered employability ecosystem connecting TVET students and graduates in Rwanda with practical learning, verified skills, industry experience and career opportunities." },
@@ -59,7 +60,7 @@ const typeStyles = [
 function Section({ title, intro, children }: { title: string; intro?: string; children: React.ReactNode }) {
   return (
     <section className="border-t border-gray-200 py-section-mobile md:py-section">
-      <h2 className="text-h2 text-navy-900">{title}</h2>
+      <h2 className="text-h2-mobile text-navy-900 md:text-h2">{title}</h2>
       {intro && <p className="mt-3 max-w-3xl text-gray-700">{intro}</p>}
       <div className="mt-8">{children}</div>
     </section>

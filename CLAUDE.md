@@ -65,7 +65,8 @@ Navy `#1C3D6A` on white is about 10.9:1, which is excellent.
 - **Typeface: Manrope**, loaded with `next/font`. Set it in one place only, so it can be swapped later in a single change.
 - Type scale (from the live site; review once Manrope is in place):
   - Display / H1: 60px, weight 800, line-height 1.0 (mobile: 36–40px)
-  - H2 section titles: 36px, weight 800, line-height 1.1
+  - H2 section titles: 36px, weight 800, line-height 1.1 (mobile: 30px)
+  - Heading alignment: left-aligned by default; centred only for short, single-statement sections (e.g. How Bridge works, final conversion)
   - H3 card titles: 20px, weight 700
   - Eyebrow labels: 12–13px, weight 700, uppercase, letter-spacing 0.08em
   - Body large: 20px / 28px
@@ -120,7 +121,7 @@ These come directly from the spec and apply to every section.
 | 9 | **Impact and learner stories** | "Progress That Goes Beyond Graduation." · approved stories only · CTA Explore Bridge's Impact. |
 | 10 | **How Bridge works** | "One Connected Journey, from Learning to Opportunity." · 4 steps: Learn, Build, Demonstrate, Connect, with consistent icons · CTA Start Your Journey. Must not imply every student automatically goes through every stage. |
 | 11 | **Insights and resources** | "Ideas for the Future of Technical Talent." · article cards · CTA Explore Resources. |
-| 12 | **Final conversion** | "Let's Connect Technical Talent to Opportunity." · Join a Programme, Book a Discovery Call, Partner with Bridge link. Strong brand section (navy, with green accents). |
+| 12 | **Final conversion** | "Let's Connect Technical Talent to Opportunity." · Join a Programme, Book a Discovery Call, Partner with Bridge link. Strong brand section (navy, with green accents; the spec asks for green, Aston chose navy on 7 Nov 2026). |
 | 13 | **Footer** | Logo and mission line · audience links · About, Programmes and Resources · official contact details · official social links · Privacy Policy, Terms of Use, Cookie preferences. |
 
 Full copy for every section is in the spec PDF. Copy it exactly into the content files; do not rewrite it.
@@ -169,7 +170,7 @@ Build each one in isolation on a `/components-preview` page first, so Aston can 
 | Official social accounts | Awaiting Bridge (the live footer's GitHub icon looks like a template leftover) |
 | Analytics setup | Not specified |
 | Hosting and deployment | Prototype: Vercel (`bridge-platform-eovr`), auto-deployed from GitHub `main`. Final hosting not specified. |
-| Bridge sign-off on navy-and-green instead of the spec's emerald hero | Aston to confirm with Bridge |
+| Bridge sign-off on navy-and-green instead of the spec's emerald hero and green final section | Aston to confirm with Bridge |
 
 ## 10. Definition of done (from spec 4.2.16)
 

@@ -58,7 +58,9 @@ Decisions made in this checkpoint (Aston, 7 Nov 2026; recorded in CLAUDE.md):
 
 Spec notes (from `Bridge 1.0.pdf`, kept out of git because the repo is public):
 - All homepage copy is now in `content/home.ts`, copied exactly from spec 4.2. Link destinations are placeholder routes until Checkpoint 5.
-- Spec 4.2.13 asks for "a visually strong green section" for the final conversion band; CLAUDE.md says navy with green accents. Needs Aston's call.
+- Spec 4.2.13 asks for "a visually strong green section" for the final conversion band; Aston chose navy with green accents (7 Nov 2026). Bridge sign-off still needed.
+- Decided 7 Nov 2026 (Aston accepted Claude's recommendations): H2 is 30px on mobile, 36px from 768px; headings left-aligned by default, centred only for short single-statement sections; hero eyebrow's full stop dropped.
+- Live bridge.co.rw nav is Home · About (About Us, Success Stories, Partnerships, Resources) · Programs · Bridge Ventures Lab · Bridge AI · Contact. It has no audience menus, so the spec's dropdown contents are still unknown. Live header: sticky, 80px tall, 48px logo.
 - Spec 4.2.2 suggests a transparent or integrated header over the hero where appropriate.
 - The hero eyebrow is written with a full stop in the spec ("THE FUTURE OF TVET EMPLOYABILITY."); the others have none.
 - Footer "Programmes and Resources" is treated as two links.

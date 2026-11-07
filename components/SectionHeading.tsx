@@ -2,7 +2,8 @@
   Section heading block (CLAUDE.md section 7, component 3).
   Eyebrow (optional), title, supporting copy (optional).
 
-  - align: "left" or "center"
+  - align: "left" (default for most homepage sections) or "center" (short,
+    single-statement sections such as How Bridge works and the final band)
   - tone: "light" for white and light-green sections, "dark" for navy sections
   - level: "h2" for homepage sections (default), "h1" for a page's main title
   - id: set it on the title so the surrounding <section> can use aria-labelledby
@@ -42,7 +43,7 @@ export function SectionHeading({
       <Title
         id={id}
         className={`${eyebrow ? "mt-3" : ""} ${
-          level === "h1" ? "text-display-mobile md:text-display" : "text-h2"
+          level === "h1" ? "text-display-mobile md:text-display" : "text-h2-mobile md:text-h2"
         } ${dark ? "text-white" : "text-navy-900"} text-balance`}
       >
         {title}

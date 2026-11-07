@@ -16,8 +16,8 @@ export const header = {
 };
 
 export const hero = {
-  // Spec 4.2.3. The spec writes this eyebrow with a full stop; the others have none.
-  eyebrow: "THE FUTURE OF TVET EMPLOYABILITY.",
+  // Spec 4.2.3. The spec's full stop is dropped to match the other eyebrows (Aston, 7 Nov 2026).
+  eyebrow: "THE FUTURE OF TVET EMPLOYABILITY",
   headline: "From Technical Skills to Real-World Opportunity.",
   supporting:
     "Bridge connects TVET students and graduates to practical learning, verified skills, industry experience, and career opportunities through one intelligent employability ecosystem.",
