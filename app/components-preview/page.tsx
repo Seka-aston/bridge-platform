@@ -5,8 +5,22 @@ import { Logo } from "@/components/Logo";
 import { SectionHeading } from "@/components/SectionHeading";
 import { Header } from "@/components/Header";
 import { StatList } from "@/components/StatItem";
+import { Suspense } from "react";
+import { ServiceCard } from "@/components/ServiceCard";
+import { AudiencePanel } from "@/components/AudiencePanel";
+import { ProgrammeCards } from "@/components/ProgrammeCard";
+import { TalentCard } from "@/components/TalentCard";
+import { JourneySteps } from "@/components/JourneySteps";
+import { ArticleCard } from "@/components/ArticleCard";
+import { StoryCard } from "@/components/StoryCard";
+import { CtaBand } from "@/components/CtaBand";
+import { Footer } from "@/components/Footer";
+import { programmes as programmeData } from "@/data/programmes";
+import { talentProfiles } from "@/data/talent";
+import { articles } from "@/data/articles";
+import { stories } from "@/data/stories";
 import { Badge } from "@/components/Badge";
-import { ecosystem, talent, trust, finalCta, howItWorks, header, type NavItem } from "@/content/home";
+import { ecosystem, talent, trust, finalCta, howItWorks, header, pathways, type NavItem } from "@/content/home";
 
 // Internal review page for Aston. Not linked from the public navigation.
 export const metadata: Metadata = {
@@ -97,6 +111,97 @@ function StateRow({ variant, label, onDark = false }: { variant: ButtonVariant; 
         </li>
       ))}
     </ul>
+  );
+}
+
+function CardsSection() {
+  return (
+    <>
+      <Section title="Service card" intro="Component 6. The three ecosystem cards from spec 4.2.5. The fourth example shows the optional Coming soon badge.">
+        <ul className="grid gap-6 lg:grid-cols-3">
+          {ecosystem.cards.map((c) => (
+            <li key={c.title}>
+              <ServiceCard {...c} />
+            </li>
+          ))}
+        </ul>
+        <div className="mt-6 max-w-md">
+          <p className="mb-3 text-gray-500">Example only: how a not-yet-live feature would be labelled</p>
+          <ServiceCard {...ecosystem.cards[1]} comingSoon />
+        </div>
+      </Section>
+
+      <Section title="Audience panel" intro="Component 7. The four pathways from spec 4.2.6, two by two from tablet width.">
+        <ul className="grid gap-6 md:grid-cols-2">
+          {pathways.panels.map((p) => (
+            <li key={p.audience}>
+              <AudiencePanel {...p} />
+            </li>
+          ))}
+        </ul>
+      </Section>
+
+      <Section
+        title="Programme card"
+        intro="Component 8. Status is calculated from today's date in Kigali: Open, Upcoming, Closed or Archived. Closed and archived cards never show a deadline or an apply button. Bridge Ventures Lab is featured while it is open or upcoming. All dates are sample dates (Draft)."
+      >
+        <Suspense fallback={<p className="text-gray-500">Loading programmes…</p>}>
+          <ProgrammeCards programmes={programmeData} />
+        </Suspense>
+      </Section>
+
+      <Section title="Talent profile card" intro="Component 9. Illustrative profiles only, each labelled Sample profile. No photos, no match percentages. Eric N.'s card has no Availability row because he hasn't consented to share it.">
+        <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {talentProfiles.map((p) => (
+            <li key={p.id}>
+              <TalentCard profile={p} />
+            </li>
+          ))}
+        </ul>
+      </Section>
+
+      <Section title="Journey step" intro="Component 10. The four steps from spec 4.2.11. No arrows, so it doesn't imply every learner goes through every stage.">
+        <JourneySteps steps={howItWorks.steps} />
+      </Section>
+
+      <Section title="Article card" intro="Component 11. The two usable resources from the live site (Draft). Reading time is hidden because it can't be calculated yet. The whole card is clickable.">
+        <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {articles.map((a) => (
+            <li key={a.id}>
+              <ArticleCard article={a} />
+            </li>
+          ))}
+          <li>
+            <p className="mb-3 text-gray-500">Without image</p>
+            <ArticleCard article={articles[0]} showImage={false} />
+          </li>
+        </ul>
+      </Section>
+
+      <Section title="Story card" intro="Component 12. No approved stories exist yet, so this shows the bracketed placeholder (prototype mode only). Nothing is shown at launch until Bridge supplies approved stories.">
+        <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {stories.length > 0 ? (
+            stories.map((st) => (
+              <li key={st.id}>
+                <StoryCard story={st} />
+              </li>
+            ))
+          ) : (
+            <li>
+              <StoryCard />
+            </li>
+          )}
+        </ul>
+      </Section>
+
+      <Section title="CTA band" intro="Component 13. The final conversion section from spec 4.2.13: navy with green accents.">
+        <CtaBand {...finalCta} />
+      </Section>
+
+      <Section title="Footer" intro="Component 14. The real footer is at the bottom of this page. Contact details come from the live site (Draft); the mission statement and social links are awaiting Bridge.">
+        <p className="text-gray-700">Scroll to the end of the page to see it.</p>
+      </Section>
+    </>
   );
 }
 
@@ -354,10 +459,12 @@ export default function ComponentsPreview() {
         <p className="text-eyebrow uppercase text-green-700">Internal review page</p>
         <h1 className="mt-3 text-display-mobile text-navy-900 md:text-display">Design system preview</h1>
         <p className="mt-6 max-w-3xl text-body-lg text-gray-700">
-          Stat item and badges (component 5), header (component 4), section heading (component 3), logo, buttons (component 2), and design tokens and typography (component 1). Newest first. Every value on this page comes from{" "}
+          Components 6–14 (cards, journey, CTA band, footer), stat item and badges (component 5), header (component 4), section heading (component 3), logo, buttons (component 2), and design tokens and typography (component 1). Newest first. Every value on this page comes from{" "}
           <code className="font-mono text-body">app/globals.css</code>.
         </p>
       </header>
+
+      <CardsSection />
 
       <StatsSection />
 
@@ -465,6 +572,7 @@ export default function ComponentsPreview() {
         </ul>
       </Section>
     </main>
+    <Footer />
     </>
   );
 }

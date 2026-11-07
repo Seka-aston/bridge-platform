@@ -66,9 +66,11 @@ Spec notes (from `Bridge 1.0.pdf`, kept out of git because the repo is public):
 - Footer "Programmes and Resources" is treated as two links.
 - Analytics: spec 4.2.15 wants important actions trackable; no setup agreed yet.
 - [ ] Header with dropdowns and mobile menu (`components/Header.tsx` built and tested; awaiting Aston's review. Menu items are plain links until the dropdown contents from the slides arrive: add them as `children` in `content/home.ts`.)
-- [ ] Footer
-- [ ] Cards: service, audience panel, programme (with automatic Open, Upcoming, Closed and Archived status), talent profile, article, testimonial
-- [ ] Stat item, journey step, CTA band, badges ("Coming soon", "Sample profile", "Draft") (stat item and badges built, awaiting Aston's review; journey step and CTA band to come)
+- [x] Footer
+- [x] Cards: service, audience panel, programme (with automatic Open, Upcoming, Closed and Archived status), talent profile, article, testimonial
+- [x] Stat item, journey step, CTA band, badges ("Coming soon", "Sample profile", "Draft")
+
+All Checkpoint 2 components built and self-tested; awaiting Aston's single review of the whole checkpoint.
 
 **Aston reviews:** every component and state on the preview page, at desktop and mobile widths.
 
@@ -160,6 +162,16 @@ Built from Aston's existing student dashboard designs. Share Figma frames or scr
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-07 — Components 6–14 in one batch
+- Working style changed at Aston's request: whole checkpoints are built, then reviewed together (CLAUDE.md section 1 updated).
+- Sample data in `/data`: programmes (live-site names, descriptions and eligibility; SAMPLE dates chosen to show all four statuses), illustrative talent profiles, two articles from the live Resources section, and an empty stories list. All unapproved items show Draft.
+- `lib/programmes.ts`: status calculated from dates in Kigali time, at request time (not build time), so it changes on the right day without a redeploy.
+- New components: ServiceCard, AudiencePanel, ProgrammeCard (+ featured Ventures Lab layout), TalentCard, JourneySteps, ArticleCard, StoryCard (bracketed placeholder until approved stories exist), CtaBand (navy, green symbol accents), Footer (contact details from the live site marked Draft; mission and social links shown as placeholders), ImagePlaceholder.
+- Interface wording in `content/ui.ts`.
+- Not used on purpose: the live site's testimonials (look like template content) and its webinar resource (expired event described as upcoming).
+- Self-tested: type check, lint, build; screenshots at 375, 768 and 1440px; no sideways scrolling. Fixed during testing: audience panel button disappearing on its own background, programme card footer alignment, talent card header crowding.
+- Hero ecosystem visual stays in Checkpoint 4, as planned.
 
 ### 2026-11-07 — Component 5: stat item and badges
 - Header approved to continue; real dropdown contents to be added later.

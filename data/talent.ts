@@ -1,0 +1,56 @@
+// Shared sample talent profiles. ILLUSTRATIVE ONLY: these are not real people.
+// Every card shows a "Sample profile" label (CLAUDE.md content rule 4). No match percentages.
+// Disciplines come from the live site's internship tracks.
+// Availability is only shown when the learner has consented to share it.
+
+export type TalentProfile = {
+  id: string;
+  name: string;
+  discipline: string;
+  level: string;
+  skills: string[];
+  projectEvidence: string[];
+  verification: "verified" | "in-progress";
+  experience: string;
+  availability?: { consented: boolean; text: string };
+  suitableFor: string[];
+};
+
+export const talentProfiles: TalentProfile[] = [
+  {
+    id: "sample-1",
+    name: "Diane M.",
+    discipline: "Software Development",
+    level: "TVET Level 5 graduate",
+    skills: ["JavaScript", "React", "REST APIs", "Git"],
+    projectEvidence: ["Inventory app for a local cooperative", "School attendance tracker"],
+    verification: "verified",
+    experience: "6-month internship as a junior web developer",
+    availability: { consented: true, text: "Available from January 2027" },
+    suitableFor: ["Junior developer roles", "Software internships"],
+  },
+  {
+    id: "sample-2",
+    name: "Eric N.",
+    discipline: "Electrical Installation",
+    level: "TVET Level 5 student",
+    skills: ["Domestic wiring", "Solar PV installation", "Safety inspection"],
+    projectEvidence: ["Solar lighting installation for a training workshop"],
+    verification: "verified",
+    experience: "3-month placement with an installation contractor",
+    availability: { consented: false, text: "" },
+    suitableFor: ["Electrical internships", "Solar installation projects"],
+  },
+  {
+    id: "sample-3",
+    name: "Claudine I.",
+    discipline: "Wood Technology",
+    level: "TVET Level 4 student",
+    skills: ["Furniture design", "Joinery", "Technical drawing"],
+    projectEvidence: ["Classroom furniture set", "Workshop storage design"],
+    verification: "in-progress",
+    experience: "Workshop projects during training",
+    availability: { consented: true, text: "Open to internships" },
+    suitableFor: ["Workshop internships", "Industry projects"],
+  },
+];

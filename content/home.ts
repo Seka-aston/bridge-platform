@@ -61,6 +61,7 @@ export const ecosystem = {
     "Technical education is the beginning. Bridge helps learners build practical experience, demonstrate what they can do, connect with industry, and prepare for their next opportunity.",
   cards: [
     {
+      icon: "learn" as const,
       title: "Learn and Build",
       description:
         "Help learners strengthen their technical skills through structured training, practical projects, learning resources, and guided development.",
@@ -73,6 +74,7 @@ export const ecosystem = {
       cta: { label: "Explore Learning", href: "/learning" },
     },
     {
+      icon: "prove" as const,
       title: "Prove Your Skills",
       description:
         "Help students and graduates demonstrate their capabilities through the Bridge Skills Passport.",
@@ -86,6 +88,7 @@ export const ecosystem = {
       cta: { label: "Explore Skills Passport", href: "/skills-passport" },
     },
     {
+      icon: "connect" as const,
       title: "Connect to Opportunity",
       description:
         "Connect prepared learners with internships, employers, industry projects, mentorship, and entrepreneurship opportunities.",
@@ -106,24 +109,28 @@ export const pathways = {
   headline: "One Ecosystem. Different Pathways to Growth.",
   panels: [
     {
+      icon: "talents" as const,
       audience: "For Talents",
       headline: "Build Skills. Gain Experience. Move Forward.",
       body: "Explore learning programmes, develop your Skills Passport, access practical experience, and discover opportunities aligned with your career goals.",
       cta: { label: "Explore Talent Opportunities", href: "/for-talents" },
     },
     {
+      icon: "schools" as const,
       audience: "For Schools",
       headline: "Extend Learning Beyond the Classroom.",
       body: "Work with Bridge to connect students to practical training, industry exposure, career development, and structured employability support.",
       cta: { label: "Partner with Bridge", href: "/for-schools" },
     },
     {
+      icon: "companies" as const,
       audience: "For Companies",
       headline: "Discover and Develop Technical Talent.",
       body: "Connect with emerging technical talent, publish opportunities, support internships, and engage learners through projects and practical industry experiences.",
       cta: { label: "Find Talent", href: "/for-companies" },
     },
     {
+      icon: "partners" as const,
       audience: "For Ecosystem Partners",
       headline: "Help Build the Future of Technical Talent.",
       body: "Collaborate with Bridge on programmes, mentorship, venture development, industry partnerships, and pathways that connect technical education to economic opportunity.",
@@ -213,6 +220,13 @@ export const footer = {
     { label: "Terms of Use", href: "/terms" },
     { label: "Cookie preferences", href: "/cookies" },
   ],
-  contact: undefined as undefined | { email?: string; phone?: string; address?: string },
+  // From the live bridge.co.rw footer. TODO: awaiting Bridge approval (confirm these are the
+  // official details; the email is a Gmail address).
+  contact: {
+    address: "KN 67 Street, UR-CST Unipod, Kigali, Rwanda",
+    phone: "+250 788 434 778",
+    email: "bridgerwanda77@gmail.com",
+    approved: false,
+  } as undefined | { email?: string; phone?: string; address?: string; approved: boolean },
   social: [] as { label: string; href: string }[],
 };

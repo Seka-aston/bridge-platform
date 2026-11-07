@@ -9,7 +9,7 @@ The project owner is **Aston**, a senior UX/product designer, not a developer. H
 How to work with him:
 
 - Explain what you are doing in plain language. Avoid jargon; when a technical term is unavoidable, explain it in one sentence.
-- Work **one component or one section at a time**. After each one, tell him how to see it in the browser and what to check, then wait for his approval before moving on.
+- Work **in batches** (Aston's preference since 7 November 2026): build a whole checkpoint's components, test them yourself, then present them for one review with all open decisions listed together at the end. Tell him how to see them in the browser and what to check, then wait for his approval before the next checkpoint.
 - Never make a design decision silently. If something isn't specified here or in his designs, ask, and offer two or three concrete options.
 - Before installing a new library, changing the folder structure, or deleting files, explain why and ask first.
 - When he gives visual feedback ("tighter", "more breathing room", "feels heavy"), translate it into specific changes and say what you changed.
