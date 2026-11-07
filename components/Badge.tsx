@@ -20,7 +20,7 @@ const looks: Record<BadgeKind, string> = {
 export function Badge({ kind, className = "" }: { kind: BadgeKind; className?: string }) {
   return (
     <span
-      className={`inline-flex items-center rounded-control px-2 py-0.5 text-eyebrow uppercase ${looks[kind]} ${className}`}
+      className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-control px-2 py-0.5 text-eyebrow uppercase ${looks[kind]} ${className}`}
     >
       {badgeLabels[kind]}
     </span>

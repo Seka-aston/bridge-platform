@@ -86,10 +86,12 @@ Built and self-tested; awaiting Aston's review of the whole page.
 
 ## Checkpoint 4: Homepage polish
 
-- [ ] Hero ecosystem visual (network of profiles, skills, partners and opportunities)
-- [ ] Responsive at 375, 768, 1024 and 1440px
-- [ ] Keyboard navigation, focus states, contrast checked
-- [ ] Restrained motion that is switched off when "reduce motion" is on
+- [x] Hero ecosystem visual (network of profiles, skills, partners and opportunities)
+- [x] Responsive at 375, 768, 1024 and 1440px (also 1280)
+- [x] Keyboard navigation, focus states, contrast checked (axe: 0 issues on homepage and placeholder pages)
+- [x] Restrained motion that is switched off when "reduce motion" is on
+
+Built and self-tested; awaiting Aston's review. Then the homepage is demo-ready.
 
 **Aston reviews:** the homepage is demo-ready.
 
@@ -164,6 +166,15 @@ Built from Aston's existing student dashboard designs. Share Figma frames or scr
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-07 — Checkpoint 4: homepage polish
+- Aston approved Checkpoint 3 and Claude's open suggestions (navy hero, integrated header).
+- `components/HeroVisual.tsx`: sample learner's Skills Passport (Diane M., labelled Sample profile) linked by dashed green lines to disciplines (live-site tracks), a partner school, an industry partner and a sample opportunity. Network layout from 1280px; simplified stacked version below. One accessible description for screen readers. Wording in `content/home.ts` (`heroVisual`).
+- Motion: a slow 3-second flow along the lines; removed entirely under reduced motion.
+- Integrated header: navy on the homepage while at the top of the hero, white once scrolling starts or the menu opens.
+- Badges never wrap onto two lines.
+- Tested: axe (WCAG 2.1 A/AA) found 0 issues on the homepage at 1440 and 375px and on placeholder pages; the only findings on /components-preview are the deliberately failing samples in its Contrast table. 90 keyboard stops, all with a visible focus ring; skip link first. Screenshots at 375, 768, 1024, 1280 and 1440px with no sideways scrolling.
+- Fixed during testing: overlapping cards and hidden lines in the first hero-visual layout, passport header wrapping, partner cards overlapping at 1024px.
 
 ### 2026-11-07 — Checkpoint 3: homepage assembled
 - Aston approved all Checkpoint 2 components as built.

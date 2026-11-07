@@ -48,11 +48,6 @@ export const footerText = {
   copyright: "© {year} Bridge. All rights reserved.",
 };
 
-export const homeText = {
-  // Shown only in prototype mode, where the hero ecosystem visual will go (Checkpoint 4).
-  heroVisualPlaceholder: "Hero ecosystem visual: learner profiles, Skills Passport, disciplines, partners and opportunities. Designed in Checkpoint 4.",
-};
-
 export const bridgeAiText = {
   panelTitle: "Bridge AI",
   // Makes clear the panel is an illustration, not a working service (spec 4.2.9).

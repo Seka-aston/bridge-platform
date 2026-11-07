@@ -1,13 +1,11 @@
-import Image from "next/image";
 import { Button } from "@/components/Button";
 import { hero } from "@/content/home";
-import { prototypeMode } from "@/content/site";
-import { homeText } from "@/content/ui";
+import { HeroVisual } from "@/components/HeroVisual";
 
 /*
   Homepage hero (spec 4.2.3), in navy and green rather than the spec's emerald and amber
   (CLAUDE.md section 4). Eyebrow, H1, supporting line, three CTAs.
-  The right-hand column is reserved for the hero ecosystem visual (Checkpoint 4).
+  The right-hand column holds the hero ecosystem visual.
 */
 
 export function Hero() {
@@ -41,21 +39,7 @@ export function Hero() {
           </p>
         </div>
 
-        {prototypeMode && (
-          <div className="relative flex min-h-80 items-center justify-center rounded-card border border-dashed border-white/40 p-8 lg:min-h-[28rem]">
-            <Image
-              aria-hidden
-              src="/brand/bridge-symbol-on-navy.svg"
-              alt=""
-              width={129}
-              height={215}
-              unoptimized
-              priority
-              className="absolute h-3/4 w-auto opacity-15"
-            />
-            <p className="relative max-w-xs text-center text-white">{homeText.heroVisualPlaceholder}</p>
-          </div>
-        )}
+        <HeroVisual />
       </div>
     </section>
   );

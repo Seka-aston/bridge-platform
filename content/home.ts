@@ -39,6 +39,19 @@ export const hero = {
   additional: { label: "Book a Discovery Call", href: "/book-a-discovery-call" },
 };
 
+// Hero ecosystem visual (spec 4.2.3). Illustrative only: no real people, partners or logos.
+// The learner comes from the shared sample data (data/talent.ts). Disciplines are the live
+// site's internship tracks. Partner and opportunity nodes are generic and labelled as samples.
+export const heroVisual = {
+  label:
+    "Illustration: a sample learner's Skills Passport connected to technical disciplines, a partner school, an industry partner and an internship opportunity.",
+  passportTitle: "Skills Passport",
+  disciplines: ["Software Development", "Electrical Installation", "Wood Technology", "Welding"],
+  school: { title: "TVET partner school", detail: "Training and assessment" },
+  industry: { title: "Industry partner", detail: "Projects and mentorship" },
+  opportunity: { tag: "Sample opportunity", title: "Software development internship", detail: "Partner company · Kigali" },
+};
+
 export const trust = {
   // Spec 4.2.4
   heading: "Built Around Real Learners. Connected to Industry.",

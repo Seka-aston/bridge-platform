@@ -31,7 +31,14 @@ const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-
 
 // Desktop menu items stay on one line. Spacing is tight so all five items fit at 1280px
 // even once they all have dropdown arrows.
-const navLinkBase = `inline-flex items-center gap-1 whitespace-nowrap rounded-control px-2.5 py-2 font-semibold transition-colors duration-150 ${focusRing}`;
+const focusRingDark = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+const navLinkBase = "inline-flex items-center gap-1 whitespace-nowrap rounded-control px-2.5 py-2 font-semibold transition-colors duration-150";
+
+// Menu link colours on the white header and on the navy (integrated) header.
+function navLinkLook(dark: boolean, active: boolean) {
+  if (dark) return `${focusRingDark} text-white underline-offset-8 hover:underline ${active ? "underline" : ""}`;
+  return `${focusRing} ${active ? "text-green-700" : "text-gray-700 hover:text-green-700"}`;
+}
 
 function isCurrent(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -43,12 +50,14 @@ function DesktopDropdown({
   onToggle,
   onClose,
   current,
+  dark,
 }: {
   item: NavItem;
   open: boolean;
   onToggle: () => void;
   onClose: () => void;
   current: boolean;
+  dark: boolean;
 }) {
   const panelId = useId();
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -75,9 +84,7 @@ function DesktopDropdown({
         aria-expanded={open}
         aria-controls={panelId}
         onClick={onToggle}
-        className={`${navLinkBase} ${
-          open || current ? "text-green-700" : "text-gray-700 hover:text-green-700"
-        }`}
+        className={`${navLinkBase} ${navLinkLook(dark, open || current)}`}
       >
         {item.label}
         <ChevronDown aria-hidden className={`size-4 transition-transform duration-150 ${open ? "rotate-180" : ""}`} />
@@ -202,10 +209,26 @@ export function Header({ nav = headerContent.nav, demo = false }: HeaderProps) {
     return () => document.removeEventListener("pointerdown", onPointer);
   }, [openDropdown]);
 
+  // Integrated header (spec 4.2.2): on the homepage the header is navy, matching the hero,
+  // until the visitor scrolls. It turns white once scrolling starts or the menu opens.
+  const [atTop, setAtTop] = useState(true);
+  useEffect(() => {
+    const onScroll = () => setAtTop(window.scrollY < 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  const dark = pathname === "/" && !demo && atTop && !menuOpen;
+  const ring = dark ? focusRingDark : focusRing;
+
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <header className={`${demo ? "relative" : "sticky top-0"} z-50 border-b border-gray-200 bg-white`}>
+    <header
+      className={`${demo ? "relative" : "sticky top-0"} z-50 border-b transition-colors duration-200 ${
+        dark ? "border-transparent bg-navy-900" : "border-gray-200 bg-white"
+      }`}
+    >
       {!demo && (
         <a
           href="#main"
@@ -220,9 +243,9 @@ export function Header({ nav = headerContent.nav, demo = false }: HeaderProps) {
           href="/"
           onClick={closeMenu}
           aria-label={headerContent.homeLabel}
-          className={`shrink-0 rounded-sm ${focusRing}`}
+          className={`shrink-0 rounded-sm ${ring}`}
         >
-          <Logo priority={!demo} />
+          <Logo variant={dark ? "white" : "green"} priority={!demo} />
         </Link>
 
         {/* Desktop menu */}
@@ -238,13 +261,14 @@ export function Header({ nav = headerContent.nav, demo = false }: HeaderProps) {
                   open={openDropdown === item.href}
                   onToggle={() => setOpenDropdown((o) => (o === item.href ? null : item.href))}
                   onClose={() => setOpenDropdown(null)}
+                  dark={dark}
                 />
               ) : (
                 <li key={item.href}>
                   <Link
                     href={item.href}
                     aria-current={current ? "page" : undefined}
-                    className={`${navLinkBase} ${current ? "text-green-700" : "text-gray-700 hover:text-green-700"}`}
+                    className={`${navLinkBase} ${navLinkLook(dark, current)}`}
                   >
                     {item.label}
                   </Link>
@@ -260,13 +284,13 @@ export function Header({ nav = headerContent.nav, demo = false }: HeaderProps) {
             <Link
               href={headerContent.login.href}
               aria-current={isCurrent(pathname, headerContent.login.href) ? "page" : undefined}
-              className={`${navLinkBase} text-gray-700 hover:text-green-700`}
+              className={`${navLinkBase} ${navLinkLook(dark, isCurrent(pathname, headerContent.login.href))}`}
             >
               {headerContent.login.label}
             </Link>
           </div>
           <div className="hidden md:block">
-            <Button href={headerContent.primary.href} className="whitespace-nowrap">
+            <Button href={headerContent.primary.href} onDark={dark} className="whitespace-nowrap">
               {headerContent.primary.label}
             </Button>
           </div>
@@ -278,7 +302,9 @@ export function Header({ nav = headerContent.nav, demo = false }: HeaderProps) {
             aria-controls={menuId}
             aria-label={menuOpen ? headerContent.menuClose : headerContent.menuOpen}
             onClick={() => setMenuOpen((o) => !o)}
-            className={`-mr-2 inline-flex size-11 items-center justify-center rounded-control text-navy-900 hover:bg-green-50 xl:hidden ${focusRing}`}
+            className={`-mr-2 inline-flex size-11 items-center justify-center rounded-control xl:hidden ${
+              dark ? "text-white hover:bg-white/10" : "text-navy-900 hover:bg-green-50"
+            } ${ring}`}
           >
             {menuOpen ? <X aria-hidden className="size-6" /> : <Menu aria-hidden className="size-6" />}
           </button>
