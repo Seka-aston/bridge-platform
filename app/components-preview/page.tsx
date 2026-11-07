@@ -95,6 +95,7 @@ const buttonStates: { label: string; state?: PreviewState; disabled?: boolean }[
 const lightVariants: { variant: ButtonVariant; name: string; note: string; label: string }[] = [
   { variant: "primary", name: "Primary", note: "green-700 fill, white text. Hover and pressed: green-800.", label: "Join a Programme" },
   { variant: "secondary", name: "Secondary", note: "green-50 fill, green-700 text. Hover and pressed: deeper fill, green-800 text.", label: "Hire Vetted Talent" },
+  { variant: "outline", name: "Outline", note: "White fill, green-700 border and text. For secondary actions on light-green backgrounds.", label: "Book a Discovery Call" },
   { variant: "text", name: "Text link", note: "green-700 with arrow. Hover: green-800, underline, arrow nudges right.", label: "Book a Discovery Call" },
 ];
 

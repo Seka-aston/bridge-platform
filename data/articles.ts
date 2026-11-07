@@ -23,7 +23,7 @@ export const articles: Article[] = [
     excerpt:
       "Learn how to make the most of your internship experience, from setting goals to networking effectively.",
     publishedOn: "2023-10-26",
-    href: "/resources",
+    href: "/resources/successful-internship-tips",
     approved: false,
   },
   {
@@ -33,7 +33,7 @@ export const articles: Article[] = [
     excerpt:
       "This guide provides practical advice for students on how to engage with their mentors for maximum benefit.",
     publishedOn: "2023-10-10",
-    href: "/resources",
+    href: "/resources/mentee-guide",
     approved: false,
   },
 ];

@@ -17,7 +17,7 @@ import type { ReactNode } from "react";
   (hover, pressed, focus) without the mouse or keyboard.
 */
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "text" | "textOnDark";
+export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "text" | "textOnDark";
 export type ButtonSize = "md" | "lg";
 export type PreviewState = "hover" | "active" | "focus";
 
@@ -41,6 +41,7 @@ const base =
 const sizes: Record<ButtonVariant, Record<ButtonSize, string>> = {
   primary: { md: "border px-6 py-2 text-body", lg: "border px-8 py-3 text-lg" },
   secondary: { md: "border px-6 py-2 text-body", lg: "border px-8 py-3 text-lg" },
+  outline: { md: "border px-6 py-2 text-body", lg: "border px-8 py-3 text-lg" },
   ghost: { md: "border px-6 py-2 text-body", lg: "border px-8 py-3 text-lg" },
   // -mx-1 px-1 gives the focus ring room without shifting the link's alignment.
   text: { md: "-mx-1 px-1 text-body", lg: "-mx-1 px-1 text-lg" },
@@ -58,6 +59,12 @@ const looks: Record<ButtonVariant, { enabled: string; disabled: string }> = {
     enabled:
       "border-transparent bg-green-50 text-green-700 hover:bg-green-500/15 hover:text-green-800 active:bg-green-500/15 active:text-green-800 data-[preview-state=hover]:bg-green-500/15 data-[preview-state=hover]:text-green-800 data-[preview-state=active]:bg-green-500/15 data-[preview-state=active]:text-green-800",
     disabled: "border-transparent bg-gray-200 text-gray-500",
+  },
+  // Secondary action on light-green backgrounds, where the green-50 Secondary fill would disappear.
+  outline: {
+    enabled:
+      "border-green-700 bg-white text-green-700 hover:bg-green-50 hover:text-green-800 active:bg-green-50 active:text-green-800 data-[preview-state=hover]:bg-green-50 data-[preview-state=hover]:text-green-800 data-[preview-state=active]:bg-green-50 data-[preview-state=active]:text-green-800",
+    disabled: "border-gray-200 bg-gray-200 text-gray-500",
   },
   ghost: {
     enabled:
@@ -81,6 +88,7 @@ const looks: Record<ButtonVariant, { enabled: string; disabled: string }> = {
 const press: Record<ButtonVariant, string> = {
   primary: "active:translate-y-px data-[preview-state=active]:translate-y-px",
   secondary: "active:translate-y-px data-[preview-state=active]:translate-y-px",
+  outline: "active:translate-y-px data-[preview-state=active]:translate-y-px",
   ghost: "active:translate-y-px data-[preview-state=active]:translate-y-px",
   text: "",
   textOnDark: "",

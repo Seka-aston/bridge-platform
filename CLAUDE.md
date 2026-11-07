@@ -86,6 +86,7 @@ Navy `#1C3D6A` on white is about 10.9:1, which is excellent.
 |---|---|
 | Primary | `green-700` fill, white text, semibold |
 | Secondary | `green-50` fill, `green-700` text (`green-600` failed contrast) |
+| Outline | white fill, `green-700` border and text. Secondary actions on light-green backgrounds, where the Secondary fill disappears (added 7 Nov 2026, Checkpoint 5) |
 | Ghost on navy | transparent, white border, white text |
 | Text link | `green-700` text with arrow icon |
 

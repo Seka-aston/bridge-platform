@@ -79,6 +79,10 @@
 }
 
 @layer base {
+  /* Leave room for the sticky header whenever the browser scrolls to a link target or focused field. */
+  html {
+    scroll-padding-top: 6rem;
+  }
   body {
     background-color: var(--color-white);
     color: var(--color-gray-800);

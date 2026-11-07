@@ -97,12 +97,14 @@ Built and self-tested; awaiting Aston's review. Then the homepage is demo-ready.
 
 ## Checkpoint 5: Public pages
 
-- [ ] For Talents, For Schools, For Companies, For Ecosystem
-- [ ] Ventures Lab
-- [ ] Programmes list with filters, and a programme detail page with an apply flow (form with validation, loading and success states)
-- [ ] Resources list and article page
-- [ ] About, Book a Discovery Call (placeholder booking step), Privacy and Terms placeholders
-- [ ] Every header, footer and CTA link goes somewhere real
+- [x] For Talents, For Schools, For Companies, For Ecosystem
+- [x] Ventures Lab
+- [x] Programmes list with filters, and a programme detail page with an apply flow (form with validation, loading and success states)
+- [x] Resources list and article page
+- [x] About, Book a Discovery Call (placeholder booking step), Privacy and Terms placeholders
+- [x] Every header, footer and CTA link goes somewhere real (only Login remains a placeholder, for Checkpoint 6)
+
+Built and self-tested; awaiting Aston's review.
 
 **Aston reviews:** clicking every link on the site, with no dead ends.
 
@@ -166,6 +168,15 @@ Built from Aston's existing student dashboard designs. Share Figma frames or scr
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-07 — Checkpoint 5: public pages
+- Copy approach (Aston): reuse spec and live-site copy; anything new is marked Draft. All page copy in `content/pages.ts`, every block labelled spec / live / NEW. Live-site US spellings changed to British. Live figures and fees (60 innovators, ~100 shortlisted, 50,000 Frw fee) marked Draft.
+- 20 new pages: For Talents, For Schools, For Companies, For Ecosystem, Ventures Lab, Programmes (filters), Programme detail (×4, apply form when open), Resources, Article (×2), About, Book a Discovery Call, Learning, Skills Passport, Opportunities, Bridge AI, Impact, Privacy, Terms, Cookies. Only Login remains a placeholder.
+- New components: PageHeader, FeatureGrid, ProgrammeBrowser (status filter), form fields with error summary, ApplyForm, DiscoveryCallForm, TopicPage, FinalBand, LegalPage. New Outline button (CLAUDE.md updated). Draft option on SectionHeading.
+- Forms: validation with an error summary that links to each field, live re-checking, loading state, success message; saved to the browser tab only, with a visible "Prototype: nothing is sent" note.
+- Legal pages contain no invented legal text.
+- Tested: link crawl from the homepage (24 pages, no dead ends; unknown addresses show 404); axe 0 issues on all 24 pages at 1440 and 375px; no sideways scrolling at 375px; filter counts correct; apply form (8 errors on empty submit, focus to summary, invalid email message, loading, success, saved); closed programmes show no form; discovery form (6 errors).
+- Fixed during testing: Secondary buttons invisible on light-green headers (now Outline), duplicate Ventures Lab heading, sticky header covering scrolled-to fields (scroll padding).
 
 ### 2026-11-07 — Checkpoint 4: homepage polish
 - Aston approved Checkpoint 3 and Claude's open suggestions (navy hero, integrated header).

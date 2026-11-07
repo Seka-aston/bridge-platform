@@ -1,3 +1,6 @@
+import { Badge } from "@/components/Badge";
+import { prototypeMode } from "@/content/site";
+
 /*
   Section heading block (CLAUDE.md section 7, component 3).
   Eyebrow (optional), title, supporting copy (optional).
@@ -10,6 +13,8 @@
 */
 
 type SectionHeadingProps = {
+  // Wording written for the prototype (not from the spec or live site): shows a Draft badge.
+  draft?: boolean;
   eyebrow?: string;
   title: string;
   supporting?: string;
@@ -21,6 +26,7 @@ type SectionHeadingProps = {
 };
 
 export function SectionHeading({
+  draft = false,
   eyebrow,
   title,
   supporting,
@@ -36,6 +42,7 @@ export function SectionHeading({
 
   return (
     <div className={`max-w-3xl ${centred ? "mx-auto text-center" : ""} ${className}`}>
+      {draft && prototypeMode && <Badge kind="draft" className="mb-3" />}
       {eyebrow && (
         // Green-500 is too low in contrast for small text on navy, so eyebrows turn white there.
         <p className={`text-eyebrow uppercase ${dark ? "text-white" : "text-green-700"}`}>{eyebrow}</p>

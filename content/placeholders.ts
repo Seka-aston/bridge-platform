@@ -7,23 +7,7 @@ export const placeholderNotice = {
   backLink: { label: "Back to the homepage", href: "/" },
 };
 
+// Only Login remains a placeholder; the "Sign in as…" screen is built in Checkpoint 6.
 export const placeholderPages: Record<string, string> = {
-  "for-talents": "For Talents",
-  "for-schools": "For Schools",
-  "for-companies": "For Companies",
-  "ventures-lab": "Ventures Lab",
-  "for-ecosystem": "For Ecosystem",
   "sign-in": "Login",
-  "book-a-discovery-call": "Book a Discovery Call",
-  programmes: "Programmes",
-  learning: "Learning",
-  "skills-passport": "Skills Passport",
-  opportunities: "Opportunities",
-  "bridge-ai": "Bridge AI",
-  impact: "Bridge's Impact",
-  resources: "Resources",
-  about: "About Bridge",
-  privacy: "Privacy Policy",
-  terms: "Terms of Use",
-  cookies: "Cookie preferences",
 };

@@ -22,7 +22,7 @@ const statusLook: Record<ProgrammeStatus, string> = {
   archived: "border border-gray-500 text-gray-700",
 };
 
-function StatusPill({ status }: { status: ProgrammeStatus }) {
+export function StatusPill({ status }: { status: ProgrammeStatus }) {
   return (
     <span className={`inline-flex items-center rounded-control px-2 py-0.5 text-eyebrow uppercase ${statusLook[status]}`}>
       {t.status[status]}
@@ -98,9 +98,9 @@ export function ProgrammeCard({ programme: p, status, featured = false }: Progra
         <div className={`mt-auto flex gap-4 pt-6 ${featured ? "flex-wrap items-center justify-between" : "flex-col items-start"}`}>
           <p className="font-semibold text-gray-800">{dateLine}</p>
           {status === "open" ? (
-            <Button href="/programmes">{t.cta.open}</Button>
+            <Button href={`/programmes/${p.id}`}>{t.cta.open}</Button>
           ) : (
-            <Button variant="text" href="/programmes">
+            <Button variant="text" href={`/programmes/${p.id}`}>
               {t.cta.other}
             </Button>
           )}
@@ -148,4 +148,12 @@ export async function ProgrammeCards({
       </ul>
     </div>
   );
+}
+
+// One programme with its status for today (e.g. the Ventures Lab page). Wrap in <Suspense>.
+export async function ProgrammeCardById({ programmes, id, featured = false }: { programmes: Programme[]; id: string; featured?: boolean }) {
+  await connection();
+  const p = programmes.find((x) => x.id === id);
+  if (!p) return null;
+  return <ProgrammeCard programme={p} status={programmeStatus(p, todayInKigali())} featured={featured} />;
 }
