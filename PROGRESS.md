@@ -68,7 +68,7 @@ Spec notes (from `Bridge 1.0.pdf`, kept out of git because the repo is public):
 - [ ] Header with dropdowns and mobile menu (`components/Header.tsx` built and tested; awaiting Aston's review. Menu items are plain links until the dropdown contents from the slides arrive: add them as `children` in `content/home.ts`.)
 - [ ] Footer
 - [ ] Cards: service, audience panel, programme (with automatic Open, Upcoming, Closed and Archived status), talent profile, article, testimonial
-- [ ] Stat item, journey step, CTA band, badges ("Coming soon", "Sample profile", "Draft")
+- [ ] Stat item, journey step, CTA band, badges ("Coming soon", "Sample profile", "Draft") (stat item and badges built, awaiting Aston's review; journey step and CTA band to come)
 
 **Aston reviews:** every component and state on the preview page, at desktop and mobile widths.
 
@@ -160,6 +160,14 @@ Built from Aston's existing student dashboard designs. Share Figma frames or scr
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-07 — Component 5: stat item and badges
+- Header approved to continue; real dropdown contents to be added later.
+- Decisions (Aston accepted recommendations): stats use a navy number with a short brand-green bar above and a grey label; unapproved content shows a "Draft" badge on the prototype, including the Vercel link.
+- `prototypeMode` switch in `content/site.ts`: when turned off for launch, unapproved content is hidden entirely. CLAUDE.md content rule 2 updated to match.
+- `components/Badge.tsx`: Draft (grey, dashed border), Coming soon and Sample profile (light green until an accent colour is chosen).
+- `components/StatItem.tsx`: stat item plus a list that is four across from 1024px and two by two below. Numbers are 30px on phones, 40px from 768px. Fits at 320px.
+- The spec's stat labels end with full stops ("facilitators."); kept as written for now.
 
 ### 2026-11-07 — Component 4: header
 - Decisions (Aston accepted recommendations): menu items are plain links now, with dropdowns switched on per item when the slide contents arrive; Login is a plain text link.

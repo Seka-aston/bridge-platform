@@ -99,7 +99,7 @@ Hover and pressed: green buttons and links turn `green-800`; the Secondary fill 
 These come directly from the spec and apply to every section.
 
 1. **Never fabricate** statistics, reviews, ratings, testimonials, partner logos, endorsements, placement outcomes, addresses, phone numbers or social profiles.
-2. Any figure or claim not yet approved by Bridge must be marked in the content file with `// TODO: awaiting Bridge approval` and shown with a visible **"Draft"** badge in development mode only.
+2. Any figure or claim not yet approved by Bridge must be marked in the content file with `// TODO: awaiting Bridge approval` and shown with a visible **"Draft"** badge while `prototypeMode` is on (`content/site.ts`), including on the shared Vercel link. When `prototypeMode` is off (real launch), unapproved items are hidden entirely, never shown without the badge. (Aston, 7 November 2026.)
 3. Features that are not yet live (e.g. Bridge AI) must be clearly labelled as **"Coming soon"** or **"Preview"**. **No live chat input** anywhere unless it is connected to a working service.
 4. Sample talent profiles must be clearly illustrative (e.g. "Sample profile"). Never imply that a match or placement is guaranteed. Do not show match percentages.
 5. Never display an expired deadline or suggest a closed programme is accepting applications.

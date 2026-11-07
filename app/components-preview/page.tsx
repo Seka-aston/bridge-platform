@@ -4,6 +4,8 @@ import { Button, type ButtonVariant, type PreviewState } from "@/components/Butt
 import { Logo } from "@/components/Logo";
 import { SectionHeading } from "@/components/SectionHeading";
 import { Header } from "@/components/Header";
+import { StatList } from "@/components/StatItem";
+import { Badge } from "@/components/Badge";
 import { ecosystem, talent, trust, finalCta, howItWorks, header, type NavItem } from "@/content/home";
 
 // Internal review page for Aston. Not linked from the public navigation.
@@ -95,6 +97,37 @@ function StateRow({ variant, label, onDark = false }: { variant: ButtonVariant; 
         </li>
       ))}
     </ul>
+  );
+}
+
+function StatsSection() {
+  return (
+    <Section
+      title="Stat item and badges"
+      intro="Component 5. The four trust figures from the spec. None is approved by Bridge yet, so each shows a Draft badge. When prototype mode is switched off for launch, unapproved figures disappear instead."
+    >
+      <div className="space-y-6">
+        <div className="rounded-card border border-gray-200 p-6 md:p-10">
+          <p className="mb-8 text-gray-500">On white</p>
+          <StatList stats={trust.stats} />
+        </div>
+        <div className="rounded-card bg-green-50 p-6 md:p-10">
+          <p className="mb-8 text-gray-700">On green-50</p>
+          <StatList stats={trust.stats} />
+        </div>
+        <div>
+          <h3 className="text-h3 text-navy-900">Badges</h3>
+          <p className="mb-6 text-gray-700">
+            Draft is neutral grey with a dashed border. Coming soon and Sample profile use light green until an accent colour is decided.
+          </p>
+          <div className="flex flex-wrap items-center gap-4">
+            <Badge kind="draft" />
+            <Badge kind="comingSoon" />
+            <Badge kind="sampleProfile" />
+          </div>
+        </div>
+      </div>
+    </Section>
   );
 }
 
@@ -321,10 +354,12 @@ export default function ComponentsPreview() {
         <p className="text-eyebrow uppercase text-green-700">Internal review page</p>
         <h1 className="mt-3 text-display-mobile text-navy-900 md:text-display">Design system preview</h1>
         <p className="mt-6 max-w-3xl text-body-lg text-gray-700">
-          Header (component 4), section heading (component 3), logo, buttons (component 2), and design tokens and typography (component 1). Newest first. Every value on this page comes from{" "}
+          Stat item and badges (component 5), header (component 4), section heading (component 3), logo, buttons (component 2), and design tokens and typography (component 1). Newest first. Every value on this page comes from{" "}
           <code className="font-mono text-body">app/globals.css</code>.
         </p>
       </header>
+
+      <StatsSection />
 
       <HeaderSection />
 

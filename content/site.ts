@@ -8,6 +8,18 @@ export const site = {
     "Bridge connects TVET students and graduates to practical learning, verified skills, industry experience, and career opportunities through one intelligent employability ecosystem.",
 };
 
+// Prototype mode (decided by Aston, 7 Nov 2026).
+// true: content awaiting Bridge's approval is shown with a visible "Draft" badge.
+// false (real launch): content awaiting approval is hidden entirely, never shown without the badge.
+export const prototypeMode = true;
+
+// Badge labels (content rules 2–4 in CLAUDE.md).
+export const badgeLabels = {
+  draft: "Draft",
+  comingSoon: "Coming soon",
+  sampleProfile: "Sample profile",
+};
+
 // Temporary homepage shown until Checkpoint 3 assembles the real one.
 export const homePlaceholder = {
   title: "Bridge",
