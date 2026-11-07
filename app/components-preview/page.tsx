@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Check, X } from "lucide-react";
 import { Button, type ButtonVariant, type PreviewState } from "@/components/Button";
+import { Logo } from "@/components/Logo";
 
 // Internal review page for Aston. Not linked from the public navigation.
 export const metadata: Metadata = {
@@ -90,6 +91,50 @@ function StateRow({ variant, label, onDark = false }: { variant: ButtonVariant; 
         </li>
       ))}
     </ul>
+  );
+}
+
+function LogoSection() {
+  return (
+    <Section
+      title="Logo"
+      intro="The three versions supplied, shown at header size (40px tall) and a compact size (32px). PNG for now; SVG to follow."
+    >
+      <ul className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <li className="rounded-card border border-gray-200 p-6">
+          <div className="flex flex-wrap items-end gap-8">
+            <Logo variant="green" height={40} />
+            <Logo variant="green" height={32} />
+          </div>
+          <p className="mt-4 font-semibold text-navy-900">Green</p>
+          <p className="text-gray-500">On white and light backgrounds</p>
+        </li>
+        <li className="rounded-card border border-gray-200 p-6">
+          <div className="flex flex-wrap items-end gap-8">
+            <Logo variant="amber" height={40} />
+            <Logo variant="amber" height={32} />
+          </div>
+          <p className="mt-4 font-semibold text-navy-900">Amber</p>
+          <p className="text-gray-500">On white and light backgrounds</p>
+        </li>
+        <li className="rounded-card bg-green-50 p-6">
+          <div className="flex flex-wrap items-end gap-8">
+            <Logo variant="green" height={40} />
+            <Logo variant="amber" height={40} />
+          </div>
+          <p className="mt-4 font-semibold text-navy-900">On green-50</p>
+          <p className="text-gray-700">Light section background</p>
+        </li>
+        <li className="rounded-card bg-navy-900 p-6">
+          <div className="flex flex-wrap items-end gap-8">
+            <Logo variant="white" height={40} />
+            <Logo variant="white" height={32} />
+          </div>
+          <p className="mt-4 font-semibold text-white">White</p>
+          <p className="text-white">On navy: footer and dark sections</p>
+        </li>
+      </ul>
+    </Section>
   );
 }
 
@@ -192,10 +237,12 @@ export default function ComponentsPreview() {
         <p className="text-eyebrow uppercase text-green-700">Internal review page</p>
         <h1 className="mt-3 text-display-mobile text-navy-900 md:text-display">Design system preview</h1>
         <p className="mt-6 max-w-3xl text-body-lg text-gray-700">
-          Component 1: design tokens and base typography. Component 2: buttons. Every value on this page comes from{" "}
+          The logo, component 1 (design tokens and base typography) and component 2 (buttons). Every value on this page comes from{" "}
           <code className="font-mono text-body">app/globals.css</code>.
         </p>
       </header>
+
+      <LogoSection />
 
       <ButtonsSection />
 

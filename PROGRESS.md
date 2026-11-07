@@ -35,7 +35,7 @@ Read this file with CLAUDE.md at the start of every session. Work on one checkpo
 
 - [x] Colour, type, spacing, radius and shadow tokens from CLAUDE.md section 4 (in `app/globals.css`; awaiting Aston's review)
 - [x] `/components-preview` page showing the type scale, colours and buttons in every state (awaiting Aston's review of buttons)
-- [ ] Logo added as SVG (waiting for the logo file from Aston)
+- [ ] Logo added as SVG (PNG versions in place in `public/brand/` via `components/Logo.tsx`; swap for SVG exports when Aston supplies them)
 - [x] Remove the starter's automatic dark mode
 - [x] Replace the Next.js sample homepage and delete the sample images in `public/` (temporary placeholder homepage)
 - [ ] Add the meta description from the spec to `content/site.ts` (waiting for the spec text)
@@ -149,6 +149,13 @@ Built from Aston's existing student dashboard designs. Share Figma frames or scr
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-07 — Logo
+- Added Aston's three logo versions (green, amber, white wordmark) as PNGs in `public/brand/`, 1329 × 430 px with transparent backgrounds.
+- `components/Logo.tsx` shows any version at a chosen height, with alt text "Bridge".
+- Symbol cut out as the browser-tab icon (`app/icon.png`); default Next.js `favicon.ico` removed.
+- Logo section added to the top of `/components-preview`.
+- Open: which version the header uses (green or amber); SVG exports to replace the PNGs.
 
 ### 2026-11-07 — Component 2: buttons
 - `components/Button.tsx`: Primary, Secondary, Ghost (on navy) and Text link variants; medium and large sizes; hover, pressed, keyboard focus and disabled states. Renders a link when given `href`, otherwise a button.
