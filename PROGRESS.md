@@ -35,7 +35,7 @@ Read this file with CLAUDE.md at the start of every session. Work on one checkpo
 
 - [x] Colour, type, spacing, radius and shadow tokens from CLAUDE.md section 4 (in `app/globals.css`; awaiting Aston's review)
 - [x] `/components-preview` page showing the type scale, colours and buttons in every state (awaiting Aston's review of buttons)
-- [ ] Logo added as SVG (PNG versions in place in `public/brand/` via `components/Logo.tsx`; swap for SVG exports when Aston supplies them)
+- [x] Logo added as SVG (green, amber and white versions in `public/brand/`, shown with `components/Logo.tsx`)
 - [x] Remove the starter's automatic dark mode
 - [x] Replace the Next.js sample homepage and delete the sample images in `public/` (temporary placeholder homepage)
 - [ ] Add the meta description from the spec to `content/site.ts` (waiting for the spec text)
@@ -46,6 +46,7 @@ Decisions made in this checkpoint (Aston, 7 Nov 2026; recorded in CLAUDE.md):
 - New token green-800 #1F6340 for hover and pressed states.
 - Focus ring: 2px navy with a 2px gap on light backgrounds, 2px white on navy.
 - Aston approved the tokens and typography as built.
+- Header logo: green version (wordmark is brand green-500), 32px tall on mobile and 40px from 768px up; letters are then 13px and 16px tall. Chosen by Claude at Aston's request.
 - Mobile H1 set to 40px (the brief says 36–40px); line-height 1.0 as specified.
 - Shadows copied from the live site's cards (Tailwind `shadow-md` / `shadow-lg` values); card radius 12px matches the live site.
 
@@ -151,11 +152,11 @@ Built from Aston's existing student dashboard designs. Share Figma frames or scr
 (Claude Code adds a short entry after each working session.)
 
 ### 2026-11-07 — Logo
-- Added Aston's three logo versions (green, amber, white wordmark) as PNGs in `public/brand/`, 1329 × 430 px with transparent backgrounds.
-- `components/Logo.tsx` shows any version at a chosen height, with alt text "Bridge".
+- Added Aston's three logo versions (green, amber, white wordmark), first as PNGs, then replaced with his SVG exports copied exactly; PNGs removed.
+- `components/Logo.tsx` shows any version at a chosen height, or the "header" preset (32px mobile, 40px from 768px), with alt text "Bridge".
 - Symbol cut out as the browser-tab icon (`app/icon.png`); default Next.js `favicon.ico` removed.
 - Logo section added to the top of `/components-preview`.
-- Open: which version the header uses (green or amber); SVG exports to replace the PNGs.
+- Header uses the green version (see decisions above).
 
 ### 2026-11-07 — Component 2: buttons
 - `components/Button.tsx`: Primary, Secondary, Ghost (on navy) and Text link variants; medium and large sizes; hover, pressed, keyboard focus and disabled states. Renders a link when given `href`, otherwise a button.

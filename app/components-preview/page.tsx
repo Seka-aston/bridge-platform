@@ -98,38 +98,37 @@ function LogoSection() {
   return (
     <Section
       title="Logo"
-      intro="The three versions supplied, shown at header size (40px tall) and a compact size (32px). PNG for now; SVG to follow."
+      intro="SVG versions supplied by Aston. The header uses the green version at 32px tall on mobile and 40px from tablet width up."
     >
       <ul className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <li className="rounded-card border border-gray-200 p-6">
-          <div className="flex flex-wrap items-end gap-8">
-            <Logo variant="green" height={40} />
-            <Logo variant="green" height={32} />
-          </div>
-          <p className="mt-4 font-semibold text-navy-900">Green</p>
-          <p className="text-gray-500">On white and light backgrounds</p>
+          <Logo variant="green" />
+          <p className="mt-4 font-semibold text-navy-900">Green · header</p>
+          <p className="text-gray-500">Resize the window: 32px below 768px wide, 40px above</p>
         </li>
         <li className="rounded-card border border-gray-200 p-6">
           <div className="flex flex-wrap items-end gap-8">
-            <Logo variant="amber" height={40} />
-            <Logo variant="amber" height={32} />
+            <Logo variant="green" size={48} />
+            <Logo variant="green" size={24} />
           </div>
+          <p className="mt-4 font-semibold text-navy-900">Green · other sizes</p>
+          <p className="text-gray-500">48px and 24px, staying sharp at any size</p>
+        </li>
+        <li className="rounded-card border border-gray-200 p-6">
+          <Logo variant="amber" />
           <p className="mt-4 font-semibold text-navy-900">Amber</p>
           <p className="text-gray-500">On white and light backgrounds</p>
         </li>
         <li className="rounded-card bg-green-50 p-6">
           <div className="flex flex-wrap items-end gap-8">
-            <Logo variant="green" height={40} />
-            <Logo variant="amber" height={40} />
+            <Logo variant="green" />
+            <Logo variant="amber" />
           </div>
           <p className="mt-4 font-semibold text-navy-900">On green-50</p>
           <p className="text-gray-700">Light section background</p>
         </li>
-        <li className="rounded-card bg-navy-900 p-6">
-          <div className="flex flex-wrap items-end gap-8">
-            <Logo variant="white" height={40} />
-            <Logo variant="white" height={32} />
-          </div>
+        <li className="rounded-card bg-navy-900 p-6 md:col-span-2">
+          <Logo variant="white" />
           <p className="mt-4 font-semibold text-white">White</p>
           <p className="text-white">On navy: footer and dark sections</p>
         </li>

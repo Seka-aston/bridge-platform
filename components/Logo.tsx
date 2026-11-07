@@ -1,33 +1,37 @@
 import Image from "next/image";
 
 /*
-  Bridge logo. Three versions supplied by Aston (7 Nov 2026):
-  - green: symbol with green wordmark, for white and light backgrounds
-  - amber: symbol with amber wordmark, for white and light backgrounds
-  - white: symbol with white wordmark, for navy backgrounds
-  These are PNGs for now; swap the files for SVGs when they are exported.
+  Bridge logo. Three SVG versions supplied by Aston (7 Nov 2026):
+  - green: green wordmark (#3AAA6D), for white and light backgrounds. Used in the header.
+  - amber: amber wordmark (#F8AC36), for white and light backgrounds.
+  - white: white wordmark with a lighter symbol, for navy backgrounds.
 */
 
 export type LogoVariant = "green" | "amber" | "white";
 
 const sources: Record<LogoVariant, string> = {
-  green: "/brand/bridge-logo-green.png",
-  amber: "/brand/bridge-logo-amber.png",
-  white: "/brand/bridge-logo-white.png",
+  green: "/brand/bridge-logo-green.svg",
+  amber: "/brand/bridge-logo-amber.svg",
+  white: "/brand/bridge-logo-white.svg",
 };
 
-// Original artwork is 1329 × 430 px.
-const RATIO = 1329 / 430;
+// Artwork is 665 × 215. The letters take up 40% of the height.
+const RATIO = 665 / 215;
 
 type LogoProps = {
   variant?: LogoVariant;
-  /** Height in pixels. Width follows the logo's proportions. */
-  height?: number;
+  /**
+   * Height in pixels, or "header": 32px on mobile, 40px from 768px up
+   * (letters 13px and 16px tall). Width follows the logo's proportions.
+   */
+  size?: number | "header";
   priority?: boolean;
   className?: string;
 };
 
-export function Logo({ variant = "green", height = 40, priority = false, className = "" }: LogoProps) {
+export function Logo({ variant = "green", size = "header", priority = false, className = "" }: LogoProps) {
+  const header = size === "header";
+  const height = header ? 40 : size;
   return (
     <Image
       src={sources[variant]}
@@ -35,7 +39,8 @@ export function Logo({ variant = "green", height = 40, priority = false, classNa
       width={Math.round(height * RATIO)}
       height={height}
       priority={priority}
-      className={className}
+      unoptimized
+      className={`${header ? "h-8 w-auto md:h-10" : ""} ${className}`}
     />
   );
 }
