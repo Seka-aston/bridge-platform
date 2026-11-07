@@ -133,10 +133,12 @@ Built from Aston's existing student dashboard designs. Share Figma frames or scr
 
 ## Checkpoint 8: Company dashboard
 
-- [ ] Talent discovery with search and filters (discipline, verified skills, availability)
-- [ ] Talent profile view built from the Skills Passport (public, authorised fields only)
-- [ ] Post and manage opportunities; see applicants
-- [ ] Shortlist
+- [x] Talent discovery with search and filters (discipline, verified skills, availability)
+- [x] Talent profile view built from the Skills Passport (public, authorised fields only)
+- [x] Post and manage opportunities; see applicants
+- [x] Shortlist
+
+Built in the student dashboard's visual language (Aston, 7 Nov 2026); self-tested; awaiting review.
 
 ## Checkpoint 9: School dashboard
 
@@ -172,6 +174,18 @@ Built from Aston's existing student dashboard designs. Share Figma frames or scr
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-07 — Checkpoint 8: company dashboard
+- Direction (Aston): same visual language as the student dashboard; no separate design.
+- Overview: "Welcome, Grace." with live counts, Find talent / Post an opportunity; Recommended talent (coloured tiles like course cards, picked by skills that match open roles); Hiring snapshot (gradient card + mini stats); Recent applicants with navy Review pills; "what's next today?" tabs (Review / Interviews / Post).
+- Talent discovery: search, discipline, availability, verified-only; profile drawer from the Skills Passport (public, authorised fields only) with Add to shortlist; link to Diane's public passport.
+- Opportunities: postings table (Open / Draft / Closed), manage drawer (close, reopen, publish), "Post an opportunity" form with validation, save as draft or publish.
+- Applicants: role and stage filters, drawer to move stage (New, Reviewing, Interview, Offer, Not progressing), note that Bridge never guarantees a match or placement.
+- Shortlist page. All changes kept in this browser tab (`CompanyData` provider keeps panels in sync).
+- Connected journey: Diane's application to the Back-End Developer Intern role (made in the student dashboard) appears in Grace's applicants as "Applied in this session".
+- Sample data: `data/company.ts`; three more sample learners in `data/talent.ts` (public pages still show three).
+- Tested: axe 0 issues on company screens at 1440, 1024, 375 (after fixing white initials on amber tiles, now navy); no sideways scrolling; filters (6 / 2 / 1 / 1); shortlist sync; posting validation (5 errors) and creation; close posting; journey; stage change reflected in table and snapshot.
+- Also unused now: `components/dashboard/CompanyTalentTable.tsx` (replaced). Awaiting Aston's OK to delete, with the two files listed under Checkpoint 7.
 
 ### 2026-11-07 — Checkpoint 7: student dashboard (Aston's design)
 - Aston supplied the student dashboard design. Decisions: his frame (top pill menu, white icon rail, grey-green background) for all four roles, replacing the navy sidebar; sample employers and matched skills in words instead of real company names, logos and match percentages (content rules 1 and 4); design colours kept accessible (green buttons use green-700, navy "Apply" buttons, amber back as a decorative accent, new grey-green background and deep-green tokens); every control works with sample data.

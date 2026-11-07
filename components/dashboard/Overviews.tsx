@@ -1,12 +1,12 @@
-import { BadgeCheck, BookOpen, CalendarClock, Clock, FileCheck2, Gauge, Hourglass, Star, Users } from "lucide-react";
+import { BadgeCheck, BookOpen, CalendarClock, Clock, FileCheck2, Gauge, Hourglass, Users } from "lucide-react";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { Badge } from "@/components/Badge";
 import { ProgrammeCard, StatusPill } from "@/components/ProgrammeCard";
 import { AdminProgrammeTable } from "@/components/dashboard/AdminProgrammeTable";
-import { CompanyTalentTable } from "@/components/dashboard/CompanyTalentTable";
+import { CompanyOverview } from "@/components/dashboard/company/CompanyScreens";
 import { StudentOverview } from "@/components/dashboard/student/StudentScreens";
-import { DashPageHeader, DataTable, EmptyState, ListItem, Panel, ProgressBar, StatCard, StatGrid } from "@/components/dashboard/parts";
+import { DashPageHeader, DataTable, ListItem, Panel, ProgressBar, StatCard, StatGrid } from "@/components/dashboard/parts";
 import { footer, trust } from "@/content/home";
 import { overviewText, roleText } from "@/content/dashboard";
 import { talentCardText } from "@/content/ui";
@@ -70,24 +70,6 @@ function SchoolOverview() {
           }))}
         />
       </Panel>
-    </div>
-  );
-}
-
-function CompanyOverview() {
-  const t = overviewText.company;
-  return (
-    <div className="space-y-8">
-      <DashPageHeader large title={welcome("company")} description={sampleUsers.company.detail} />
-      <StatGrid>
-        <StatCard label={t.stats.profiles} value={talentProfiles.length} icon={Users} />
-        <StatCard label={t.stats.verified} value={talentProfiles.filter((p) => p.verification === "verified").length} icon={BadgeCheck} />
-        <StatCard label={t.stats.shortlisted} value={0} icon={Star} />
-      </StatGrid>
-      <Panel title={t.tableTitle} id="talent-title">
-        <CompanyTalentTable profiles={talentProfiles} />
-      </Panel>
-      <EmptyState icon={Star} title={t.shortlistEmpty.title} body={t.shortlistEmpty.body} />
     </div>
   );
 }

@@ -106,7 +106,7 @@ export default function Home() {
       <HomeSection id="talent" labelledBy="talent-title">
         <SectionHeading id="talent-title" eyebrow={talent.eyebrow} title={talent.headline} supporting={talent.supporting} />
         <ul className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {talentProfiles.map((p) => (
+          {talentProfiles.slice(0, 3).map((p) => (
             <li key={p.id}>
               <TalentCard profile={p} />
             </li>

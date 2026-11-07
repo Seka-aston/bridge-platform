@@ -3,6 +3,7 @@ import { Construction } from "lucide-react";
 import { notFound } from "next/navigation";
 import { DashPageHeader, EmptyState } from "@/components/dashboard/parts";
 import { studentScreens } from "@/components/dashboard/student/StudentScreens";
+import { companyScreens } from "@/components/dashboard/company/CompanyScreens";
 import { dashboardText as t, roleText } from "@/content/dashboard";
 import { roles, type Role } from "@/data/users";
 
@@ -23,7 +24,8 @@ export default async function SectionPage({ params }: PageProps<"/dashboard/[rol
   const item = roleText[r]?.nav.find((n) => n.slug === section && n.slug);
   if (!item) notFound();
 
-  const Screen = r === "student" ? studentScreens[section] : undefined;
+  const built: Partial<Record<Role, Record<string, () => React.ReactElement>>> = { student: studentScreens, company: companyScreens };
+  const Screen = built[r]?.[section];
   if (Screen) return <Screen />;
 
   return (

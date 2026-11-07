@@ -13,4 +13,7 @@ export const learnerProgress: Record<string, number> = {
   "sample-1": 90,
   "sample-2": 65,
   "sample-3": 40,
+  "sample-4": 100,
+  "sample-5": 55,
+  "sample-6": 100,
 };
