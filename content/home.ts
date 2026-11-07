@@ -2,15 +2,28 @@
 // section 4.2 (28 October 2026). Edit copy here, not inside components.
 // Links point to placeholder routes until the real pages exist (Checkpoint 5).
 
+export type NavItem = {
+  label: string;
+  href: string;
+  // Dropdown links. Add them here when the contents from the slides arrive; the header
+  // turns the item into a dropdown automatically.
+  children?: { label: string; href: string }[];
+};
+
 export const header = {
   // Spec 4.2.2. Dropdown contents are "shared in slides" and not yet supplied.
+  skipLink: "Skip to main content",
+  homeLabel: "Bridge home",
+  menuOpen: "Open menu",
+  menuClose: "Close menu",
+  navLabel: "Main",
   nav: [
     { label: "For Talents", href: "/for-talents" },
     { label: "For Schools", href: "/for-schools" },
     { label: "For Companies", href: "/for-companies" },
     { label: "Ventures Lab", href: "/ventures-lab" },
     { label: "For Ecosystem", href: "/for-ecosystem" },
-  ],
+  ] as NavItem[],
   login: { label: "Login", href: "/sign-in" },
   primary: { label: "Book a Discovery Call", href: "/book-a-discovery-call" },
 };

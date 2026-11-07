@@ -3,7 +3,8 @@ import { Check, X } from "lucide-react";
 import { Button, type ButtonVariant, type PreviewState } from "@/components/Button";
 import { Logo } from "@/components/Logo";
 import { SectionHeading } from "@/components/SectionHeading";
-import { ecosystem, talent, trust, finalCta, howItWorks } from "@/content/home";
+import { Header } from "@/components/Header";
+import { ecosystem, talent, trust, finalCta, howItWorks, header, type NavItem } from "@/content/home";
 
 // Internal review page for Aston. Not linked from the public navigation.
 export const metadata: Metadata = {
@@ -94,6 +95,47 @@ function StateRow({ variant, label, onDark = false }: { variant: ButtonVariant; 
         </li>
       ))}
     </ul>
+  );
+}
+
+// Sample dropdown items for testing the dropdown behaviour only. Not real content:
+// the real dropdown contents are in the slides Aston will supply.
+const demoNav: NavItem[] = header.nav.map((item, i) =>
+  i < 2
+    ? {
+        ...item,
+        children: [
+          { label: "Sample dropdown item 1", href: item.href },
+          { label: "Sample dropdown item 2", href: item.href },
+          { label: "Sample dropdown item 3", href: item.href },
+        ],
+      }
+    : item,
+);
+
+function HeaderSection() {
+  return (
+    <Section
+      title="Header"
+      intro="Component 4. The real header is at the top of this page and stays put as you scroll. Below 1280px wide the menu folds into the menu button; below 768px the Book a Discovery Call button moves into the menu too. The menu items are plain links until the dropdown contents arrive."
+    >
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-h3 text-navy-900">Dropdown behaviour test</h3>
+          <p className="mb-6 text-gray-700">
+            The first two items here have sample dropdowns so you can test them: click, or Tab to an item and press Enter. Escape closes and
+            returns focus. Clicking or tabbing away also closes. Sample items are not real content.
+          </p>
+          <div className="min-h-80 rounded-card border border-gray-200">
+            <Header nav={demoNav} demo />
+          </div>
+        </div>
+        <p className="text-gray-700">
+          What to try on the real header: hover each link, press Tab from the address bar (a &ldquo;Skip to main content&rdquo; link appears first),
+          narrow the window to see the menu button, open it, and press Escape to close it.
+        </p>
+      </div>
+    </Section>
   );
 }
 
@@ -272,15 +314,19 @@ function Verdict({ ratio }: { ratio: number }) {
 
 export default function ComponentsPreview() {
   return (
-    <main className="mx-auto w-full max-w-content px-gutter">
+    <>
+    <Header />
+    <main id="main" className="mx-auto w-full max-w-content px-gutter">
       <header className="py-section-mobile md:py-section">
         <p className="text-eyebrow uppercase text-green-700">Internal review page</p>
         <h1 className="mt-3 text-display-mobile text-navy-900 md:text-display">Design system preview</h1>
         <p className="mt-6 max-w-3xl text-body-lg text-gray-700">
-          Section heading (component 3), logo, buttons (component 2), and design tokens and typography (component 1). Newest first. Every value on this page comes from{" "}
+          Header (component 4), section heading (component 3), logo, buttons (component 2), and design tokens and typography (component 1). Newest first. Every value on this page comes from{" "}
           <code className="font-mono text-body">app/globals.css</code>.
         </p>
       </header>
+
+      <HeaderSection />
 
       <HeadingSection />
 
@@ -384,5 +430,6 @@ export default function ComponentsPreview() {
         </ul>
       </Section>
     </main>
+    </>
   );
 }

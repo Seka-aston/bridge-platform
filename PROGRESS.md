@@ -65,7 +65,7 @@ Spec notes (from `Bridge 1.0.pdf`, kept out of git because the repo is public):
 - The hero eyebrow is written with a full stop in the spec ("THE FUTURE OF TVET EMPLOYABILITY."); the others have none.
 - Footer "Programmes and Resources" is treated as two links.
 - Analytics: spec 4.2.15 wants important actions trackable; no setup agreed yet.
-- [ ] Header with dropdowns and mobile menu
+- [ ] Header with dropdowns and mobile menu (`components/Header.tsx` built and tested; awaiting Aston's review. Menu items are plain links until the dropdown contents from the slides arrive: add them as `children` in `content/home.ts`.)
 - [ ] Footer
 - [ ] Cards: service, audience panel, programme (with automatic Open, Upcoming, Closed and Archived status), talent profile, article, testimonial
 - [ ] Stat item, journey step, CTA band, badges ("Coming soon", "Sample profile", "Draft")
@@ -160,6 +160,14 @@ Built from Aston's existing student dashboard designs. Share Figma frames or scr
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-07 — Component 4: header
+- Decisions (Aston accepted recommendations): menu items are plain links now, with dropdowns switched on per item when the slide contents arrive; Login is a plain text link.
+- `components/Header.tsx`: sticky; 64px tall on mobile, 72px from 1280px. 1280px+: logo, menu, Login, Book a Discovery Call. 768–1279px: logo, button, menu button. Below 768px: logo and menu button only.
+- Dropdowns: open with click, Enter or Space; close with Escape (focus returns), clicking away or tabbing away. Mobile menu: Escape closes, page behind doesn't scroll, closes after navigating. "Skip to main content" link added.
+- Tested in Chrome: all of the above, no sideways scrolling at 375, 768, 1024, 1280 and 1440px; all five items still fit at 1280px with dropdown arrows. Fixed a bug where Login and the button showed on small screens.
+- Placeholder pages for every link destination (`app/[slug]/page.tsx`, list in `content/placeholders.ts`), marked "Placeholder page" and hidden from search engines. Unknown addresses show the 404 page.
+- Header shown at the top of `/components-preview`, with a dropdown test using clearly labelled sample items. Not yet on the homepage (Checkpoint 3).
 
 ### 2026-11-07 — Spec copy, meta description, section heading
 - Aston added the spec PDF. It is git-ignored so it stays out of the public repo.
