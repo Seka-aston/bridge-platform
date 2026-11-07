@@ -165,7 +165,7 @@ Build each one in isolation on a `/components-preview` page first, so Aston can 
 | Approved stats, logos, testimonials, photos | Awaiting Bridge |
 | Official social accounts | Awaiting Bridge (the live footer's GitHub icon looks like a template leftover) |
 | Analytics setup | Not specified |
-| Hosting and deployment | Not specified |
+| Hosting and deployment | Prototype: Vercel (`bridge-platform-eovr`), auto-deployed from GitHub `main`. Final hosting not specified. |
 | Bridge sign-off on navy-and-green instead of the spec's emerald hero | Aston to confirm with Bridge |
 
 ## 10. Definition of done (from spec 4.2.16)

@@ -33,12 +33,17 @@ Read this file with CLAUDE.md at the start of every session. Work on one checkpo
 
 ## Checkpoint 1: Design foundation
 
-- [ ] Colour, type, spacing, radius and shadow tokens from CLAUDE.md section 4
-- [ ] `/components-preview` page showing the type scale, colours and buttons in every state
-- [ ] Logo added as SVG
-- [ ] Remove the starter's automatic dark mode
-- [ ] Replace the Next.js sample homepage and delete the sample images in `public/`
-- [ ] Add the meta description from the spec to `content/site.ts`
+- [x] Colour, type, spacing, radius and shadow tokens from CLAUDE.md section 4 (in `app/globals.css`; awaiting Aston's review)
+- [ ] `/components-preview` page showing the type scale, colours and buttons in every state (tokens and type done; buttons next)
+- [ ] Logo added as SVG (waiting for the logo file from Aston)
+- [x] Remove the starter's automatic dark mode
+- [x] Replace the Next.js sample homepage and delete the sample images in `public/` (temporary placeholder homepage)
+- [ ] Add the meta description from the spec to `content/site.ts` (waiting for the spec text)
+
+Decisions raised in this checkpoint:
+- Green-600 text on green-50 is 3.9:1 and fails AA for normal text. CLAUDE.md uses this pair for the Secondary button; green-700 on green-50 (4.8:1) passes. Decide when building buttons.
+- Mobile H1 set to 40px (the brief says 36–40px); line-height 1.0 as specified.
+- Shadows copied from the live site's cards (Tailwind `shadow-md` / `shadow-lg` values); card radius 12px matches the live site.
 
 **Aston reviews:** type, colour and buttons feel right. All later work depends on this step.
 
@@ -140,6 +145,13 @@ Built from Aston's existing student dashboard designs. Share Figma frames or scr
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-07 — Component 1: design tokens and base typography
+- CLAUDE.md hosting row updated to Vercel.
+- `app/globals.css`: brand colours (Tailwind's own palette switched off), type scale, radius, shadows, content width, gutter and section spacing as tokens. Dark mode removed. Reduced-motion rule added.
+- New `/components-preview` page (hidden from search engines) showing colours, measured contrast, type scale, shape, shadow and layout tokens.
+- Sample homepage replaced with a placeholder (copy in `content/site.ts`); five Next.js sample images deleted.
+- Lint and build pass; checked at 375px and 1440px.
 
 ### 2026-11-07 — Vercel connected
 - Vercel CLI updated to 65.12.1. Vercel project `bridge-platform-eovr` was already linked to the GitHub repo (imported via the Vercel website).
