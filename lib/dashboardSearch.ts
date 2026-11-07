@@ -21,7 +21,7 @@ export function searchItemsFor(role: Role): SearchItem[] {
         ...pages,
       ];
     case "school":
-      return [...talentProfiles.map((p) => ({ label: p.name, meta: p.discipline, href: base })), ...pages];
+      return [...talentProfiles.map((p) => ({ label: p.name, meta: p.discipline, href: `${base}/students` })), ...pages];
     case "company":
       return [
         ...talentProfiles.map((p) => ({ label: p.name, meta: `${p.discipline} · ${p.skills.join(", ")}`, href: `${base}/talent` })),
@@ -29,7 +29,7 @@ export function searchItemsFor(role: Role): SearchItem[] {
         ...pages,
       ];
     case "admin":
-      return [...programmes.map((p) => ({ label: p.name, meta: dashboardText.searchKinds.programme, href: base })), ...pages];
+      return [...programmes.map((p) => ({ label: p.name, meta: dashboardText.searchKinds.programme, href: `${base}/programmes` })), ...pages];
   }
 }
 

@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { DashPageHeader, EmptyState } from "@/components/dashboard/parts";
 import { studentScreens } from "@/components/dashboard/student/StudentScreens";
 import { companyScreens } from "@/components/dashboard/company/CompanyScreens";
+import { schoolScreens } from "@/components/dashboard/school/SchoolScreens";
+import { adminScreens } from "@/components/dashboard/admin/AdminScreens";
 import { dashboardText as t, roleText } from "@/content/dashboard";
 import { roles, type Role } from "@/data/users";
 
@@ -24,7 +26,7 @@ export default async function SectionPage({ params }: PageProps<"/dashboard/[rol
   const item = roleText[r]?.nav.find((n) => n.slug === section && n.slug);
   if (!item) notFound();
 
-  const built: Partial<Record<Role, Record<string, () => React.ReactElement>>> = { student: studentScreens, company: companyScreens };
+  const built: Partial<Record<Role, Record<string, () => React.ReactElement>>> = { student: studentScreens, company: companyScreens, school: schoolScreens, admin: adminScreens };
   const Screen = built[r]?.[section];
   if (Screen) return <Screen />;
 

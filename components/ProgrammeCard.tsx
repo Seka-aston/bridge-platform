@@ -15,20 +15,8 @@ import { formatDate, programmeStatus, todayInKigali, type ProgrammeStatus } from
   `featured` gives Bridge Ventures Lab a wide, side-by-side layout.
 */
 
-const statusLook: Record<ProgrammeStatus, string> = {
-  open: "bg-green-700 text-white",
-  upcoming: "border border-navy-900 text-navy-900",
-  closed: "bg-gray-200 text-gray-800",
-  archived: "border border-gray-500 text-gray-700",
-};
-
-export function StatusPill({ status }: { status: ProgrammeStatus }) {
-  return (
-    <span className={`inline-flex items-center rounded-control px-2 py-0.5 text-eyebrow uppercase ${statusLook[status]}`}>
-      {t.status[status]}
-    </span>
-  );
-}
+export { StatusPill } from "@/components/StatusPill";
+import { StatusPill } from "@/components/StatusPill";
 
 type ProgrammeCardProps = { programme: Programme; status: ProgrammeStatus; featured?: boolean };
 

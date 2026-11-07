@@ -25,3 +25,7 @@ export const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()
 
 // Short pause so the loading state is visible, like a real request.
 export const fakeNetwork = () => new Promise((r) => setTimeout(r, 1200));
+
+// School verification decisions, read by the student's Skills Passport (cross-role journey).
+// Shape: { "talentId:skill name": "verified" | "declined" }
+export const VERIFY_STORE = "bridge-skill-verifications";

@@ -6,7 +6,8 @@ import { Button } from "@/components/Button";
 import { ErrorText } from "@/components/forms/Fields";
 import { studentText } from "@/content/dashboard";
 import type { Skill } from "@/data/student";
-import { readSession, saveToSession } from "@/lib/prototypeStore";
+import { school } from "@/data/school";
+import { readSession, saveToSession, VERIFY_STORE } from "@/lib/prototypeStore";
 
 /*
   Skills list with "Add New Skill" (opens automatically when arriving from the overview's
@@ -49,6 +50,7 @@ export function PassportActions({ publicHref, onAdd }: { publicHref: string; onA
 
 export function SkillsSection({ skills, publicHref }: { skills: Skill[]; publicHref: string }) {
   const [added, setAdded] = useState<Skill[]>([]);
+  const [decisions, setDecisions] = useState<Record<string, string>>({});
   const [name, setName] = useState("");
   const [evidence, setEvidence] = useState("");
   const [error, setError] = useState("");
@@ -58,10 +60,16 @@ export function SkillsSection({ skills, publicHref }: { skills: Skill[]; publicH
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- browser-only storage, read after mount
     setAdded(readSession<Skill>(STORE));
+    try {
+      setDecisions(JSON.parse(sessionStorage.getItem(VERIFY_STORE) ?? "{}"));
+    } catch {}
     if (window.location.hash === "#add") dialogRef.current?.showModal();
   }, []);
 
-  const all = [...skills, ...added];
+  // Skills the school verified during the demo show as verified here.
+  const all = [...skills, ...added].map((s) =>
+    !s.verified && decisions[`sample-1:${s.name}`] === "verified" ? { ...s, verified: true, verifiedBy: school.name } : s,
+  );
   const verified = all.filter((s) => s.verified);
   const pending = all.filter((s) => !s.verified);
 

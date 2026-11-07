@@ -142,16 +142,20 @@ Built in the student dashboard's visual language (Aston, 7 Nov 2026); self-teste
 
 ## Checkpoint 9: School dashboard
 
-- [ ] Student overview and progress by programme or class
-- [ ] Programme participation and placements
-- [ ] Institution profile and facilitators
+- [x] Student overview and progress by programme or class
+- [x] Programme participation and placements
+- [x] Institution profile and facilitators
+
+Built in the student dashboard's visual language (Aston, 7 Nov 2026); self-tested; awaiting review.
 
 ## Checkpoint 10: Admin dashboard
 
-- [ ] Users (all roles) list and detail
-- [ ] Programme management: create, edit, open and close (feeds the public programme listing)
-- [ ] Content: approve stats, testimonials and articles
-- [ ] Reporting overview with charts
+- [x] Users (all roles) list and detail
+- [x] Programme management: create, edit, open and close (feeding the public listing is wired in Checkpoint 11)
+- [x] Content: approve stats, testimonials and articles (removing public Draft badges is wired in Checkpoint 11)
+- [x] Reporting overview with charts
+
+Built in the student dashboard's visual language; self-tested; awaiting review.
 
 ## Checkpoint 11: Connected journeys
 
@@ -174,6 +178,16 @@ Built in the student dashboard's visual language (Aston, 7 Nov 2026); self-teste
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-07 — Checkpoints 9 and 10: school and admin dashboards
+- Direction (Aston): same visual language as the student dashboard, built together.
+- Shared kit `components/dashboard/kit.tsx`: ColorTile, SummaryPanel (gradient card + mini stats), TodayTabs, ArrowLink, Pill. `StatusPill` moved to its own file so browser components can use it.
+- School (Jean-Paul K.): overview with class tiles (average progress), institution snapshot, verification requests, "what's next today?" (Verify / Placements / Programmes); Students (search, class filter, progress, drawer); Programmes (live status, sample learner counts, Diane's session application flagged); Placements (sample employers, no-guarantee note); Institution profile with facilitators and a validated Add facilitator form.
+- Cross-role journey: skills Diane adds (and her pending sample skills) arrive as verification requests; verifying one shows it as "Verified by Sample TVET School" on her Skills Passport.
+- Admin (Eric H.): overview with programme table, platform snapshot, approvals queue and today tabs; Users (all roles, search, role filter, drawer); Programmes (create and edit with date-order validation, "open/close applications today", live status preview; status always from dates); Content approvals (approve / request changes for all 11 Draft items); Reports (stat tiles, weekly sign-ups column chart, two bar charts; one hue, tooltips on hover and keyboard focus, "Show as table" for each, labelled "Sample figures, not real data").
+- Data: `data/school.ts`, `data/admin.ts`. Wording in `content/dashboard.ts` (Draft).
+- Tested: axe 0 issues on all 10 school and admin screens at 1440, 1024, 375 (after adding image roles to chart bars); no sideways scrolling; verification journey end to end; class filter; facilitator form (3 errors, then added); programme date-order error, status preview, creation; approvals (11 → 9); chart keyboard tooltip.
+- Unused files awaiting Aston's OK to delete: `components/dashboard/StudentApplications.tsx`, `CompanyTalentTable.tsx`, `AdminProgrammeTable.tsx`, plus `studentCourses` and `overviewText` leftovers.
 
 ### 2026-11-07 — Checkpoint 8: company dashboard
 - Direction (Aston): same visual language as the student dashboard; no separate design.
