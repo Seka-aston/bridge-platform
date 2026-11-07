@@ -4,7 +4,10 @@ import { BadgeCheck, Clock, Star } from "lucide-react";
 import { Button } from "@/components/Button";
 import { TalentCard } from "@/components/TalentCard";
 import { useCompanyData } from "@/components/dashboard/company/CompanyData";
-import { companyText } from "@/content/dashboard";
+import { companyText, noticeText } from "@/content/dashboard";
+import { company } from "@/data/company";
+import { addNotice } from "@/lib/prototypeStore";
+import { useEffect } from "react";
 import { talentCardText } from "@/content/ui";
 import type { TalentProfile } from "@/data/talent";
 
@@ -71,12 +74,19 @@ export function ProfileDrawerBody({ profile }: { profile: TalentProfile }) {
   const { shortlist, toggleShortlist } = useCompanyData();
   const saved = shortlist.includes(profile.id);
   const t = companyText.profile;
+  // Connected journey: the sample student sees that this company viewed her Skills Passport.
+  useEffect(() => {
+    if (profile.id === "sample-1") addNotice("student", noticeText.profileViewed.replace("{company}", company.name));
+  }, [profile.id]);
   return (
     <div className="space-y-5">
       <p className="rounded-tile bg-gray-50 p-3 text-sm text-gray-700">{t.note}</p>
       <TalentCard profile={profile} />
       <div className="flex flex-wrap gap-3">
-        <Button shape="pill" variant={saved ? "outline" : "primary"} onClick={() => toggleShortlist(profile.id)}>
+        <Button shape="pill" variant={saved ? "outline" : "primary"} onClick={() => {
+            if (!saved && profile.id === "sample-1") addNotice("student", noticeText.shortlisted.replace("{company}", company.name));
+            toggleShortlist(profile.id);
+          }}>
           <Star aria-hidden className="size-4" fill={saved ? "currentColor" : "none"} />
           {saved ? t.remove : t.shortlist}
         </Button>

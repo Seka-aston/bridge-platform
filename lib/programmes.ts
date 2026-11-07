@@ -30,3 +30,13 @@ export function formatDate(isoDay: string): string {
     new Date(`${isoDay}T00:00:00Z`),
   );
 }
+
+// Order programmes for display: hide archived if asked, and feature Bridge Ventures Lab
+// only "when relevant and available" (open or upcoming), as spec 4.2.7 says.
+export function arrangeProgrammes(list: Programme[], today: string, opts: { showFeatured?: boolean; hideArchived?: boolean } = {}) {
+  const withStatus = list
+    .map((p) => ({ p, status: programmeStatus(p, today) }))
+    .filter(({ status }) => !(opts.hideArchived && status === "archived"));
+  const featured = opts.showFeatured !== false ? withStatus.find(({ p, status }) => p.featured && (status === "open" || status === "upcoming")) : undefined;
+  return { featured, rest: withStatus.filter((x) => x !== featured) };
+}

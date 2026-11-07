@@ -36,7 +36,7 @@ export default async function ArticlePage({ params }: PageProps<"/resources/[id]
         </Link>
         <div className="mt-8 flex flex-wrap items-center gap-2">
           <p className="text-eyebrow uppercase text-green-700">{a.category}</p>
-          {!a.approved && <Badge kind="draft" />}
+          {!a.approved && <Badge kind="draft" approvalKey={`article:${a.id}`} />}
         </div>
         <h1 className="mt-4 text-balance text-h2-mobile text-navy-900 md:text-display-mobile">{a.title}</h1>
         <p className="mt-4 text-gray-500">

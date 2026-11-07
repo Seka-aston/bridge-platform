@@ -1,3 +1,4 @@
+import { ApprovableDraft } from "@/components/ApprovableDraft";
 import { badgeLabels } from "@/content/site";
 
 /*
@@ -17,7 +18,10 @@ const looks: Record<BadgeKind, string> = {
   preview: "border border-green-700 bg-white text-green-700",
 };
 
-export function Badge({ kind, className = "" }: { kind: BadgeKind; className?: string }) {
+// `approvalKey` links a Draft badge to an item in the admin's Content approvals queue:
+// once approved in this browser session, the badge disappears (Checkpoint 11).
+export function Badge({ kind, className = "", approvalKey }: { kind: BadgeKind; className?: string; approvalKey?: string }) {
+  if (kind === "draft" && approvalKey) return <ApprovableDraft approvalKey={approvalKey} className={className} />;
   return (
     <span
       className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-control px-2 py-0.5 text-eyebrow uppercase ${looks[kind]} ${className}`}

@@ -5,7 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/Button";
 import { CheckboxField, ErrorSummary, SelectField, TextArea, TextField } from "@/components/forms/Fields";
 import { applyForm as t, formText } from "@/content/pages";
-import { fakeNetwork, isEmail, readSession, saveToSession } from "@/lib/prototypeStore";
+import { addNotice, fakeNetwork, isEmail, readSession, saveToSession } from "@/lib/prototypeStore";
+import { noticeText } from "@/content/dashboard";
 
 /*
   Programme application (spec 4.2.15: validation, loading state, success message,
@@ -86,6 +87,9 @@ export function ApplyForm({ programmeId, programmeName }: { programmeId: string;
     setStatus("submitting");
     await fakeNetwork();
     saveToSession(STORE, { programmeId, programmeName, ...values });
+    const notice = noticeText.programmeApplied.replace("{name}", values.fullName.trim()).replace("{programme}", programmeName);
+    addNotice("school", notice);
+    addNotice("admin", notice);
     setStatus("done");
     requestAnimationFrame(() => successRef.current?.focus());
   }

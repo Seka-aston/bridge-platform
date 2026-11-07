@@ -7,7 +7,8 @@ import { ErrorText } from "@/components/forms/Fields";
 import { studentText } from "@/content/dashboard";
 import type { Skill } from "@/data/student";
 import { school } from "@/data/school";
-import { readSession, saveToSession, VERIFY_STORE } from "@/lib/prototypeStore";
+import { addNotice, readSession, saveToSession, VERIFY_STORE } from "@/lib/prototypeStore";
+import { noticeText } from "@/content/dashboard";
 
 /*
   Skills list with "Add New Skill" (opens automatically when arriving from the overview's
@@ -81,6 +82,7 @@ export function SkillsSection({ skills, publicHref }: { skills: Skill[]; publicH
     }
     const skill: Skill = { name: name.trim(), verified: false, evidence: evidence.trim() || undefined };
     saveToSession(STORE, skill);
+    addNotice("school", noticeText.skillAdded.replace("{skill}", skill.name));
     setAdded((a) => [...a, skill]);
     setName("");
     setEvidence("");

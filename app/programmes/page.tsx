@@ -4,26 +4,18 @@ import { Suspense } from "react";
 import { Badge } from "@/components/Badge";
 import { FinalBand } from "@/components/FinalBand";
 import { PageHeader } from "@/components/PageHeader";
-import { ProgrammeBrowser } from "@/components/ProgrammeBrowser";
-import { ProgrammeCard } from "@/components/ProgrammeCard";
+import { LiveProgrammeBrowser } from "@/components/LiveProgrammes";
 import { programmesPage as c } from "@/content/pages";
 import { prototypeMode } from "@/content/site";
 import { programmes } from "@/data/programmes";
-import { programmeStatus, todayInKigali } from "@/lib/programmes";
+import { todayInKigali } from "@/lib/programmes";
 
 export const metadata: Metadata = { title: "Programmes", description: c.header.supporting };
 
 // Status is worked out for today when the page is requested; the cards are then filtered in the browser.
 async function Listing() {
   await connection();
-  const today = todayInKigali();
-  const items = programmes
-    .filter((p) => p.approved || prototypeMode)
-    .map((p) => {
-      const status = programmeStatus(p, today);
-      return { id: p.id, status, card: <ProgrammeCard programme={p} status={status} /> };
-    });
-  return <ProgrammeBrowser items={items} labels={c.filters} />;
+  return <LiveProgrammeBrowser programmes={programmes.filter((p) => p.approved || prototypeMode)} today={todayInKigali()} labels={c.filters} />;
 }
 
 export default function ProgrammesPage() {

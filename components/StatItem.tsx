@@ -18,7 +18,7 @@ export function StatItem({ value, label, approved }: Stat) {
       {/* 30px on phones so "1,000+" fits two to a row at 320px; 40px from 768px up. */}
       <p className="mt-4 text-h2-mobile text-navy-900 md:text-display-mobile">{value}</p>
       <p className="mt-2 text-gray-700">{label}</p>
-      {!approved && <Badge kind="draft" className="mt-3" />}
+      {!approved && <Badge kind="draft" className="mt-3" approvalKey={`stat:${value}`} />}
     </div>
   );
 }

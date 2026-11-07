@@ -19,7 +19,7 @@ export function DashPageHeader({
   large?: boolean; // the overview's big welcome line
 }) {
   return (
-    <div className="flex flex-col gap-4 px-1 md:flex-row md:items-end md:justify-between">
+    <div className="flex flex-col gap-4 px-1 lg:flex-row lg:items-end lg:justify-between">
       <div>
         <h1 className={`text-navy-900 ${large ? "text-display-mobile md:text-display" : "text-h2-mobile md:text-h2"}`}>{title}</h1>
         {description && <p className={`mt-2 max-w-2xl text-gray-700 ${large ? "text-body-lg" : ""}`}>{description}</p>}
@@ -149,8 +149,9 @@ export function DataTable({
   columns: Column[];
   rows: { key: string; cells: Record<string, ReactNode> }[];
 }) {
+  // `relative` keeps screen-reader-only labels inside this scrolling frame, so they can't widen the page.
   return (
-    <div role="region" aria-label={caption} tabIndex={0} className="overflow-x-auto rounded-control focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900">
+    <div role="region" aria-label={caption} tabIndex={0} className="relative overflow-x-auto rounded-control focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900">
       <table className="w-full min-w-[40rem] border-collapse text-left">
         <caption className="sr-only">{caption}</caption>
         <thead>

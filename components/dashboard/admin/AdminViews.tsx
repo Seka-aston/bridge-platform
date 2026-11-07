@@ -19,6 +19,7 @@ import { sampleUsers } from "@/data/users";
 import { school } from "@/data/school";
 import { company } from "@/data/company";
 import { formatDate, programmeStatus, todayInKigali } from "@/lib/programmes";
+import { APPROVAL_STORE, PROGRAMME_EDITS_STORE, readSession } from "@/lib/prototypeStore";
 
 /*
   Admin dashboard (Checkpoint 10), in the student dashboard's visual language.
@@ -26,8 +27,7 @@ import { formatDate, programmeStatus, todayInKigali } from "@/lib/programmes";
   Changes are kept in this browser tab; showing them on the public site is Checkpoint 11.
 */
 
-const PROG_STORE = "bridge-admin-programmes"; // edited or created programmes, by id
-const APPROVAL_STORE = "bridge-approvals"; // { itemKey: "approved" | "changes" }
+const PROG_STORE = PROGRAMME_EDITS_STORE;
 
 type Decision = "approved" | "changes";
 type ApprovalItem = { key: string; label: string; type: keyof typeof t.content.types };
@@ -50,6 +50,7 @@ type Ctx = {
   decisions: Record<string, Decision>;
   decide: (key: string, d: Decision) => void;
   users: UserRow[];
+  sessionApps: string[];
 };
 const AdminCtx = createContext<Ctx | null>(null);
 
@@ -66,12 +67,14 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const [today, setToday] = useState("");
   const [edited, setEdited] = useState<Record<string, Programme>>({});
   const [decisions, setDecisions] = useState<Record<string, Decision>>({});
+  const [sessionApps, setSessionApps] = useState<string[]>([]);
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect -- browser-only storage and clock, read once after mount */
     setEdited(load(PROG_STORE, {}));
     setDecisions(load(APPROVAL_STORE, {}));
     setToday(todayInKigali());
+    setSessionApps(readSession<{ programmeId: string }>("bridge-applications").map((a) => a.programmeId));
     setReady(true);
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
@@ -113,8 +116,9 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       decisions,
       decide,
       users,
+      sessionApps,
     };
-  }, [ready, today, edited, saveProgramme, decisions, decide]);
+  }, [ready, today, edited, saveProgramme, decisions, decide, sessionApps]);
 
   return <AdminCtx.Provider value={value}>{children}</AdminCtx.Provider>;
 }
@@ -200,7 +204,7 @@ export function AdminToday({ firstName, contentHref, programmesHref, usersHref }
 type FormV = { name: string; summary: string; opensOn: string; closesOn: string; endsOn: string };
 
 export function ProgrammeManager({ compact = false }: { compact?: boolean }) {
-  const { programmes, saveProgramme, today, ready } = useAdmin();
+  const { programmes, saveProgramme, today, ready, sessionApps } = useAdmin();
   const p = t.programmes;
   const f = p.form;
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -275,7 +279,12 @@ export function ProgrammeManager({ compact = false }: { compact?: boolean }) {
             rows={shown.map((x) => ({
               key: x.id,
               cells: {
-                name: x.name,
+                name: (
+                  <span>
+                    {x.name}
+                    {sessionApps.includes(x.id) && <span className="block text-sm font-semibold text-green-700">{t.programmes.sessionApplied}</span>}
+                  </span>
+                ),
                 status: <StatusPill status={programmeStatus(x, today)} />,
                 opens: formatDate(x.opensOn),
                 closes: formatDate(x.closesOn),

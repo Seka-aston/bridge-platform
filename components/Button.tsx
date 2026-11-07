@@ -37,7 +37,7 @@ type ButtonProps = {
 };
 
 const base =
-  "group inline-flex items-center justify-center gap-2 font-semibold transition-[color,background-color,transform] duration-150 select-none";
+  "group inline-flex items-center justify-center gap-2 whitespace-nowrap font-semibold transition-[color,background-color,transform] duration-150 select-none";
 
 // Padding is left off text buttons so they line up with body copy.
 const sizes: Record<ButtonVariant, Record<ButtonSize, string>> = {

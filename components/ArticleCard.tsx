@@ -26,7 +26,7 @@ export function ArticleCard({ article: a, showImage = true }: { article: Article
       <div className="flex flex-1 flex-col p-6">
         <div className="flex flex-wrap items-center gap-2">
           <p className="text-eyebrow uppercase text-green-700">{a.category}</p>
-          {!a.approved && <Badge kind="draft" />}
+          {!a.approved && <Badge kind="draft" approvalKey={`article:${a.id}`} />}
         </div>
         <h3 className="mt-3 text-h3 text-navy-900">
           <Link

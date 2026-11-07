@@ -246,37 +246,6 @@ export const studentText = {
   },
 };
 
-// Overview wording for the other roles (Checkpoint 6).
-export const overviewText = {
-  school: {
-    stats: { learners: "Learners", verified: "Skills verified", avgProgress: "Average progress" },
-    tableTitle: "Learner progress",
-    columns: { learner: "Learner", discipline: "Discipline", level: "Level", verification: "Verification", progress: "Progress" },
-  },
-  company: {
-    stats: { profiles: "Talent profiles", verified: "Verified skills", shortlisted: "Shortlisted" },
-    tableTitle: "Talent",
-    filterLabel: "Discipline",
-    searchPlaceholder: "Search by name or skill",
-    columns: { name: "Name", discipline: "Discipline", verification: "Verification", availability: "Availability" },
-    notShared: "Not shared",
-    shortlistEmpty: { title: "Your shortlist is empty", body: "Shortlisting comes in Checkpoint 8." },
-  },
-  admin: {
-    stats: { open: "Open programmes", upcoming: "Upcoming", users: "Sample users", pending: "Items awaiting approval" },
-    tableTitle: "Programmes",
-    columns: { name: "Programme", status: "Status", opens: "Applications open", closes: "Applications close" },
-    approvalsTitle: "Awaiting Bridge approval",
-    approvals: {
-      stats: "Trust statistics",
-      programmes: "Programme dates",
-      articles: "Articles",
-      contact: "Footer contact details",
-      stories: "Learner stories (none supplied)",
-    },
-  },
-};
-
 // ---------- Company dashboard (Checkpoint 8). NEW, Draft. Same visual language as the student dashboard. ----------
 export const companyText = {
   welcomeLine: "{open} open roles · {applicants} active applicants",
@@ -517,6 +486,7 @@ export const adminText = {
     description: "Create and edit programmes. Status is always worked out from the dates, never typed by hand.",
     columns: { name: "Programme", status: "Status", opens: "Applications open", closes: "Applications close", ends: "Programme ends" },
     edit: "Edit",
+    sessionApplied: "1 application this session",
     form: {
       createTitle: "New programme",
       editTitle: "Edit {name}",
@@ -531,7 +501,7 @@ export const adminText = {
       cancel: "Cancel",
       openNow: "Open applications today",
       closeNow: "Close applications today",
-      prototype: "Prototype: changes are kept in this browser tab. Showing them on the public site is part of Checkpoint 11.",
+      prototype: "Prototype: changes are kept in this browser tab and show on the public site in the same tab."
     },
   },
   content: {
@@ -542,7 +512,7 @@ export const adminText = {
     status: { pending: "Awaiting approval", approved: "Approved", changes: "Changes requested" },
     approve: "Approve",
     requestChanges: "Request changes",
-    note: "Prototype: decisions are kept in this browser tab. Removing Draft badges from the public site is part of Checkpoint 11.",
+    note: "Prototype: decisions are kept in this browser tab. Approved items lose their Draft badge on the public site in the same tab.",
   },
   reports: {
     title: "Reports",
@@ -553,4 +523,23 @@ export const adminText = {
     disciplines: "Learners by discipline",
     weekLabel: "Week",
   },
+};
+
+// ---------- Live notifications between roles (Checkpoint 11). NEW, Draft. ----------
+export const noticeText = {
+  programmeApplied: "{name} applied to {programme}",
+  opportunityApplied: "Diane M. applied to {position}",
+  skillAdded: "Diane M. asked you to verify {skill}",
+  profileViewed: "{company} viewed your Skills Passport",
+  shortlisted: "{company} added you to their shortlist",
+  stageMoved: "Your application for {position} moved to: {stage}",
+  skillVerified: "Your {skill} skill was verified by {school}",
+  live: "Just now",
+};
+
+export const resetText = {
+  title: "Presenting a demo?",
+  body: "Clear everything the demo saved in this browser tab (applications, approvals, verifications, notifications) and start fresh.",
+  button: "Reset demo data",
+  done: "Demo data cleared.",
 };

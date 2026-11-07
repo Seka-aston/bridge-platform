@@ -4,7 +4,9 @@ import { Check, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/dashboard/parts";
 import { studentText } from "@/content/dashboard";
-import { readSession } from "@/lib/prototypeStore";
+import { readJSON, readSession } from "@/lib/prototypeStore";
+import { companyText } from "@/content/dashboard";
+import type { Stage } from "@/data/company";
 import { OPP_STORE } from "@/components/dashboard/student/OpportunitiesTable";
 
 /*
@@ -14,7 +16,9 @@ import { OPP_STORE } from "@/components/dashboard/student/OpportunitiesTable";
 */
 
 const t = studentText.opportunitiesPage;
-type Item = { key: string; title: string; kind: "programme" | "opportunity"; savedAt: string };
+type Item = { key: string; title: string; kind: "programme" | "opportunity"; savedAt: string; stage?: Stage };
+// Where a company stage sits on the student's three-step tracker.
+const stepOf = (s?: Stage) => (!s || s === "new" ? 0 : s === "reviewing" || s === "interview" ? 1 : 2);
 
 export function ApplicationsTracker() {
   const [items, setItems] = useState<Item[] | null>(null);
@@ -26,7 +30,10 @@ export function ApplicationsTracker() {
       kind: "programme" as const,
       savedAt: a.savedAt,
     }));
+    // The company dashboard's stage for the student's application to its internship (Checkpoint 11).
+    const companyStage = readJSON<Record<string, Stage>>("bridge-stage-overrides", {})["session-diane"];
     const opps = readSession<{ id: string; position: string; company: string; savedAt: string }>(OPP_STORE).map((a) => ({
+      stage: a.id === "o1" ? companyStage : undefined,
       key: `o-${a.id}-${a.savedAt}`,
       title: `${a.position} · ${a.company}`,
       kind: "opportunity" as const,
@@ -54,16 +61,20 @@ export function ApplicationsTracker() {
               )}
             </p>
           </div>
-          <ol className="mt-4 grid grid-cols-3 gap-2" aria-label={t.currentStep.replace("{step}", t.steps[0])}>
-            {t.steps.map((step, i) => (
-              <li key={step} className="flex flex-col gap-2">
-                <span className={`h-1.5 rounded-full ${i === 0 ? "bg-green-700" : "bg-gray-200"}`} aria-hidden />
-                <span className={`flex items-center gap-1.5 text-sm ${i === 0 ? "font-semibold text-navy-900" : "text-gray-700"}`}>
-                  {i === 0 && <Check aria-hidden className="size-4 text-green-700" />}
-                  {step}
-                </span>
-              </li>
-            ))}
+          <ol className="mt-4 grid grid-cols-3 gap-2" aria-label={t.currentStep.replace("{step}", t.steps[stepOf(a.stage)])}>
+            {t.steps.map((step, i) => {
+              const reached = i <= stepOf(a.stage);
+              return (
+                <li key={step} className="flex flex-col gap-2">
+                  <span className={`h-1.5 rounded-full ${reached ? "bg-green-700" : "bg-gray-200"}`} aria-hidden />
+                  <span className={`flex items-center gap-1.5 text-sm ${reached ? "font-semibold text-navy-900" : "text-gray-700"}`}>
+                    {reached && <Check aria-hidden className="size-4 text-green-700" />}
+                    {step}
+                    {i === stepOf(a.stage) && a.stage && a.stage !== "new" && ` · ${companyText.applicantsPage.stages[a.stage]}`}
+                  </span>
+                </li>
+              );
+            })}
           </ol>
         </li>
       ))}

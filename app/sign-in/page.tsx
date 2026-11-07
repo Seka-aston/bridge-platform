@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Briefcase, GraduationCap, School, ShieldCheck, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/Button";
 import { PageHeader } from "@/components/PageHeader";
+import { ResetDemo } from "@/components/ResetDemo";
 import { roleText, signInText as t } from "@/content/dashboard";
 import { roles, sampleUsers, type Role } from "@/data/users";
 
@@ -36,6 +37,9 @@ export default function SignInPage() {
             );
           })}
         </ul>
+        <div className="mt-12">
+          <ResetDemo />
+        </div>
       </div>
     </main>
   );

@@ -16,7 +16,7 @@ export default async function RoleLayout({ children, params }: LayoutProps<"/das
   if (!roles.includes(role as Role)) notFound();
   const r = role as Role;
   return (
-    <DashboardShell base={`/dashboard/${r}`} title={roleText[r].title} roleLabel={roleText[r].label} user={sampleUsers[r]} nav={roleText[r].nav}
+    <DashboardShell role={r} base={`/dashboard/${r}`} title={roleText[r].title} roleLabel={roleText[r].label} user={sampleUsers[r]} nav={roleText[r].nav}
       searchItems={searchItemsFor(r)}
       notifications={notificationsFor(r)}
     >

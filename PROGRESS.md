@@ -159,25 +159,51 @@ Built in the student dashboard's visual language; self-tested; awaiting review.
 
 ## Checkpoint 11: Connected journeys
 
-- [ ] Student applies to a programme → appears for School and Admin
-- [ ] Admin opens a programme → appears on the homepage and Programmes page
-- [ ] Company views a student's Skills Passport → student sees the interest
-- [ ] Sample data tells one coherent story across all four roles
+- [x] Student applies to a programme → appears for School and Admin
+- [x] Admin opens a programme → appears on the homepage and Programmes page
+- [x] Company views a student's Skills Passport → student sees the interest
+- [x] Sample data tells one coherent story across all four roles
+
+Also: admin approvals remove Draft badges on the public site; company stage changes move the student's tracker; school verification shows on the student's passport. All journeys work within one browser tab (demo data is per tab).
 
 **Aston reviews:** walking through each journey as each role.
 
 ## Checkpoint 12: QA and demo
 
-- [ ] Check against the acceptance criteria in CLAUDE.md section 10
-- [ ] Cross-device check
-- [ ] Demo script: the 3–4 journeys to show Bridge, in order
-- [ ] Final deploy with a shareable link
+- [x] Check against the acceptance criteria in CLAUDE.md section 10 (see table below)
+- [x] Cross-device check (52 pages × 375, 768, 1024, 1440px)
+- [x] Demo script: the 3–4 journeys to show Bridge, in order (`DEMO.md`)
+- [x] Final deploy with a shareable link: https://bridge-platform-eovr.vercel.app
+
+Definition of done (CLAUDE.md section 10), honest status:
+
+| # | Criterion | Status |
+|---|---|---|
+| 1 | Agreed sections and hierarchy implemented | Done: all 13 homepage sections in spec order |
+| 2 | Bridge identity preserved and applied consistently | Done in the prototype; Bridge's sign-off on navy-and-green is still open |
+| 3 | Four audience pathways clear and functional | Done: homepage panels, four audience pages, four dashboards |
+| 4 | Programme information reflects the approved source of truth | **Not yet**: dates are sample dates; needs Bridge's real programme data |
+| 5 | Every CTA leads to its intended destination | Done for the prototype: no dead ends (crawl of 52 pages). Booking and login are clearly labelled stand-ins |
+| 6 | Works on desktop, tablet and mobile | Done: no sideways scrolling at 375, 768, 1024, 1440px |
+| 7 | Accessibility, performance and security | Accessibility done (axe WCAG 2.1 AA: 0 issues in 208 checks; keyboard, focus, reduced motion). Performance not formally measured. No backend yet, so security review comes with the real build |
+| 8 | No fabricated statistics, endorsements or capabilities | Done: all samples labelled; unapproved items Draft; Bridge AI shown as preview; no match percentages; no real company names |
+| 9 | Bridge has approved content, imagery and journeys | **Not yet**: needs Bridge's review |
 
 ---
 
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-07 — Checkpoints 11 and 12: connected journeys, QA and demo
+- Aston approved deleting unused files: StudentApplications, CompanyTalentTable, AdminProgrammeTable components and two leftover data blocks removed.
+- Programme card and detail split into presentational views (`ProgrammeCardView`, `ProgrammeDetailView`) plus a browser layer (`LiveProgrammes`) that applies admin programme edits from this session to the homepage, Programmes list, Ventures Lab and programme pages. `arrangeProgrammes` in `lib/programmes.ts`.
+- Draft badges take an `approvalKey`; approved items lose the badge on the public site (`ApprovableDraft`).
+- Live notifications between roles (`addNotice` / `readNotices`), shown first in each dashboard's bell: programme applications (school, admin), opportunity applications (company), skill requests (school), profile viewed, shortlisted, stage moved, skill verified (student).
+- Student application tracker follows the company's stage; admin programme table shows session applications.
+- "Reset demo data" on the sign-in screen clears everything the demo saved in the tab.
+- QA: crawl found 52 pages, no broken links; axe 0 issues in 208 checks (52 pages × 4 widths); no sideways scrolling on any page at 375, 768, 1024 or 1440px after two fixes: dashboard header buttons now stack under the title below 1024px, and table frames now contain their screen-reader-only labels (they had widened the Content approvals page at 768px). Button text no longer wraps.
+- `DEMO.md`: four journeys for presenting to Bridge, with setup, clicks and talking points. Verified by an automated run of all journeys in one tab.
 
 ### 2026-11-07 — Checkpoints 9 and 10: school and admin dashboards
 - Direction (Aston): same visual language as the student dashboard, built together.

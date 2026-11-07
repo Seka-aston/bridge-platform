@@ -5,7 +5,9 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/Button";
 import { studentText } from "@/content/dashboard";
 import type { Opportunity } from "@/data/opportunities";
-import { fakeNetwork, readSession, saveToSession } from "@/lib/prototypeStore";
+import { addNotice, fakeNetwork, readSession, saveToSession } from "@/lib/prototypeStore";
+import { noticeText } from "@/content/dashboard";
+import { company } from "@/data/company";
 
 /*
   "Opportunities for you" from Aston's design, adapted to the content rules: sample employers
@@ -43,6 +45,7 @@ export function OpportunitiesTable({ items, mySkills }: { items: Opportunity[]; 
     setSending(true);
     await fakeNetwork();
     saveToSession(OPP_STORE, { id: current.id, position: current.position, company: current.company });
+    if (current.company === company.name) addNotice("company", noticeText.opportunityApplied.replace("{position}", current.position));
     setApplied((a) => [...a, current.id]);
     setSending(false);
     dialogRef.current?.close();
@@ -50,7 +53,7 @@ export function OpportunitiesTable({ items, mySkills }: { items: Opportunity[]; 
 
   return (
     <>
-      <div role="region" aria-label={t.title} tabIndex={0} className="overflow-x-auto rounded-tile focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900">
+      <div role="region" aria-label={t.title} tabIndex={0} className="relative overflow-x-auto rounded-tile focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900">
         <table className="w-full min-w-[40rem] border-separate border-spacing-y-1 text-left">
           <caption className="sr-only">{t.title}</caption>
           <thead>

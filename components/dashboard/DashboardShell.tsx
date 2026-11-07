@@ -8,7 +8,8 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Logo } from "@/components/Logo";
-import { dashboardText as t, type IconKey, type NavLink } from "@/content/dashboard";
+import { dashboardText as t, noticeText, type IconKey, type NavLink } from "@/content/dashboard";
+import { readNotices } from "@/lib/prototypeStore";
 
 /*
   Dashboard frame from Aston's student dashboard design (7 Nov 2026), used for all four roles:
@@ -29,6 +30,7 @@ export type SearchItem = { label: string; meta: string; href: string };
 export type Notice = { id: string; text: string; daysAgo: number; unread: boolean };
 
 type Props = {
+  role: string;
   base: string;
   title: string;
   roleLabel: string;
@@ -127,9 +129,16 @@ function SearchDialog({ items }: { items: SearchItem[] }) {
   );
 }
 
-function Notifications({ items }: { items: Notice[] }) {
+function Notifications({ items: sample, role }: { items: Notice[]; role: string }) {
   const { open, setOpen, ref } = useDisclosure();
   const [read, setRead] = useState(false);
+  // Live notifications from other roles in this browser session (Checkpoint 11), newest first.
+  const [live, setLive] = useState<Notice[]>([]);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- browser-only storage, read after mount
+    setLive(readNotices(role).map((n, i) => ({ id: `live-${i}`, text: n.text, daysAgo: -1, unread: true })));
+  }, [role]);
+  const items = [...live, ...sample];
   const unread = read ? 0 : items.filter((i) => i.unread).length;
   return (
     <div ref={ref} className="relative">
@@ -153,7 +162,7 @@ function Notifications({ items }: { items: Notice[] }) {
             {items.map((n) => (
               <li key={n.id} className="rounded-control px-3 py-2.5">
                 <p className="text-gray-800">{n.text}</p>
-                <p className="text-sm text-gray-500">{when(n.daysAgo)}</p>
+                <p className="text-sm text-gray-500">{n.daysAgo < 0 ? noticeText.live : when(n.daysAgo)}</p>
               </li>
             ))}
           </ul>
@@ -217,7 +226,7 @@ function RailButton({ href, label, icon: Icon, active }: { href: string; label: 
   );
 }
 
-export function DashboardShell({ base, title, roleLabel, user, nav, searchItems, notifications, children }: Props) {
+export function DashboardShell({ role, base, title, roleLabel, user, nav, searchItems, notifications, children }: Props) {
   const pathname = usePathname();
   const menuRef = useRef<HTMLDialogElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -286,7 +295,7 @@ export function DashboardShell({ base, title, roleLabel, user, nav, searchItems,
             {t.prototypeLabel}
           </span>
           <SearchDialog items={searchItems} />
-          <Notifications items={notifications} />
+          <Notifications items={notifications} role={role} />
           <AccountMenu user={user} roleLabel={roleLabel} />
         </div>
       </header>

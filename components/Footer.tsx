@@ -83,7 +83,7 @@ export function Footer() {
             <h2 className="text-eyebrow uppercase text-white">{t.columns.contact}</h2>
             {showContact ? (
               <address className="mt-4 space-y-3 not-italic">
-                {!contact.approved && <Badge kind="draft" />}
+                {!contact.approved && <Badge kind="draft" approvalKey="contact:footer" />}
                 {contact.address && (
                   <p className="flex gap-3">
                     <MapPin aria-hidden className="mt-0.5 size-5 shrink-0 text-green-500" />

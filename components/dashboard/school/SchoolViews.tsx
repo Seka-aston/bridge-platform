@@ -8,7 +8,7 @@ import { DetailDrawer } from "@/components/dashboard/DetailDrawer";
 import { DataTable, EmptyState, Panel, ProgressBar } from "@/components/dashboard/parts";
 import { ago, ColorTile, Pill, ring, SummaryPanel, TodayTabs } from "@/components/dashboard/kit";
 import { ErrorSummary, TextField } from "@/components/forms/Fields";
-import { schoolText as t, sharedText } from "@/content/dashboard";
+import { noticeText, schoolText as t, sharedText } from "@/content/dashboard";
 import { formText } from "@/content/pages";
 import { learnerProgress } from "@/data/dashboard";
 import { programmes } from "@/data/programmes";
@@ -18,7 +18,7 @@ import {
 import { skills as studentSkills, type Skill } from "@/data/student";
 import { talentProfiles } from "@/data/talent";
 import { formatDate, programmeStatus, todayInKigali, type ProgrammeStatus } from "@/lib/programmes";
-import { isEmail, readSession, VERIFY_STORE } from "@/lib/prototypeStore";
+import { addNotice, isEmail, readSession, VERIFY_STORE } from "@/lib/prototypeStore";
 import { StatusPill } from "@/components/StatusPill";
 import { talentCardText } from "@/content/ui";
 
@@ -68,6 +68,7 @@ export function SchoolDataProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const decide = useCallback((r: Request, d: "verified" | "declined") => {
+    if (d === "verified" && r.talentId === "sample-1") addNotice("student", noticeText.skillVerified.replace("{skill}", r.skill).replace("{school}", school.name));
     setDecisions((s) => {
       const next = { ...s, [keyOf(r.talentId, r.skill)]: d };
       try {

@@ -3,7 +3,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { OPP_STORE } from "@/components/dashboard/student/OpportunitiesTable";
 import { applicants as sampleApplicants, postings as samplePostings, type Applicant, type Posting, type PostingStatus, type Stage } from "@/data/company";
-import { readSession } from "@/lib/prototypeStore";
+import { addNotice, readSession } from "@/lib/prototypeStore";
+import { companyText, noticeText } from "@/content/dashboard";
 
 /*
   Company dashboard data in the browser (Checkpoint 8): the sample data plus anything changed
@@ -75,6 +76,10 @@ export function CompanyDataProvider({ children }: { children: ReactNode }) {
     });
   }, []);
   const setStage = useCallback((id: string, stage: Stage) => {
+    if (id === "session-diane") {
+      const position = samplePostings.find((p) => p.id === "o1")?.title ?? "";
+      addNotice("student", noticeText.stageMoved.replace("{position}", position).replace("{stage}", companyText.applicantsPage.stages[stage]));
+    }
     setStages((s) => {
       const next = { ...s, [id]: stage };
       save(KEYS.stages, next);
