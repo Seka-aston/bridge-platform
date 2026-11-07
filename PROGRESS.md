@@ -110,10 +110,12 @@ Built and self-tested; awaiting Aston's review.
 
 ## Checkpoint 6: Platform shell
 
-- [ ] "Sign in as…" screen with the four sample users
-- [ ] Shared dashboard layout: sidebar, top bar, page header
-- [ ] Dashboard components: stat cards, tables, lists, progress bars, empty states, filters, detail drawers
-- [ ] Each role lands on its own dashboard
+- [x] "Sign in as…" screen with the four sample users
+- [x] Shared dashboard layout: sidebar, top bar, page header
+- [x] Dashboard components: stat cards, tables, lists, progress bars, empty states, filters, detail drawers
+- [x] Each role lands on its own dashboard
+
+Built and self-tested; awaiting Aston's review.
 
 **Aston reviews:** the dashboard frame and components, before any role's screens are built.
 
@@ -168,6 +170,17 @@ Built from Aston's existing student dashboard designs. Share Figma frames or scr
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-07 — Checkpoint 6: platform shell
+- Decisions (Aston): navy dashboard sidebar; delete the unused placeholder-page template (`app/[slug]`, `content/placeholders.ts`), done.
+- `/sign-in`: four sample users (Diane M. student, Jean-Paul K. school, Grace N. company, Eric H. admin) in `data/users.ts`; no passwords, nothing stored. `/dashboard` redirects there.
+- `DashboardShell`: navy sidebar (green bar marks the current page), white top bar with "Prototype · sample data" label and the sample user, Switch user and Back to website. Below 1024px the sidebar is a slide-in menu (native dialog). Public header and footer hidden on dashboards (`SiteChrome`).
+- Components in `components/dashboard/`: DashPageHeader, Panel, StatCard, ProgressBar, EmptyState, DataTable (scrolls inside its frame on phones), ListItem, DetailDrawer (native dialog), plus CompanyTalentTable (search, discipline filter, drawer), AdminProgrammeTable (drawer), StudentApplications.
+- Role overviews use the shared sample data: student courses and applications; school learner progress table; company talent table; admin programme table (live statuses) and a count of items awaiting Bridge approval (11, worked out from the data).
+- Connected journey, first step: applications made on the public site this session appear on the student dashboard.
+- Every sidebar link works; screens for Checkpoints 7–10 show an empty state naming the checkpoint.
+- All dashboard wording in `content/dashboard.ts` (new, Draft).
+- Tested: crawl of sign-in and all 22 dashboard screens (no dead ends; unknown role shows 404); axe 0 issues at 1440 and 375px; no sideways scrolling; search and filter counts; drawer opens by keyboard with focus inside, Escape closes, focus returns; mobile menu opens and closes; apply-then-dashboard journey.
 
 ### 2026-11-07 — Checkpoint 5: public pages
 - Copy approach (Aston): reuse spec and live-site copy; anything new is marked Draft. All page copy in `content/pages.ts`, every block labelled spec / live / NEW. Live-site US spellings changed to British. Live figures and fees (60 innovators, ~100 shortlisted, 50,000 Frw fee) marked Draft.
