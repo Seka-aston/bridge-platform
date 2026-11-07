@@ -14,6 +14,7 @@ const looks: Record<BadgeKind, string> = {
   draft: "border border-dashed border-gray-500 bg-white text-gray-700",
   comingSoon: "border border-transparent bg-green-50 text-green-700",
   sampleProfile: "border border-transparent bg-green-50 text-green-700",
+  preview: "border border-green-700 bg-white text-green-700",
 };
 
 export function Badge({ kind, className = "" }: { kind: BadgeKind; className?: string }) {

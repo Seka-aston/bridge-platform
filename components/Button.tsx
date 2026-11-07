@@ -17,7 +17,7 @@ import type { ReactNode } from "react";
   (hover, pressed, focus) without the mouse or keyboard.
 */
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "text";
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "text" | "textOnDark";
 export type ButtonSize = "md" | "lg";
 export type PreviewState = "hover" | "active" | "focus";
 
@@ -44,6 +44,7 @@ const sizes: Record<ButtonVariant, Record<ButtonSize, string>> = {
   ghost: { md: "border px-6 py-2 text-body", lg: "border px-8 py-3 text-lg" },
   // -mx-1 px-1 gives the focus ring room without shifting the link's alignment.
   text: { md: "-mx-1 px-1 text-body", lg: "-mx-1 px-1 text-lg" },
+  textOnDark: { md: "-mx-1 px-1 text-body", lg: "-mx-1 px-1 text-lg" },
 };
 
 // Every class is written out in full so Tailwind can find it.
@@ -68,6 +69,12 @@ const looks: Record<ButtonVariant, { enabled: string; disabled: string }> = {
       "rounded-sm text-green-700 underline-offset-4 hover:text-green-800 hover:underline active:text-green-800 data-[preview-state=hover]:text-green-800 data-[preview-state=hover]:underline data-[preview-state=active]:text-green-800",
     disabled: "rounded-sm text-gray-500",
   },
+  // White link with arrow for navy backgrounds (green text is too low in contrast there).
+  textOnDark: {
+    enabled:
+      "rounded-sm text-white underline-offset-4 hover:underline data-[preview-state=hover]:underline",
+    disabled: "rounded-sm text-white/60",
+  },
 };
 
 // Pressed buttons move down 1px. Text links don't move.
@@ -76,6 +83,7 @@ const press: Record<ButtonVariant, string> = {
   secondary: "active:translate-y-px data-[preview-state=active]:translate-y-px",
   ghost: "active:translate-y-px data-[preview-state=active]:translate-y-px",
   text: "",
+  textOnDark: "",
 };
 
 const focusLight =
@@ -95,7 +103,7 @@ export function Button({
   previewState,
   className = "",
 }: ButtonProps) {
-  const dark = onDark || variant === "ghost";
+  const dark = onDark || variant === "ghost" || variant === "textOnDark";
   const classes = [
     base,
     sizes[variant][size],
@@ -107,7 +115,7 @@ export function Button({
   const content = (
     <>
       {children}
-      {variant === "text" && (
+      {(variant === "text" || variant === "textOnDark") && (
         <ArrowRight
           aria-hidden
           className={`size-[1em] transition-transform duration-150 ${

@@ -76,9 +76,11 @@ All Checkpoint 2 components built and self-tested; awaiting Aston's single revie
 
 ## Checkpoint 3: Homepage assembled
 
-- [ ] All 13 sections from CLAUDE.md section 6, in order, with the spec copy
-- [ ] Sample data wired in: programmes, talent cards, articles
-- [ ] Unapproved figures marked as Draft
+- [x] All 13 sections from CLAUDE.md section 6, in order, with the spec copy
+- [x] Sample data wired in: programmes, talent cards, articles
+- [x] Unapproved figures marked as Draft
+
+Built and self-tested; awaiting Aston's review of the whole page.
 
 **Aston reviews:** the full page from top to bottom, for hierarchy and flow.
 
@@ -162,6 +164,15 @@ Built from Aston's existing student dashboard designs. Share Figma frames or scr
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-07 — Checkpoint 3: homepage assembled
+- Aston approved all Checkpoint 2 components as built.
+- Header and footer moved into `app/layout.tsx`, so every page has them. Page titles now read "Page · Bridge".
+- `app/page.tsx`: all 13 sections in spec order. Backgrounds alternate white and green-50; navy for hero, final band and footer.
+- New: `Hero` (navy, like the live site; reserved, clearly labelled space for the Checkpoint 4 ecosystem visual), `BridgeAiPreview` (static capability panel, "Preview · in development" badge, no chat input), `HomeSection` wrapper, `textOnDark` button style (white link with arrow for navy backgrounds), "Preview" badge.
+- Homepage hides archived programmes (they belong in the full listing). Stories and articles sections disappear at launch if nothing is approved.
+- Fixed: hero headline breaking "Real-World" at the hyphen.
+- Self-tested: type check, lint, build; screenshots at 375, 768, 1024 and 1440px; no sideways scrolling.
 
 ### 2026-11-07 — Components 6–14 in one batch
 - Working style changed at Aston's request: whole checkpoints are built, then reviewed together (CLAUDE.md section 1 updated).

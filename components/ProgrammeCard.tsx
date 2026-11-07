@@ -118,13 +118,18 @@ export function ProgrammeCard({ programme: p, status, featured = false }: Progra
 export async function ProgrammeCards({
   programmes,
   showFeatured = true,
+  hideArchived = false,
 }: {
   programmes: Programme[];
   showFeatured?: boolean;
+  // The homepage hides archived programmes; they belong in the full programme listing.
+  hideArchived?: boolean;
 }) {
   await connection();
   const today = todayInKigali();
-  const withStatus = programmes.map((p) => ({ p, status: programmeStatus(p, today) }));
+  const withStatus = programmes
+    .map((p) => ({ p, status: programmeStatus(p, today) }))
+    .filter(({ status }) => !(hideArchived && status === "archived"));
   // Ventures Lab is featured only "when relevant and available": while it is open or upcoming.
   const featured = showFeatured
     ? withStatus.find(({ p, status }) => p.featured && (status === "open" || status === "upcoming"))

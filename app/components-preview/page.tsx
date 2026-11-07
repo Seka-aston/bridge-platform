@@ -14,7 +14,6 @@ import { JourneySteps } from "@/components/JourneySteps";
 import { ArticleCard } from "@/components/ArticleCard";
 import { StoryCard } from "@/components/StoryCard";
 import { CtaBand } from "@/components/CtaBand";
-import { Footer } from "@/components/Footer";
 import { programmes as programmeData } from "@/data/programmes";
 import { talentProfiles } from "@/data/talent";
 import { articles } from "@/data/articles";
@@ -198,7 +197,7 @@ function CardsSection() {
         <CtaBand {...finalCta} />
       </Section>
 
-      <Section title="Footer" intro="Component 14. The real footer is at the bottom of this page. Contact details come from the live site (Draft); the mission statement and social links are awaiting Bridge.">
+      <Section title="Footer" intro="Component 14. The real footer is at the bottom of every page. Contact details come from the live site (Draft); the mission statement and social links are awaiting Bridge.">
         <p className="text-gray-700">Scroll to the end of the page to see it.</p>
       </Section>
     </>
@@ -452,8 +451,6 @@ function Verdict({ ratio }: { ratio: number }) {
 
 export default function ComponentsPreview() {
   return (
-    <>
-    <Header />
     <main id="main" className="mx-auto w-full max-w-content px-gutter">
       <header className="py-section-mobile md:py-section">
         <p className="text-eyebrow uppercase text-green-700">Internal review page</p>
@@ -572,7 +569,5 @@ export default function ComponentsPreview() {
         </ul>
       </Section>
     </main>
-    <Footer />
-    </>
   );
 }

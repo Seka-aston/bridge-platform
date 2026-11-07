@@ -18,11 +18,5 @@ export const badgeLabels = {
   draft: "Draft",
   comingSoon: "Coming soon",
   sampleProfile: "Sample profile",
-};
-
-// Temporary homepage shown until Checkpoint 3 assembles the real one.
-export const homePlaceholder = {
-  title: "Bridge",
-  message: "The new homepage is being built.",
-  previewLink: { label: "View the design system preview", href: "/components-preview" },
+  preview: "Preview · in development",
 };

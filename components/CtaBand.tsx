@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Button } from "@/components/Button";
 import { SectionHeading } from "@/components/SectionHeading";
 
@@ -53,12 +52,9 @@ export function CtaBand({ headline, supporting, primary, secondary, link }: CtaB
       </div>
       {link && (
         <p className="mt-6 text-center">
-          <Link
-            href={link.href}
-            className="rounded-sm font-semibold text-white underline underline-offset-4 hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-          >
+          <Button href={link.href} variant="textOnDark">
             {link.label}
-          </Link>
+          </Button>
         </p>
       )}
     </div>
