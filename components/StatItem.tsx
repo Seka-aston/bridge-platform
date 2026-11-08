@@ -2,9 +2,8 @@ import { Badge } from "@/components/Badge";
 import { prototypeMode } from "@/content/site";
 
 /*
-  Stat item (CLAUDE.md section 7, component 5).
-  Short brand-green bar, large navy number, grey label underneath.
-  Figures not yet approved by Bridge show a "Draft" badge in prototype mode,
+  Stat item: short brand-green bar, large navy number, label underneath.
+  Figures not yet approved by Bridge show a Draft badge in prototype mode,
   and are hidden entirely when prototype mode is off.
 */
 
@@ -13,11 +12,9 @@ export type Stat = { value: string; label: string; approved: boolean };
 export function StatItem({ value, label, approved }: Stat) {
   if (!approved && !prototypeMode) return null;
   return (
-    <div>
-      <span aria-hidden className="block h-1 w-8 rounded-full bg-green-500" />
-      {/* 30px on phones so "1,000+" fits two to a row at 320px; 40px from 768px up. */}
-      <p className="mt-4 text-h2-mobile text-navy-900 md:text-display-mobile">{value}</p>
-      <p className="mt-2 text-gray-700">{label}</p>
+    <div className="border-l-2 border-brand-green pl-5">
+      <p className="text-3xl leading-none font-bold tracking-tight text-heading tabular-nums md:text-4xl">{value}</p>
+      <p className="mt-3 text-base text-muted-foreground">{label}</p>
       {!approved && <Badge kind="draft" className="mt-3" approvalKey={`stat:${value}`} />}
     </div>
   );

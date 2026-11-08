@@ -45,3 +45,6 @@ next-env.d.ts
 
 # Before/after screenshots for the redesign (local only, Aston 8 Nov 2026)
 /screenshots/
+
+# Redesign brief (Aston's working document; kept local, 8 Nov 2026)
+/REDESIGN-BRIEF.md

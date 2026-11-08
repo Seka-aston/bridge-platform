@@ -207,7 +207,7 @@ Branch `shadcn-redesign`. One step at a time, each reviewed by Aston before the 
 
 - [x] Step 1: Audit and "before" screenshots (118 screenshots: 59 pages at 1440 and 375px)
 - [x] Step 2: Foundation: shadcn set up, Bridge theme, components installed, `/components-preview` rebuilt (approved 8 Nov 2026)
-- [ ] Step 3: Shared layout
+- [x] Step 3: Shared layout: header, footer, section heading, CTA band, every card type, badges (approved 8 Nov 2026)
 - [ ] Step 4: Homepage
 - [ ] Step 5: Public pages
 - [ ] Step 6: Platform shell
@@ -219,6 +219,7 @@ Decisions (Aston, 8 Nov 2026):
 - Fix every contrast issue, including field borders and switch tracks.
 - Focus ring stays navy on light backgrounds and white on navy.
 - Screenshots stay local only.
+- Step 3 review: alternate sections stay neutral grey (not mint); REDESIGN-BRIEF.md stays local and git-ignored.
 - Step 2 review: Draft label is the amber tint with a pencil (option A); dashboard sidebar stays light grey; the neutral outline button replaces the old green outline; branch pushed for a Vercel preview link.
 
 ---
@@ -226,6 +227,14 @@ Decisions (Aston, 8 Nov 2026):
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-08 — Redesign Step 3: shared layout
+- Header rebuilt on the shadcn Navigation Menu, with a slide-in Sheet menu on phones and tablets. Full menu from 1024px (was 1280px). Navy at the top of the homepage, solid white once scrolled.
+- Footer, section heading, section wrapper, page header, CTA band, stats, and every card type (service, audience, programme, talent, article, story, feature grid, journey steps, Bridge AI preview) rebuilt on shadcn Card, Badge, Separator, Avatar and the type scale.
+- Badges: the Draft label is the amber tint with a pencil everywhere; programme status uses the new status badges. On navy, badges swap to navy-safe colours.
+- `components/Button.tsx` is now a transition adapter that draws the shadcn Button, so every button on the site has the new look; it is deleted in Step 8.
+- New helpers: `IconTile`, `TalentField`, `tokens-navy` utility, `section-tint` token (alternate sections are neutral grey instead of mint; Aston agreed).
+- `/components-preview` gains a "Shared layout" section.
 
 ### 2026-11-08 — Redesign Steps 1 and 2: audit and shadcn foundation
 - Step 1: audit of every page and component; 118 "before" screenshots saved locally.

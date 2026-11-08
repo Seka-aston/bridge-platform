@@ -1,16 +1,23 @@
 import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { Badge } from "@/components/Badge";
-import { Button } from "@/components/Button";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { StatusPill } from "@/components/StatusPill";
+import { Badge as UiBadge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { H2, H3 } from "@/components/ui/typography";
 import { prototypeMode } from "@/content/site";
 import { programmeCardText as t } from "@/content/ui";
 import type { Programme } from "@/data/programmes";
+import { cn } from "@/lib/utils";
 import { formatDate, type ProgrammeStatus } from "@/lib/programmes";
 
 /*
-  Programme card (CLAUDE.md section 7, component 8; spec 4.2.7). Presentational only, so it
-  renders both on the server and in the browser (when an admin has edited programmes this session).
+  Programme card (spec 4.2.7). Presentational only, so it renders both on the server and in the
+  browser (when an admin has edited programmes this session).
   Status (Open, Upcoming, Closed, Archived) is calculated from the dates by the caller.
   Closed and archived cards never show a deadline or an apply button.
   `featured` gives Bridge Ventures Lab a wide, side-by-side layout.
@@ -23,59 +30,48 @@ export type ProgrammeCardProps = { programme: Programme; status: ProgrammeStatus
 
 export function ProgrammeCard({ programme: p, status, featured = false }: ProgrammeCardProps) {
   if (!p.approved && !prototypeMode) return null;
-  const dateLine = t.dateLine[status].replace(
-    "{date}",
-    formatDate(status === "upcoming" ? p.opensOn : p.closesOn),
-  );
+  const dateLine = t.dateLine[status].replace("{date}", formatDate(status === "upcoming" ? p.opensOn : p.closesOn));
   const details: [string, string][] = [
     [t.labels.audience, p.audience],
     [t.labels.format, p.format],
     [t.labels.location, p.location],
   ];
+  const Title = featured ? H2 : H3;
 
   return (
-    <article
-      className={`flex h-full flex-col overflow-hidden rounded-card border border-gray-200 bg-white shadow-card ${
-        featured ? "lg:flex-row" : ""
-      }`}
-    >
-      <div className={featured ? "lg:w-5/12" : ""}>
+    <Card className={cn("h-full gap-0 py-0 text-base", featured && "lg:flex-row")}>
+      <div className={cn("relative", featured && "lg:w-5/12 lg:shrink-0")}>
         {p.image ? (
-          <Image
-            src={p.image.src}
-            alt={p.image.alt}
-            width={800}
-            height={450}
-            className={`aspect-video w-full object-cover ${featured ? "lg:h-full" : ""}`}
-          />
+          <Image src={p.image.src} alt={p.image.alt} width={800} height={450} className={cn("aspect-video w-full object-cover", featured && "lg:h-full")} />
         ) : (
-          <ImagePlaceholder className={`aspect-video w-full ${featured ? "lg:aspect-auto lg:h-full" : ""}`} />
+          <ImagePlaceholder className={cn("aspect-video w-full", featured && "lg:aspect-auto lg:h-full")} />
         )}
       </div>
 
-      <div className={`flex flex-1 flex-col p-6 ${featured ? "md:p-10" : ""}`}>
+      <div className={cn("flex flex-1 flex-col p-6", featured && "md:p-10")}>
         <div className="flex flex-wrap items-center gap-2">
           <StatusPill status={status} />
-          {featured && (
-            <span className="text-eyebrow uppercase text-green-700">{t.featuredLabel}</span>
-          )}
+          {featured && <UiBadge variant="featured">{t.featuredLabel}</UiBadge>}
           {!p.approved && <Badge kind="draft" approvalKey={`programme:${p.id}`} />}
         </div>
 
-        <h3 className={`mt-4 text-navy-900 ${featured ? "text-h2-mobile md:text-h2" : "text-h3"}`}>{p.name}</h3>
-        <p className={`mt-2 text-gray-700 ${featured ? "text-body-lg" : ""}`}>{p.summary}</p>
+        <Title as="h3" className="mt-4">
+          {p.name}
+        </Title>
+        <p className={cn("mt-2 text-muted-foreground", featured && "text-lg")}>{p.summary}</p>
 
-        <dl className="mt-6 grid gap-x-6 gap-y-3 border-t border-gray-200 pt-6 sm:grid-cols-[auto_1fr]">
+        <Separator className="my-6" />
+        <dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-[auto_1fr]">
           {details.map(([label, value]) => (
             <div key={label} className="contents">
-              <dt className="font-semibold text-navy-900">{label}</dt>
-              <dd className="text-gray-700">{value}</dd>
+              <dt className="font-semibold text-heading">{label}</dt>
+              <dd>{value}</dd>
             </div>
           ))}
           <div className="contents">
-            <dt className="font-semibold text-navy-900">{t.labels.eligibility}</dt>
-            <dd className="text-gray-700">
-              <ul className="list-disc space-y-1 pl-5">
+            <dt className="font-semibold text-heading">{t.labels.eligibility}</dt>
+            <dd>
+              <ul className="list-disc space-y-1 pl-4 marker:text-muted-foreground">
                 {p.eligibility.map((e) => (
                   <li key={e}>{e}</li>
                 ))}
@@ -84,21 +80,24 @@ export function ProgrammeCard({ programme: p, status, featured = false }: Progra
           </div>
         </dl>
 
-        <div className={`mt-auto flex gap-4 pt-6 ${featured ? "flex-wrap items-center justify-between" : "flex-col items-start"}`}>
-          <p className="font-semibold text-gray-800">{dateLine}</p>
+        <div className={cn("mt-auto flex gap-4 pt-8", featured ? "flex-wrap items-center justify-between" : "flex-col items-start")}>
+          <p className="text-sm font-semibold">{dateLine}</p>
           {status === "open" ? (
-            <Button href={hrefFor(p)}>{t.cta.open}</Button>
+            <Button asChild size="lg">
+              <Link href={hrefFor(p)}>{t.cta.open}</Link>
+            </Button>
           ) : (
-            <Button variant="text" href={hrefFor(p)}>
-              {t.cta.other}
+            <Button asChild variant="link" size="lg">
+              <Link href={hrefFor(p)}>
+                {t.cta.other} <ArrowRight data-icon="inline-end" aria-hidden />
+              </Link>
             </Button>
           )}
         </div>
       </div>
-    </article>
+    </Card>
   );
 }
-
 
 export type Arranged = { featured?: { p: Programme; status: ProgrammeStatus }; rest: { p: Programme; status: ProgrammeStatus }[] };
 

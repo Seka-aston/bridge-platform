@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/Badge";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
+import { Card } from "@/components/ui/card";
+import { Eyebrow, H3 } from "@/components/ui/typography";
 import { prototypeMode } from "@/content/site";
 import { articleCardText as t } from "@/content/ui";
 import type { Article } from "@/data/articles";
@@ -9,15 +11,15 @@ import { formatDate } from "@/lib/programmes";
 import { readingMinutes } from "@/lib/articles";
 
 /*
-  Article card (CLAUDE.md section 7, component 11; spec 4.2.12).
-  Category, title, excerpt, date, image, reading time (only if calculated), link.
+  Article card (spec 4.2.12): category, title, excerpt, date, image, reading time, link.
   The whole card is one link; the title is the link text.
 */
 
 export function ArticleCard({ article: a, showImage = true }: { article: Article; showImage?: boolean }) {
   if (!a.approved && !prototypeMode) return null;
+  const minutes = readingMinutes(a);
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-card border border-gray-200 bg-white shadow-card transition-shadow duration-150 hover:shadow-card-hover focus-within:shadow-card-hover">
+    <Card className="group relative h-full gap-0 py-0 text-base transition-shadow duration-150 focus-within:shadow-md hover:shadow-md">
       {showImage &&
         (a.image ? (
           <Image src={a.image.src} alt={a.image.alt} width={800} height={450} className="aspect-video w-full object-cover" />
@@ -26,23 +28,23 @@ export function ArticleCard({ article: a, showImage = true }: { article: Article
         ))}
       <div className="flex flex-1 flex-col p-6">
         <div className="flex flex-wrap items-center gap-2">
-          <p className="text-eyebrow uppercase text-green-700">{a.category}</p>
+          <Eyebrow>{a.category}</Eyebrow>
           {!a.approved && <Badge kind="draft" approvalKey={`article:${a.id}`} />}
         </div>
-        <h3 className="mt-3 text-h3 text-navy-900">
+        <H3 className="mt-3">
           <Link
             href={a.href}
-            className="rounded-sm after:absolute after:inset-0 group-hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900 underline-offset-4"
+            className="rounded-sm underline-offset-4 group-hover:underline after:absolute after:inset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
             {a.title}
           </Link>
-        </h3>
-        <p className="mt-2 text-gray-700">{a.excerpt}</p>
-        <p className="mt-auto pt-6 text-gray-500">
+        </H3>
+        <p className="mt-2 text-muted-foreground">{a.excerpt}</p>
+        <p className="mt-auto pt-6 text-sm text-muted-foreground">
           <time dateTime={a.publishedOn}>{formatDate(a.publishedOn)}</time>
-          {readingMinutes(a) ? ` · ${t.readingTime.replace("{minutes}", String(readingMinutes(a)))}` : null}
+          {minutes ? ` · ${t.readingTime.replace("{minutes}", String(minutes))}` : null}
         </p>
       </div>
-    </article>
+    </Card>
   );
 }

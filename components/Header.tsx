@@ -2,215 +2,128 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, Menu, X } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
-import { Button } from "@/components/Button";
+import { Menu } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import {
+  NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
+import { Separator } from "@/components/ui/separator";
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { header as headerContent, type NavItem } from "@/content/home";
+import { cn } from "@/lib/utils";
 
 /*
-  Site header (CLAUDE.md section 7, component 4; spec 4.2.2).
+  Site header (spec 4.2.2), built on the shadcn Navigation Menu and Sheet.
 
-  - 1280px and wider: logo · menu links · Login (text) · Book a Discovery Call (button)
-  - 768–1279px: logo · Book a Discovery Call · menu button
-  - Below 768px: logo · menu button (everything else is inside the menu)
+  - 1024px and wider: logo · menu · Login (text) · Book a Discovery Call (button)
+  - 768–1023px: logo · Book a Discovery Call · menu button
+  - Below 768px: logo · menu button (everything else is in the slide-in menu)
 
-  Menu items become dropdowns automatically when they have `children` in
-  content/home.ts. Dropdowns open with Enter or Space, close with Escape
-  (focus returns to the menu item), or by clicking or tabbing away.
+  Menu items become dropdowns automatically when they have `children` in content/home.ts
+  (Bridge has not supplied the dropdown contents yet). Keyboard: Tab, Enter, arrow keys, Escape.
 
-  `demo` is for /components-preview only: no sticky position, no skip link.
+  Integrated header: on the homepage the header is navy, matching the hero, until the visitor
+  scrolls; then it turns white.
 */
-
-type HeaderProps = {
-  nav?: NavItem[];
-  demo?: boolean;
-};
-
-const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900";
-
-// Desktop menu items stay on one line. Spacing is tight so all five items fit at 1280px
-// even once they all have dropdown arrows.
-const focusRingDark = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
-const navLinkBase = "inline-flex items-center gap-1 whitespace-nowrap rounded-control px-2.5 py-2 font-semibold transition-colors duration-150";
-
-// Menu link colours on the white header and on the navy (integrated) header.
-function navLinkLook(dark: boolean, active: boolean) {
-  if (dark) return `${focusRingDark} text-white underline-offset-8 hover:underline ${active ? "underline" : ""}`;
-  return `${focusRing} ${active ? "text-green-700" : "text-gray-700 hover:text-green-700"}`;
-}
 
 function isCurrent(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function DesktopDropdown({
-  item,
-  open,
-  onToggle,
-  onClose,
-  current,
-  dark,
-}: {
-  item: NavItem;
-  open: boolean;
-  onToggle: () => void;
-  onClose: () => void;
-  current: boolean;
-  dark: boolean;
-}) {
-  const panelId = useId();
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const wrapperRef = useRef<HTMLLIElement>(null);
-
-  return (
-    <li
-      ref={wrapperRef}
-      className="relative"
-      onKeyDown={(e) => {
-        if (e.key === "Escape" && open) {
-          onClose();
-          buttonRef.current?.focus();
-        }
-      }}
-      onBlur={(e) => {
-        // Close when keyboard focus leaves the item and its dropdown.
-        if (open && !wrapperRef.current?.contains(e.relatedTarget as Node | null)) onClose();
-      }}
-    >
-      <button
-        ref={buttonRef}
-        type="button"
-        aria-expanded={open}
-        aria-controls={panelId}
-        onClick={onToggle}
-        className={`${navLinkBase} ${navLinkLook(dark, open || current)}`}
-      >
-        {item.label}
-        <ChevronDown aria-hidden className={`size-4 transition-transform duration-150 ${open ? "rotate-180" : ""}`} />
-      </button>
-      <div
-        id={panelId}
-        hidden={!open}
-        className="absolute left-0 top-full z-10 mt-2 w-72 rounded-card border border-gray-200 bg-white p-2 shadow-card-hover"
-      >
-        <ul>
-          {item.children?.map((child) => (
-            <li key={child.href}>
-              <Link
-                href={child.href}
-                onClick={onClose}
-                className={`block rounded-control px-3 py-2 font-semibold text-gray-700 hover:bg-green-50 hover:text-green-800 ${focusRing}`}
-              >
-                {child.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </li>
-  );
-}
-
-function MobileItem({ item, onNavigate, current }: { item: NavItem; onNavigate: () => void; current: boolean }) {
-  const [open, setOpen] = useState(false);
-  const listId = useId();
-  const rowClass = `flex w-full items-center justify-between rounded-control px-3 py-3 text-body-lg font-semibold ${focusRing}`;
-
-  if (!item.children?.length) {
+function DesktopItem({ item, current }: { item: NavItem; current: boolean }) {
+  if (item.children?.length) {
     return (
-      <li>
-        <Link
-          href={item.href}
-          onClick={onNavigate}
-          aria-current={current ? "page" : undefined}
-          className={`${rowClass} ${current ? "bg-green-50 text-green-700" : "text-navy-900 hover:bg-green-50"}`}
-        >
-          {item.label}
-        </Link>
-      </li>
+      <NavigationMenuItem>
+        <NavigationMenuTrigger className={cn("bg-transparent", current && "text-heading")}>{item.label}</NavigationMenuTrigger>
+        <NavigationMenuContent>
+          <ul className="grid w-72 gap-1 p-1">
+            {item.children.map((child) => (
+              <li key={child.href}>
+                <NavigationMenuLink asChild>
+                  <Link href={child.href} className="font-medium">
+                    {child.label}
+                  </Link>
+                </NavigationMenuLink>
+              </li>
+            ))}
+          </ul>
+        </NavigationMenuContent>
+      </NavigationMenuItem>
     );
   }
-
   return (
-    <li>
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-controls={listId}
-        onClick={() => setOpen((o) => !o)}
-        className={`${rowClass} text-navy-900 hover:bg-green-50`}
-      >
-        {item.label}
-        <ChevronDown aria-hidden className={`size-5 transition-transform duration-150 ${open ? "rotate-180" : ""}`} />
-      </button>
-      <ul id={listId} hidden={!open} className="pb-2 pl-3">
-        {item.children.map((child) => (
-          <li key={child.href}>
-            <Link
-              href={child.href}
-              onClick={onNavigate}
-              className={`block rounded-control px-3 py-2 font-semibold text-gray-700 hover:bg-green-50 hover:text-green-800 ${focusRing}`}
-            >
-              {child.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </li>
+    <NavigationMenuItem>
+      <NavigationMenuLink asChild active={current} className={cn(navigationMenuTriggerStyle(), "bg-transparent px-3", current ? "text-foreground" : "text-foreground/80")}>
+        <Link href={item.href} aria-current={current ? "page" : undefined}>
+          {item.label}
+        </Link>
+      </NavigationMenuLink>
+    </NavigationMenuItem>
   );
 }
 
-export function Header({ nav = headerContent.nav, demo = false }: HeaderProps) {
+function MobileMenu({ nav, pathname }: { nav: NavItem[]; pathname: string }) {
+  const row = "flex w-full items-center rounded-md px-3 py-3 text-base font-medium hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
+  return (
+    <nav aria-label={headerContent.navLabel} className="flex flex-1 flex-col overflow-y-auto px-4 pb-6">
+      <ul className="space-y-1">
+        {nav.map((item) => {
+          const current = isCurrent(pathname, item.href);
+          if (item.children?.length) {
+            return (
+              <li key={item.href}>
+                <Accordion type="single" collapsible>
+                  <AccordionItem value={item.href} className="border-0">
+                    <AccordionTrigger className="px-3 py-3 text-base hover:no-underline">{item.label}</AccordionTrigger>
+                    <AccordionContent className="pb-2 pl-3">
+                      {item.children.map((child) => (
+                        <SheetClose asChild key={child.href}>
+                          <Link href={child.href} className={row}>
+                            {child.label}
+                          </Link>
+                        </SheetClose>
+                      ))}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </li>
+            );
+          }
+          return (
+            <li key={item.href}>
+              <SheetClose asChild>
+                <Link href={item.href} aria-current={current ? "page" : undefined} className={cn(row, current && "bg-secondary text-secondary-foreground")}>
+                  {item.label}
+                </Link>
+              </SheetClose>
+            </li>
+          );
+        })}
+      </ul>
+      <Separator className="my-6" />
+      <div className="mt-auto flex flex-col gap-3">
+        <SheetClose asChild>
+          <Button asChild variant="outline" size="lg">
+            <Link href={headerContent.login.href}>{headerContent.login.label}</Link>
+          </Button>
+        </SheetClose>
+        <SheetClose asChild>
+          <Button asChild size="lg">
+            <Link href={headerContent.primary.href}>{headerContent.primary.label}</Link>
+          </Button>
+        </SheetClose>
+      </div>
+    </nav>
+  );
+}
+
+export function Header({ nav = headerContent.nav }: { nav?: NavItem[] }) {
   const pathname = usePathname() ?? "/";
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const menuId = useId();
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
-  const navRef = useRef<HTMLUListElement>(null);
 
-  // Close everything after moving to another page.
-  const [lastPath, setLastPath] = useState(pathname);
-  if (pathname !== lastPath) {
-    setLastPath(pathname);
-    setMenuOpen(false);
-    setOpenDropdown(null);
-  }
-
-  // Mobile menu: Escape closes it; the page behind doesn't scroll; it closes if the window grows to desktop width.
-  useEffect(() => {
-    if (!menuOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setMenuOpen(false);
-        menuButtonRef.current?.focus();
-      }
-    };
-    const wide = window.matchMedia("(min-width: 1280px)");
-    const onWide = () => wide.matches && setMenuOpen(false);
-    document.addEventListener("keydown", onKey);
-    wide.addEventListener("change", onWide);
-    const previousOverflow = document.documentElement.style.overflow;
-    if (!demo) document.documentElement.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      wide.removeEventListener("change", onWide);
-      document.documentElement.style.overflow = previousOverflow;
-    };
-  }, [menuOpen, demo]);
-
-  // Desktop dropdowns close when clicking anywhere else.
-  useEffect(() => {
-    if (!openDropdown) return;
-    const onPointer = (e: PointerEvent) => {
-      if (!navRef.current?.contains(e.target as Node)) setOpenDropdown(null);
-    };
-    document.addEventListener("pointerdown", onPointer);
-    return () => document.removeEventListener("pointerdown", onPointer);
-  }, [openDropdown]);
-
-  // Integrated header (spec 4.2.2): on the homepage the header is navy, matching the hero,
-  // until the visitor scrolls. It turns white once scrolling starts or the menu opens.
+  // Navy while at the top of the homepage; white once the visitor scrolls.
   const [atTop, setAtTop] = useState(true);
   useEffect(() => {
     const onScroll = () => setAtTop(window.scrollY < 8);
@@ -218,126 +131,66 @@ export function Header({ nav = headerContent.nav, demo = false }: HeaderProps) {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-  const dark = pathname === "/" && !demo && atTop && !menuOpen;
-  const ring = dark ? focusRingDark : focusRing;
-
-  const closeMenu = () => setMenuOpen(false);
+  const dark = pathname === "/" && atTop;
+  const loginCurrent = isCurrent(pathname, headerContent.login.href);
 
   return (
     <header
-      className={`${demo ? "relative" : "sticky top-0"} z-50 border-b transition-colors duration-200 ${
-        dark ? "border-transparent bg-navy-900" : "border-gray-200 bg-white"
-      }`}
-    >
-      {!demo && (
-        <a
-          href="#main"
-          className="sr-only rounded-control bg-white px-4 py-2 font-semibold text-navy-900 focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:outline-2 focus:outline-navy-900"
-        >
-          {headerContent.skipLink}
-        </a>
+      className={cn(
+        "sticky top-0 z-50 border-b transition-colors duration-200",
+        dark ? "surface-navy border-transparent" : "border-border bg-background",
       )}
+    >
+      <a
+        href="#main"
+        className="sr-only rounded-md bg-background px-4 py-2 text-sm font-semibold text-heading focus:not-sr-only focus:absolute focus:top-3 focus:left-4 focus:z-50 focus:outline-2 focus:outline-ring"
+      >
+        {headerContent.skipLink}
+      </a>
 
-      <div className="mx-auto flex h-16 max-w-content items-center justify-between gap-4 px-gutter xl:h-18">
-        <Link
-          href="/"
-          onClick={closeMenu}
-          aria-label={headerContent.homeLabel}
-          className={`shrink-0 rounded-sm ${ring}`}
-        >
-          <Logo variant={dark ? "white" : "green"} priority={!demo} />
+      <div className="mx-auto flex h-16 max-w-content items-center justify-between gap-4 px-gutter">
+        <Link href="/" aria-label={headerContent.homeLabel} className="shrink-0 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+          <Logo variant={dark ? "white" : "green"} size={32} priority />
         </Link>
 
-        {/* Desktop menu */}
-        <nav aria-label={headerContent.navLabel} className="hidden xl:block">
-          <ul ref={navRef} className="flex items-center gap-0.5">
-            {nav.map((item) => {
-              const current = isCurrent(pathname, item.href);
-              return item.children?.length ? (
-                <DesktopDropdown
-                  key={item.href}
-                  item={item}
-                  current={current}
-                  open={openDropdown === item.href}
-                  onToggle={() => setOpenDropdown((o) => (o === item.href ? null : item.href))}
-                  onClose={() => setOpenDropdown(null)}
-                  dark={dark}
-                />
-              ) : (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    aria-current={current ? "page" : undefined}
-                    className={`${navLinkBase} ${navLinkLook(dark, current)}`}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
+        <NavigationMenu aria-label={headerContent.navLabel} className="hidden lg:flex">
+          <NavigationMenuList className="gap-0">
+            {nav.map((item) => (
+              <DesktopItem key={item.href} item={item} current={isCurrent(pathname, item.href)} />
+            ))}
+          </NavigationMenuList>
+        </NavigationMenu>
 
         <div className="flex items-center gap-2">
-          {/* Wrappers carry the show/hide rules so they can't clash with the links' own display style. */}
-          <div className="hidden xl:block">
-            <Link
-              href={headerContent.login.href}
-              aria-current={isCurrent(pathname, headerContent.login.href) ? "page" : undefined}
-              className={`${navLinkBase} ${navLinkLook(dark, isCurrent(pathname, headerContent.login.href))}`}
-            >
+          <Button asChild variant="ghost" className={cn("hidden lg:inline-flex", loginCurrent ? "text-foreground" : "text-foreground/80")}>
+            <Link href={headerContent.login.href} aria-current={loginCurrent ? "page" : undefined}>
               {headerContent.login.label}
             </Link>
-          </div>
-          <div className="hidden md:block">
-            <Button href={headerContent.primary.href} onDark={dark} className="whitespace-nowrap">
-              {headerContent.primary.label}
-            </Button>
-          </div>
+          </Button>
+          <Button asChild className="hidden md:inline-flex">
+            <Link href={headerContent.primary.href}>{headerContent.primary.label}</Link>
+          </Button>
 
-          <button
-            ref={menuButtonRef}
-            type="button"
-            aria-expanded={menuOpen}
-            aria-controls={menuId}
-            aria-label={menuOpen ? headerContent.menuClose : headerContent.menuOpen}
-            onClick={() => setMenuOpen((o) => !o)}
-            className={`-mr-2 inline-flex size-11 items-center justify-center rounded-control xl:hidden ${
-              dark ? "text-white hover:bg-white/10" : "text-navy-900 hover:bg-green-50"
-            } ${ring}`}
-          >
-            {menuOpen ? <X aria-hidden className="size-6" /> : <Menu aria-hidden className="size-6" />}
-          </button>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon-lg" className="-mr-2 lg:hidden" aria-label={headerContent.menuOpen}>
+                <Menu />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-full max-w-sm gap-0">
+              <SheetHeader className="pb-6">
+                <SheetTitle asChild>
+                  <div>
+                    <Logo size={32} />
+                    <span className="sr-only">{headerContent.navLabel}</span>
+                  </div>
+                </SheetTitle>
+                <SheetDescription className="sr-only">{headerContent.navLabel}</SheetDescription>
+              </SheetHeader>
+              <MobileMenu nav={nav} pathname={pathname} />
+            </SheetContent>
+          </Sheet>
         </div>
-      </div>
-
-      {/* Mobile and tablet menu */}
-      <div
-        id={menuId}
-        hidden={!menuOpen}
-        className={`${
-          demo ? "relative" : "absolute inset-x-0 top-full h-[calc(100dvh-100%)]"
-        } overflow-y-auto border-t border-gray-200 bg-white xl:hidden`}
-      >
-        <nav aria-label={headerContent.navLabel} className="mx-auto max-w-content px-gutter py-6">
-          <ul className="space-y-1">
-            {nav.map((item) => (
-              <MobileItem key={item.href} item={item} onNavigate={closeMenu} current={isCurrent(pathname, item.href)} />
-            ))}
-          </ul>
-          <div className="mt-6 flex flex-col gap-3 border-t border-gray-200 pt-6">
-            <Link
-              href={headerContent.login.href}
-              onClick={closeMenu}
-              className={`rounded-control px-3 py-3 text-body-lg font-semibold text-gray-700 hover:bg-green-50 ${focusRing}`}
-            >
-              {headerContent.login.label}
-            </Link>
-            <Button href={headerContent.primary.href} size="lg" className="w-full">
-              {headerContent.primary.label}
-            </Button>
-          </div>
-        </nav>
       </div>
     </header>
   );

@@ -4,33 +4,51 @@ import { Suspense } from "react";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { Badge } from "@/components/Badge";
 import { Logo } from "@/components/Logo";
+import { Separator } from "@/components/ui/separator";
+import { Eyebrow } from "@/components/ui/typography";
 import { footer, header } from "@/content/home";
 import { prototypeMode } from "@/content/site";
 import { footerText as t } from "@/content/ui";
 
 /*
-  Footer (CLAUDE.md section 7, component 14; spec 4.2.14).
-  Navy. Logo and mission statement, audience links, About / Programmes / Resources,
-  official contact details, official social links, legal links.
-  Missing Bridge-supplied items show a dashed placeholder in prototype mode and
-  nothing at all otherwise. Nothing is invented.
+  Footer (spec 4.2.14). Navy. Logo and mission statement, audience links, About / Programmes /
+  Resources, official contact details, official social links, legal links.
+  Missing Bridge-supplied items show a Draft placeholder line in prototype mode and nothing at
+  all otherwise. Nothing is invented.
 */
 
 const linkClass =
-  "rounded-sm text-white hover:underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+  "rounded-sm text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
 
 // Worked out when the page is requested, so the year is never stuck at build time.
 async function Copyright() {
   await connection();
-  return <p className="text-white">{t.copyright.replace("{year}", String(new Date().getFullYear()))}</p>;
+  return <p className="text-sm text-muted-foreground">{t.copyright.replace("{year}", String(new Date().getFullYear()))}</p>;
 }
 
 function Placeholder({ children }: { children: string }) {
   if (!prototypeMode) return null;
   return (
-    <p className="rounded-control border border-dashed border-white/60 px-3 py-2 text-white">
-      {children} <Badge kind="draft" className="ml-1 align-middle" />
+    <p className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+      <Badge kind="draft" /> {children}
     </p>
+  );
+}
+
+function LinkColumn({ title, links }: { title: string; links: { label: string; href: string }[] }) {
+  return (
+    <nav aria-label={title}>
+      <Eyebrow as="h2">{title}</Eyebrow>
+      <ul className="mt-5 space-y-3">
+        {links.map((l) => (
+          <li key={l.href}>
+            <Link href={l.href} className={linkClass}>
+              {l.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }
 
@@ -39,60 +57,37 @@ export function Footer() {
   const showContact = contact && (contact.approved || prototypeMode);
 
   return (
-    <footer className="bg-navy-900 text-white">
-      <div className="mx-auto max-w-content px-gutter py-section-mobile md:py-section">
-        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1.3fr]">
-          <div className="space-y-6">
-            <Link href="/" aria-label={header.homeLabel} className={`inline-block ${linkClass}`}>
+    <footer className="surface-navy">
+      <div className="mx-auto max-w-content px-gutter pt-section-mobile pb-10 md:pt-section">
+        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.4fr]">
+          <div className="space-y-5">
+            <Link href="/" aria-label={header.homeLabel} className="inline-block rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
               <Logo variant="white" />
             </Link>
             {footer.missionStatement ? (
-              <p className="max-w-sm text-white">{footer.missionStatement}</p>
+              <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">{footer.missionStatement}</p>
             ) : (
               <Placeholder>{t.missionPlaceholder}</Placeholder>
             )}
           </div>
 
-          <nav aria-label={t.columns.pathways}>
-            <h2 className="text-eyebrow uppercase text-white">{t.columns.pathways}</h2>
-            <ul className="mt-4 space-y-3">
-              {footer.audienceLinks.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className={linkClass}>
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <nav aria-label={t.columns.explore}>
-            <h2 className="text-eyebrow uppercase text-white">{t.columns.explore}</h2>
-            <ul className="mt-4 space-y-3">
-              {footer.otherLinks.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className={linkClass}>
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <LinkColumn title={t.columns.pathways} links={footer.audienceLinks} />
+          <LinkColumn title={t.columns.explore} links={footer.otherLinks} />
 
           <div>
-            <h2 className="text-eyebrow uppercase text-white">{t.columns.contact}</h2>
+            <Eyebrow as="h2">{t.columns.contact}</Eyebrow>
             {showContact ? (
-              <address className="mt-4 space-y-3 not-italic">
+              <address className="mt-5 space-y-3 text-sm not-italic">
                 {!contact.approved && <Badge kind="draft" approvalKey="contact:footer" />}
                 {contact.address && (
-                  <p className="flex gap-3">
-                    <MapPin aria-hidden className="mt-0.5 size-5 shrink-0 text-green-500" />
+                  <p className="flex gap-3 text-muted-foreground">
+                    <MapPin aria-hidden className="mt-0.5 size-4 shrink-0 text-brand-green" />
                     <span>{contact.address}</span>
                   </p>
                 )}
                 {contact.phone && (
                   <p className="flex gap-3">
-                    <Phone aria-hidden className="mt-0.5 size-5 shrink-0 text-green-500" />
+                    <Phone aria-hidden className="mt-0.5 size-4 shrink-0 text-brand-green" />
                     <a href={`tel:${contact.phone.replace(/\s/g, "")}`} className={linkClass}>
                       {contact.phone}
                     </a>
@@ -100,7 +95,7 @@ export function Footer() {
                 )}
                 {contact.email && (
                   <p className="flex gap-3">
-                    <Mail aria-hidden className="mt-0.5 size-5 shrink-0 text-green-500" />
+                    <Mail aria-hidden className="mt-0.5 size-4 shrink-0 text-brand-green" />
                     <a href={`mailto:${contact.email}`} className={`break-all ${linkClass}`}>
                       {contact.email}
                     </a>
@@ -126,8 +121,9 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-4 border-t border-white/20 pt-8 md:flex-row md:items-center md:justify-between">
-          <Suspense fallback={<p className="text-white">&nbsp;</p>}>
+        <Separator className="mt-14 mb-8" />
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <Suspense fallback={<p className="text-sm">&nbsp;</p>}>
             <Copyright />
           </Suspense>
           <ul className="flex flex-wrap gap-x-6 gap-y-2">

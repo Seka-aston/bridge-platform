@@ -118,6 +118,7 @@
   /* Neutrals */
   --muted: #f4f6f5; /* gray-50, quiet backgrounds */
   --muted-foreground: #626a75; /* Captions and metadata. 5.0:1 on muted, 5.5:1 on white */
+  --section-tint: #f4f6f5; /* Alternate section background (was green-50 mint; see Step 3 decision) */
   --accent: #eef1f0; /* Hover background for menus and list rows */
   --accent-foreground: #1f2937;
   --border: #e5e7eb; /* gray-200, card and divider lines (decorative) */
@@ -150,9 +151,10 @@
   --sidebar-ring: #1c3d6a;
 }
 
-/* Navy sections (hero, final band, footer): tokens flip so text, borders and the focus ring stay visible. */
-@utility surface-navy {
-  background-color: var(--brand-navy);
+/* Navy sections (hero, final band, footer): tokens flip so text, borders and the focus ring stay
+   visible. surface-navy paints the navy background too; tokens-navy only flips the colours, for
+   content placed on a navy background painted elsewhere. */
+@utility tokens-navy {
   color: var(--brand-navy-foreground);
   --foreground: #ffffff;
   --muted-foreground: #c9d2dc; /* 7.1:1 on navy */
@@ -162,10 +164,26 @@
   --eyebrow-foreground: #a7ddbf; /* Light green, 7.1:1 on navy (green-700 fails at 2.1:1) */
   --link: #ffffff;
   --link-hover: #c9d2dc;
+  --accent: rgb(255 255 255 / 0.1); /* Hover on navy */
+  --accent-foreground: #ffffff;
+}
+@utility surface-navy {
+  background-color: var(--brand-navy);
+  color: var(--brand-navy-foreground);
+  --foreground: #ffffff;
+  --muted-foreground: #c9d2dc;
+  --border: rgb(255 255 255 / 0.2);
+  --ring: #ffffff;
+  --heading: #ffffff;
+  --eyebrow-foreground: #a7ddbf;
+  --link: #ffffff;
+  --link-hover: #c9d2dc;
+  --accent: rgb(255 255 255 / 0.1);
+  --accent-foreground: #ffffff;
 }
 
-/* White cards placed on a navy section (e.g. the hero visual) switch back to light-surface tokens. */
-.surface-navy [data-slot="card"] {
+/* White cards and menus placed on a navy section (e.g. the hero visual) switch back to light-surface tokens. */
+:is(.surface-navy, .tokens-navy) :is([data-slot="card"], [data-slot="navigation-menu-viewport"]) {
   --foreground: #1f2937;
   --muted-foreground: #626a75;
   --border: #e5e7eb;
@@ -174,10 +192,28 @@
   --eyebrow-foreground: #277a4d;
   --link: #277a4d;
   --link-hover: #1f6340;
+  --accent: #eef1f0;
+  --accent-foreground: #1f2937;
   color: var(--card-foreground);
 }
 
 /* Layout (kept from the original system; shared by old and new components) */
+/* Badges on navy (outside white cards): colours that only work on light surfaces are swapped. */
+:is(.surface-navy, .tokens-navy) [data-slot="badge"]:not([data-slot="card"] *) {
+  &[data-variant="draft"] {
+    background-color: var(--brand-amber);
+    color: var(--brand-navy); /* 5.7:1 */
+  }
+  &[data-variant="preview"] {
+    border-color: rgb(255 255 255 / 0.5);
+    color: #ffffff;
+  }
+  &:is([data-variant="closed"], [data-variant="upcoming"]) {
+    background-color: rgb(255 255 255 / 0.15);
+    color: #ffffff;
+  }
+}
+
 @theme {
   --container-content: 1200px; /* Content max-width */
   --spacing-gutter: 1.5rem; /* 24px side padding */
@@ -209,6 +245,7 @@
   --color-brand-navy-foreground: var(--brand-navy-foreground);
   --color-brand-green: var(--brand-green);
   --color-brand-amber: var(--brand-amber);
+  --color-section-tint: var(--section-tint);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);

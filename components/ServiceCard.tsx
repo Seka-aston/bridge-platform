@@ -1,10 +1,15 @@
-import { BadgeCheck, Briefcase, Check, GraduationCap, type LucideIcon } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, BadgeCheck, Briefcase, Check, GraduationCap, type LucideIcon } from "lucide-react";
 import { Badge } from "@/components/Badge";
-import { Button } from "@/components/Button";
+import { IconTile } from "@/components/IconTile";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { H3 } from "@/components/ui/typography";
 
 /*
-  Service card (CLAUDE.md section 7, component 6; spec 4.2.5).
-  Icon, title, description, capability list, CTA, optional "Coming soon" badge.
+  Service card (spec 4.2.5): icon, title, description, capability list, CTA,
+  optional "Coming soon" badge. Cards in a row share one height; the CTA sits on the bottom.
 */
 
 export const serviceIcons: Record<string, LucideIcon> = {
@@ -23,30 +28,34 @@ type ServiceCardProps = {
 };
 
 export function ServiceCard({ icon, title, description, capabilities, cta, comingSoon = false }: ServiceCardProps) {
-  const Icon = serviceIcons[icon];
   return (
-    <article className="flex h-full flex-col rounded-card border border-gray-200 bg-white p-6 shadow-card md:p-8">
-      <div className="flex items-start justify-between gap-4">
-        <span className="inline-flex size-12 items-center justify-center rounded-control bg-green-50">
-          <Icon aria-hidden className="size-6 text-green-700" />
-        </span>
-        {comingSoon && <Badge kind="comingSoon" />}
-      </div>
-      <h3 className="mt-6 text-h3 text-navy-900">{title}</h3>
-      <p className="mt-2 text-gray-700">{description}</p>
-      <ul className="mt-6 space-y-3 border-t border-gray-200 pt-6">
-        {capabilities.map((c) => (
-          <li key={c} className="flex gap-3 text-gray-800">
-            <Check aria-hidden className="mt-0.5 size-5 shrink-0 text-green-500" />
-            <span>{c}</span>
-          </li>
-        ))}
-      </ul>
-      <div className="mt-auto pt-8">
-        <Button variant="text" href={cta.href}>
-          {cta.label}
+    <Card className="h-full gap-6 text-base">
+      <CardHeader className="gap-0">
+        <div className="flex items-start justify-between gap-4">
+          <IconTile icon={serviceIcons[icon]} />
+          {comingSoon && <Badge kind="comingSoon" />}
+        </div>
+        <H3 className="mt-6">{title}</H3>
+        <p className="mt-2 text-muted-foreground">{description}</p>
+      </CardHeader>
+      <CardContent className="flex-1">
+        <Separator className="mb-3" />
+        <ul className="space-y-3">
+          {capabilities.map((c) => (
+            <li key={c} className="flex gap-3">
+              <Check aria-hidden className="mt-1 size-4 shrink-0 text-primary" />
+              <span>{c}</span>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+      <CardFooter>
+        <Button asChild variant="link" size="lg">
+          <Link href={cta.href}>
+            {cta.label} <ArrowRight data-icon="inline-end" aria-hidden />
+          </Link>
         </Button>
-      </div>
-    </article>
+      </CardFooter>
+    </Card>
   );
 }

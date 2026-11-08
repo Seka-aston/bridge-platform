@@ -8,6 +8,7 @@ import { Forms } from "./_preview/Forms";
 import { Foundations } from "./_preview/Foundations";
 import { Navigation } from "./_preview/Navigation";
 import { Overlays } from "./_preview/Overlays";
+import { SharedLayout } from "./_preview/SharedLayout";
 import { SidebarDemo } from "./_preview/SidebarDemo";
 
 // Internal review page for Aston (REDESIGN-BRIEF.md Step 2). Not linked from the public navigation.
@@ -29,12 +30,13 @@ const contents = [
   ["data", "Cards, tables, data"],
   ["feedback", "Feedback and states"],
   ["sidebar", "Dashboard sidebar"],
+  ["shared", "Shared layout (Step 3)"],
 ] as const;
 
 export default function ComponentsPreviewPage() {
   return (
     <main id="main" className="mx-auto w-full max-w-content px-gutter py-section-mobile md:py-section">
-      <Eyebrow>Design system · Step 2</Eyebrow>
+      <Eyebrow>Design system · Steps 2 and 3</Eyebrow>
       <Display className="mt-4">Bridge on shadcn/ui</Display>
       <Lead className="mt-4">
         Every component the platform will use, themed with Bridge colours, Manrope and one set of rules. Pages move onto these components from Step 3.
@@ -64,6 +66,7 @@ export default function ComponentsPreviewPage() {
           <DataDisplay />
           <Feedback />
           <SidebarDemo />
+          <SharedLayout />
         </div>
       </div>
     </main>

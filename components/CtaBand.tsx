@@ -1,11 +1,12 @@
 import Image from "next/image";
-import { Button } from "@/components/Button";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { SectionHeading } from "@/components/SectionHeading";
+import { Button } from "@/components/ui/button";
 
 /*
-  CTA band (CLAUDE.md section 7, component 13; spec 4.2.13).
-  Navy with green accents (Aston, 7 Nov 2026). Primary button, ghost button, and a white text link
-  (green text links are too low in contrast on navy).
+  CTA band (spec 4.2.13). Navy with green accents (Aston, 7 Nov 2026): primary button, outlined
+  button and a white text link. The Bridge symbol sits faintly at two corners as the brand accent.
 */
 
 type CtaBandProps = {
@@ -18,8 +19,7 @@ type CtaBandProps = {
 
 export function CtaBand({ headline, supporting, primary, secondary, link }: CtaBandProps) {
   return (
-    <div className="relative isolate overflow-hidden rounded-card bg-navy-900 px-6 py-section-mobile md:px-12 md:py-section">
-      {/* Green accents: the Bridge symbol, large and faint, at both edges. Decoration only. */}
+    <div className="surface-navy relative isolate overflow-hidden rounded-xl px-6 py-16 md:px-12 md:py-24">
       <Image
         aria-hidden
         src="/brand/bridge-symbol-on-navy.svg"
@@ -27,7 +27,7 @@ export function CtaBand({ headline, supporting, primary, secondary, link }: CtaB
         width={129}
         height={215}
         unoptimized
-        className="pointer-events-none absolute -left-10 -top-16 -z-10 h-64 w-auto opacity-20 md:h-80"
+        className="pointer-events-none absolute -top-16 -left-10 -z-10 h-64 w-auto opacity-15 md:h-80"
       />
       <Image
         aria-hidden
@@ -36,24 +36,25 @@ export function CtaBand({ headline, supporting, primary, secondary, link }: CtaB
         width={129}
         height={215}
         unoptimized
-        className="pointer-events-none absolute -bottom-16 -right-10 -z-10 h-64 w-auto rotate-180 opacity-20 md:h-80"
+        className="pointer-events-none absolute -right-10 -bottom-16 -z-10 h-64 w-auto rotate-180 opacity-15 md:h-80"
       />
-      <span aria-hidden className="mx-auto mb-6 block h-1 w-12 rounded-full bg-green-500" />
-      <SectionHeading title={headline} supporting={supporting} align="center" tone="dark" />
-      <div className="mt-10 flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center">
-        <Button href={primary.href} size="lg" onDark>
-          {primary.label}
+      <SectionHeading title={headline} supporting={supporting} align="center" />
+      <div className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+        <Button asChild size="xl">
+          <Link href={primary.href}>{primary.label}</Link>
         </Button>
         {secondary && (
-          <Button href={secondary.href} variant="ghost" size="lg">
-            {secondary.label}
+          <Button asChild size="xl" variant="on-navy">
+            <Link href={secondary.href}>{secondary.label}</Link>
           </Button>
         )}
       </div>
       {link && (
         <p className="mt-6 text-center">
-          <Button href={link.href} variant="textOnDark">
-            {link.label}
+          <Button asChild variant="link" size="lg">
+            <Link href={link.href}>
+              {link.label} <ArrowRight data-icon="inline-end" aria-hidden />
+            </Link>
           </Button>
         </p>
       )}

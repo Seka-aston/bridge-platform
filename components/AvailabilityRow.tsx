@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { TalentField } from "@/components/TalentField";
 import { readStudentPrivacy } from "@/lib/privacy";
 
 /*
@@ -18,9 +19,8 @@ export function AvailabilityRow({ profileId, consented, text, label }: { profile
   }, [profileId, consented, text]);
   if (!state.consented || !state.text) return null;
   return (
-    <div>
-      <h4 className="font-semibold text-navy-900">{label}</h4>
-      <p className="mt-1 text-gray-700">{state.text}</p>
-    </div>
+    <TalentField label={label}>
+      <p>{state.text}</p>
+    </TalentField>
   );
 }

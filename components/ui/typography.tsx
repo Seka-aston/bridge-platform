@@ -6,7 +6,7 @@ import { cn } from "cn"
   so every page shares one scale.
 
   Marketing pages              Dashboards
-  Display   48 / 60px, 800     PageTitle     24px, 600
+  Display   40 / 48 / 60px, 800    PageTitle     24px, 600
   H2        30 / 36px, 700     SectionTitle  18px, 600
   H3        20px, 600          body          14px (text-sm), 400
   Lead      18px, 400          Caption       12px
@@ -29,7 +29,7 @@ function make<T extends keyof React.JSX.IntrinsicElements>(defaultTag: T, slot: 
 }
 
 // Marketing
-export const Display = make("h1", "display", "font-heading text-5xl leading-[1.05] font-extrabold tracking-tight text-heading text-balance md:text-6xl")
+export const Display = make("h1", "display", "font-heading text-[2.5rem] leading-[1.05] font-extrabold tracking-tight text-heading text-balance md:text-5xl lg:text-6xl")
 export const H2 = make("h2", "h2", "font-heading text-3xl leading-tight font-bold tracking-tight text-heading text-balance md:text-4xl")
 export const H3 = make("h3", "h3", "font-heading text-xl leading-snug font-semibold text-heading")
 export const Lead = make("p", "lead", "max-w-prose text-lg leading-relaxed text-muted-foreground")
