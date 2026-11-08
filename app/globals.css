@@ -6,81 +6,13 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  LEGACY Bridge tokens (CLAUDE.md section 4, before the shadcn redesign).
-  Still used by pages that have not been migrated yet. Deleted in Step 8 of
-  REDESIGN-BRIEF.md. New code must use the shadcn tokens further down.
+  Closed colour palette: Tailwind's built-in colours are switched off, so only the Bridge
+  tokens below (and white) exist. A stray "bg-gray-500" or "text-green-600" draws nothing,
+  which keeps every page on brand. Black is defined further down, for overlays only.
 */
-
 @theme {
-  /* ---------- Colour ----------
-     Tailwind's built-in palette is switched off, so only brand colours exist. */
   --color-*: initial;
   --color-white: #ffffff;
-  --color-navy-900: #1c3d6a; /* Headings, dark sections, footer */
-  --color-green-500: #3aaa6d; /* Brand green: icons, illustrations, large display text */
-  --color-green-600: #2f8a58; /* Text on light-green backgrounds (see contrast note on preview page) */
-  --color-green-700: #277a4d; /* Buttons and text links (decided 7 Nov 2026) */
-  --color-green-800: #1f6340; /* Hover and pressed state for green buttons and links */
-  --color-green-50: #ebf7f0; /* Light section backgrounds, secondary button fill */
-  --color-gray-800: #1f2937; /* Body text */
-  --color-gray-700: #374151; /* Secondary text, nav links */
-  --color-gray-500: #6b7280; /* Captions, metadata */
-  --color-gray-200: #e5e7eb; /* Borders, dividers */
-  --color-gray-50: #f4f6f5; /* Dashboard page background (Aston's dashboard design) */
-
-  /* From Aston's student dashboard design (7 Nov 2026). Decorative accents, see notes. */
-  --color-green-deep: #027a48; /* Course tiles, passport gradient start (logo green). White text 5.4:1 */
-  --color-amber-500: #f8ac36; /* Rank chip (logo amber). Navy text only (5.7:1) */
-  --color-amber-600: #d58916; /* Course tile, decoration only: white text fails (2.8:1) */
-
-  /* ---------- Type scale ----------
-     Sizes from the live site; review once Manrope is in place. */
-  --text-display: 3.75rem; /* 60px, H1 on desktop */
-  --text-display--line-height: 1;
-  --text-display--font-weight: 800;
-
-  --text-display-mobile: 2.5rem; /* 40px, H1 on mobile */
-  --text-display-mobile--line-height: 1;
-  --text-display-mobile--font-weight: 800;
-
-  --text-h2: 2.25rem; /* 36px, section titles from 768px up */
-  --text-h2--line-height: 1.1;
-  --text-h2--font-weight: 800;
-
-  --text-h2-mobile: 1.875rem; /* 30px, section titles on mobile */
-  --text-h2-mobile--line-height: 1.1;
-  --text-h2-mobile--font-weight: 800;
-
-  --text-h3: 1.25rem; /* 20px, card titles */
-  --text-h3--line-height: 1.75rem;
-  --text-h3--font-weight: 700;
-
-  --text-panel: 1.625rem; /* 26px, dashboard panel titles (dashboard design) */
-  --text-panel--line-height: 1.2;
-  --text-panel--font-weight: 700;
-
-  --text-eyebrow: 0.8125rem; /* 13px, uppercase labels */
-  --text-eyebrow--line-height: 1.25rem;
-  --text-eyebrow--font-weight: 700;
-  --text-eyebrow--letter-spacing: 0.08em;
-
-  --text-body-lg: 1.25rem; /* 20px / 28px */
-  --text-body-lg--line-height: 1.75rem;
-
-  --text-body: 1rem; /* 16px / 24px */
-  --text-body--line-height: 1.5rem;
-
-  /* ---------- Shape ---------- */
-  --radius-control: 8px; /* Buttons, inputs, small elements */
-  --radius-card: 12px; /* Cards (matches the live site's service cards) */
-  --radius-tile: 16px; /* Dashboard tiles and inner cards (dashboard design) */
-  --radius-panel: 28px; /* Dashboard panels and top bar (dashboard design) */
-
-  /* ---------- Shadows ----------
-     Copied from the live site: soft, neutral, minimal. */
-  --shadow-soft: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* Buttons, inputs */
-  --shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-card-hover: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
 /*

@@ -14,7 +14,7 @@ const icons: LucideIcon[] = [BookOpenCheck, Target, FileText, Route, Search, Roc
 
 export function BridgeAiPreview({ capabilities }: { capabilities: string[] }) {
   return (
-    <Card className="gap-0 py-0 text-base shadow-md">
+    <Card className="gap-0 py-0 text-base">
       <figure>
         <CardHeader className="flex flex-wrap items-center justify-between gap-3 border-b py-4">
           <div className="flex items-center gap-3">

@@ -28,77 +28,76 @@ Current live site for reference: https://bridge.co.rw
 ## 3. Tech stack
 
 - **Next.js** (App Router) with **TypeScript**
-- **Tailwind CSS** for styling, with all brand values defined as design tokens (section 4). Never hard-code a colour, font size or spacing value inside a component.
+- **Tailwind CSS v4** for styling, with all brand values defined as design tokens (section 4). Never hard-code a colour, font size or spacing value inside a component.
+- **shadcn/ui** (style "radix-vega", Radix primitives) for every UI component, themed with the Bridge tokens (section 4). Forms use react-hook-form and zod; tables use TanStack Table v8; toasts use sonner.
 - Icons: **lucide-react**, a single consistent line-icon set
 - Font: **Manrope**, loaded with `next/font`.
 - Copy lives in **separate content files** (`/content/*.ts`), never inside components, so copy can be edited without touching layout. Sample records (students, schools, companies, programmes, opportunities, applications, articles) live in **one shared dataset in `/data`**, used by every page and dashboard so the story is consistent across roles.
 - No backend. Sample data is shaped like the real data will be. Login, the database, emails, payments, booking and Bridge AI are simulated and clearly marked (see "Prototype scope" in `PROGRESS.md`). Changes made during a demo are kept in the browser for that session only.
 
-## 4. Design system: Bridge tokens
+## 4. Design system: shadcn/ui with the Bridge theme
 
-Visual direction: **the live site's navy-and-green look**, upgraded to feel more premium. The spec's emerald hero with amber highlights is **not** used; its content is kept but rendered in navy and green.
+Since 8 November 2026 the whole platform runs on **shadcn/ui** with a Bridge theme (redesign Steps 1–8, see `PROGRESS.md`). Visual direction: **navy and white with green actions**, premium and production-ready. The spec's emerald hero with amber highlights is **not** used; its content is kept but rendered in navy and green.
 
-### Colour
+### Tokens (`app/globals.css`)
 
-Values below come from the live site. Define them as CSS variables and expose them through the Tailwind theme.
+All values live in `:root` and are exposed to Tailwind through `@theme inline`. Tailwind's built-in colour palette is **switched off**: only these tokens (plus white, and black for overlays) exist, so a stray `bg-gray-500` draws nothing. Use the token classes (`bg-primary`, `text-heading`, `text-muted-foreground`, `border-border` …), never hex values.
 
 | Token | Value | Use |
 |---|---|---|
-| `navy-900` | `#1C3D6A` | Headings, dark sections, footer |
-| `green-500` | `#3AAA6D` | Brand green: decorative use, icons, large display text, accents on white |
-| `green-600` | `#2F8A58` | Large text and icons on light-green backgrounds only (3.9:1 on `green-50`, fails for normal text) |
-| `green-700` | `#277A4D` | Button and link colour (**decided**, see accessibility note) |
-| `green-800` | `#1F6340` | Hover and pressed state for green buttons and links |
-| `green-50` | `#EBF7F0` | Light section backgrounds, secondary button fill |
-| `gray-800` | `#1F2937` | Body text |
-| `gray-700` | `#374151` | Secondary text, nav links |
-| `gray-500` | `#6B7280` | Captions, metadata |
-| `gray-200` | `#E5E7EB` | Borders, dividers |
-| `gray-50` | `#F4F6F5` | Dashboard page background (from Aston's dashboard design) |
-| `green-deep` | `#027A48` | Logo green: course tiles, passport gradient start (white text 5.4:1) |
-| `amber-500` | `#F8AC36` | Logo amber, **decorative accent**: rank chip, notification dot. Navy text only (5.7:1) |
-| `amber-600` | `#D58916` | Course tile colour, **decoration only** (white text fails, 2.8:1) |
-| `white` | `#FFFFFF` | Page background, text on navy |
+| `foreground` | `#1F2937` | Body text |
+| `heading` | `#1C3D6A` | Headings (navy) |
+| `primary` / `primary-hover` | `#277A4D` / `#1F6340` | Buttons, links, selected states / hover and pressed. White text 5.3:1 (Aston's green-700 decision, 7 Nov 2026) |
+| `secondary` / `secondary-foreground` | `#EBF7F0` / `#277A4D` | Secondary button fill, Open and Verified labels |
+| `link`, `eyebrow-foreground` | `#277A4D` | Text links, eyebrow labels |
+| `brand-navy` | `#1C3D6A` | Navy sections, footer, avatars, Navy button |
+| `brand-green` | `#3AAA6D` | Logo, icons, illustrations, decorative arcs. **Never small text** (2.9:1) |
+| `brand-amber` | `#F8AC36` | Decorative accent only: Draft label tint, rank chip, shortlist star, notification dot. Navy text on it |
+| `muted` / `muted-foreground` | `#F4F6F5` / `#626A75` | Quiet backgrounds / captions and metadata (5.5:1) |
+| `section-tint` | `#F4F6F5` | Alternate marketing sections (neutral grey, not mint) |
+| `accent` | `#EEF1F0` | Hover background for menus and list rows |
+| `border` | `#E5E7EB` | Card and divider lines |
+| `input` | `#80878F` | Field borders and switch tracks (3:1 or more) |
+| `ring` | `#1C3D6A` | Focus ring |
+| `destructive`, `warning`, `success` | `#B42318`, `#8A5A00`, `#277A4D` | Errors, text-safe amber, success |
+| `chart-1…5` | validated palette | Multi-series charts (single-series charts use `primary`) |
+| `sidebar-*` | light grey | Dashboard sidebar |
 
-**Accessibility note (decided by Aston, 7 November 2026):** white text on `#3AAA6D` has a contrast ratio of about 2.9:1, and `#3AAA6D` text on white is the same. Both fail the WCAG AA minimum of 4.5:1 for normal text. The live site's buttons, "Learn More" links and eyebrow labels all use this combination. `green-700 #277A4D` reaches about 5.3:1 while staying close to the brand green. Use `green-700` for buttons and text links and keep `green-500` for icons, illustrations and large display text.
+**Navy surfaces:** `surface-navy` paints a navy background and flips the tokens (text, muted text, borders, links, focus ring → white); `tokens-navy` flips the tokens only. White cards and menus inside a navy section reset to the light tokens automatically.
 
-Navy `#1C3D6A` on white is about 10.9:1, which is excellent.
+**Accessibility (decided):** WCAG 2.1 AA everywhere. The focus ring is a solid 2px outline with a 2px gap: navy on light backgrounds, white on navy. Animations respect "reduce motion".
 
-### Typography
+### Typography (`components/ui/typography.tsx`)
 
-- **Typeface: Manrope**, loaded with `next/font`. Set it in one place only, so it can be swapped later in a single change.
-- Type scale (from the live site; review once Manrope is in place):
-  - Display / H1: 60px, weight 800, line-height 1.0 (mobile: 36–40px)
-  - H2 section titles: 36px, weight 800, line-height 1.1 (mobile: 30px)
-  - Heading alignment: left-aligned by default; centred only for short, single-statement sections (e.g. How Bridge works, final conversion)
-  - H3 card titles: 20px, weight 700
-  - Eyebrow labels: 12–13px, weight 700, uppercase, letter-spacing 0.08em
-  - Body large: 20px / 28px
-  - Body: 16px / 24px
+**Manrope** only, loaded once with `next/font` (`--font-brand`). Use the named components, not raw sizes:
 
-### Shape and spacing
+| Marketing | | Dashboards | |
+|---|---|---|---|
+| `Display` | 40 / 48 / 60px, 800 | `PageTitle` | 24px, 600 |
+| `H2` | 30 / 36px, 700 | `SectionTitle` | 18px, 600 |
+| `H3` | 20px, 600 | body | 14px (`text-sm`) |
+| `Lead` | 18px | `Caption` | 12px |
+| body / `Small` | 16px / 14px | `Eyebrow` | 12px, 600, uppercase, 0.08em (one style everywhere) |
 
-- Corner radius: **8px** for buttons, inputs and small elements; 12px for cards (proposed, to confirm).
-- Spacing follows a 4px base scale (Tailwind default).
-- Content max-width: 1200px, centred, with 24px side padding on mobile.
-- Section vertical padding: 96px desktop, 64px mobile.
-- Shadows: soft and minimal, matching the live site's service cards.
+Headings are left-aligned by default; centred only for short single-statement sections. Paragraphs cap at about 70 characters. Numbers in tables and stats use `tabular-nums`. At most three weights per view.
 
-### Buttons
+### Shape, spacing and surfaces
 
-| Variant | Style |
-|---|---|
-| Primary | `green-700` fill, white text, semibold |
-| Secondary | `green-50` fill, `green-700` text (`green-600` failed contrast) |
-| Outline | white fill, `green-700` border and text. Secondary actions on light-green backgrounds, where the Secondary fill disappears (added 7 Nov 2026, Checkpoint 5) |
-| Navy | `navy-900` fill, white text. Dashboard actions such as "Apply" (Aston's dashboard design) |
-| Ghost on navy | transparent, white border, white text |
-| Text link | `green-700` text with arrow icon |
+- Radius: `--radius` 8px for buttons, inputs and small elements; cards 12px (`rounded-xl`). No other corner styles.
+- 4px grid; use 4, 8, 12, 16, 24, 32, 48, 64, 96. Content max-width 1200px (`max-w-content`), 24px side padding on mobile, sections 96px / 64px vertical padding.
+- Borders over shadows: cards use a 1px border and at most `shadow-xs`; clickable cards may lift to `shadow-md` on hover. No gradients or glows, except the homepage hero visual.
+- Icons: lucide-react only. 16px inline, 20px in buttons and nav, 24px feature icons (`IconTile`).
 
-Sizes: medium (8px × 24px padding, 16px text) and large (12px × 32px, 18px text).
-Every interactive element needs **hover, focus-visible, active and disabled** states. Focus rings must be clearly visible on both white and navy backgrounds: 2px `navy-900` ring with a 2px gap on light backgrounds, 2px white ring on navy.
+### Variants (customise through these, never one-off overrides)
 
-Hover and pressed: green buttons and links turn `green-800`; the Secondary fill deepens to `green-500` at 15%; buttons move down 1px when pressed. The component is `components/Button.tsx`.
+- **Button** (`components/ui/button.tsx`): `default` (green), `secondary`, `outline`, `navy` (dashboard actions such as Apply, Review), `on-navy` (on navy sections), `ghost`, `link`, `destructive`. Sizes `xs`, `sm`, `default` (36px), `lg` (44px), `xl` (48px), `icon*`. Links that look like buttons use `<Button asChild><Link/></Button>`. Every state (hover, focus-visible, active, disabled, loading with `Spinner`) comes from the component.
+- **Badge** (`components/ui/badge.tsx`), always text, never colour alone: programme status `open`, `upcoming`, `closed`, `archived` (calculated from dates); `draft` (amber tint with a pencil, content awaiting Bridge approval); `preview` ("Coming soon", Bridge AI); `sample` ("Sample profile", "Sample figures"); `verified`; `featured`; plus `secondary` and `outline`. Dashboard stage labels map onto these: the further along, the stronger the green.
+- **Alert**: `default` (info), `success`, `destructive`. **Card** takes `as="section" | "article"`. **Table** takes `scrollLabel` so narrow screens scroll it in a labelled frame.
+
+### Patterns
+
+- **Forms:** `components/forms/Fields.tsx` (labels, "(required)", inline errors linked to the field, calendar date picker), an error summary that takes focus after a failed submit, a spinner on the submit button, and a toast on success.
+- **Dashboards:** shadcn Sidebar frame (collapsible, breadcrumb, Ctrl+K search, notifications); page header = title, short description, actions on the right; one stat card, one table (`DataGrid`: search, sorting, filters in the toolbar, pages, empty state), one drawer (`DetailDrawer`, returns focus), dialogs for forms, toasts for confirmations; every list has empty, loading (Skeleton) and error states.
 
 ## 5. Content rules (non-negotiable)
 
@@ -132,25 +131,20 @@ These come directly from the spec and apply to every section.
 
 Full copy for every section is in the spec PDF. Copy it exactly into the content files; do not rewrite it.
 
-## 7. Component list (build in this order; grouped into Checkpoints 1–4 in `PROGRESS.md`)
+## 7. Components: where things live
 
-Build each one in isolation on a `/components-preview` page first, so Aston can review every state before it is used on the homepage.
+Every component is reviewed on **`/components-preview`** before it is used. To add one: install it with the shadcn CLI (`npx shadcn@latest add <name>`), make the focus ring and colours match section 4 inside `components/ui`, add it to the preview page, then use it.
 
-1. Design tokens and base typography
-2. Button (all variants, sizes and states)
-3. Eyebrow + section heading block
-4. Header (desktop with dropdowns, mobile menu)
-5. Stat item
-6. Service card (title, description, capability list, CTA, optional "Coming soon" badge)
-7. Audience panel
-8. **Programme card**, with statuses: Open, Upcoming, Closed, Archived. Fields: name, image, description, audience, eligibility, format and location, opening and closing dates, status, CTA. Status must be calculated from the dates, never typed by hand.
-9. Talent profile card: discipline, skills and project evidence, verification indicator, experience, availability (only if consented), suitable opportunities, "Sample profile" label.
-10. Journey step
-11. Article card: category, title, excerpt, date, image, reading time, link
-12. Testimonial / story card
-13. CTA band
-14. Footer
-15. Hero ecosystem visual (last, after the system is stable)
+| Area | Files |
+|---|---|
+| shadcn components, Bridge-themed | `components/ui/*` (button, badge, card, table, dialog, sheet, sidebar, tabs, select, field, …) and `components/ui/typography.tsx` |
+| Content labels | `components/Badge.tsx` (Draft, Coming soon, Sample profile), `ApprovableDraft.tsx`, `StatusPill.tsx` (programme status from dates) |
+| Marketing layout | `Header`, `Footer`, `HomeSection`, `PageHeader`, `SectionHeading`, `CtaBand`, `LinkButton`, `TextLink`, `IconTile`, `CheckList` |
+| Marketing cards | `StatItem`, `ServiceCard`, `AudiencePanel`, `ProgrammeCardView`, `TalentCard`, `ArticleCard`, `StoryCard`, `JourneySteps`, `BridgeAiPreview`, `Hero` + `HeroVisual` |
+| Forms | `components/forms/Fields.tsx`, `ApplyForm`, `DiscoveryCallForm`, `components/auth/*` (log in, create account, password reset, simulated social buttons) |
+| Dashboard frame | `components/dashboard/DashboardShell.tsx`, `app/dashboard/[role]/loading.tsx` and `error.tsx` |
+| Dashboard building blocks | `parts.tsx` (page header, panel, stat card, progress bar, empty state), `DataGrid.tsx`, `DetailDrawer.tsx`, `kit.tsx` (navy summary card, figure strip, today tabs, initials avatar, toolbar dropdown), `charts.tsx` (accessible single-series charts with "Show as table") |
+| Role screens | `components/dashboard/{student,company,school,admin}/*`, shared `SettingsView.tsx` |
 
 ## 8. Quality bar
 

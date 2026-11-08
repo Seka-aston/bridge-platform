@@ -219,7 +219,7 @@ Branch `shadcn-redesign`. One step at a time, each reviewed by Aston before the 
   - [x] Company (approved 8 Nov 2026)
   - [x] School (approved 8 Nov 2026)
   - [x] Admin (approved 8 Nov 2026)
-- [ ] Step 8: Clean-up and QA
+- [x] Step 8: Clean-up and QA (8 Nov 2026; awaiting Aston's final look)
 
 Decisions (Aston, 8 Nov 2026):
 - His student dashboard design shows what belongs on a dashboard, not how it should look. All dashboards are redesigned on shadcn.
@@ -490,4 +490,12 @@ Decisions (Aston, 8 Nov 2026):
 - After Approve or Request changes, focus moves to the next item still waiting (the row's buttons are replaced by a tick).
 - No dashboard uses the old pill, the old focus-ring helper or the old Button adapter any more.
 - Tests: Admin journeys pass (approve removes a Draft badge on the homepage, content search, users filter and search, programme edit and validation, reports table and keyboard tooltip); Student, Company, School and cross-dashboard journeys rerun and pass, including the admin's new programme appearing on the public site; no accessibility issues in dialogs and drawers; no sideways scrolling at 768 and 375px; full sweep of 60 pages at four widths: 0 issues.
+
+### 2026-11-08 — Redesign Step 8: clean-up and QA
+- Admin dashboard approved, committed and pushed.
+- Removed the old design tokens (colours, type scale, radii, shadows) and the old `components/Button.tsx` adapter; nothing used them any more. The Tailwind colour palette stays closed, so only Bridge tokens exist.
+- Checked every page against the brief's quality rules (section 6) with an automated scan: no hard-coded colours (except the Bridge logo and the official Google, Microsoft and LinkedIn logo colours), no one-off font sizes, no gradients. Fixed one: the Bridge AI preview card had a heavier resting shadow than every other card.
+- QA: 61 pages at 375, 768, 1024 and 1440px: 0 accessibility issues, 0 broken links, no sideways scrolling. Every journey suite rerun and passing (log in, apply, booking, all four dashboards, cross-dashboard journeys).
+- "After" screenshots: 61 pages at 1440 and 375px in `/screenshots/after`, and a local side-by-side comparison page at `/screenshots/index.html` (local only, not committed).
+- CLAUDE.md sections 3, 4 and 7 now describe the shadcn design system: tokens, type scale, variants, patterns and where components live.
 
