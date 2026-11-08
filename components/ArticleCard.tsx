@@ -19,7 +19,7 @@ export function ArticleCard({ article: a, showImage = true }: { article: Article
   if (!a.approved && !prototypeMode) return null;
   const minutes = readingMinutes(a);
   return (
-    <Card className="group relative h-full gap-0 py-0 text-base transition-shadow duration-150 focus-within:shadow-md hover:shadow-md">
+    <Card as="article" className="group relative h-full gap-0 py-0 text-base transition-shadow duration-150 focus-within:shadow-md hover:shadow-md">
       {showImage &&
         (a.image ? (
           <Image src={a.image.src} alt={a.image.alt} width={800} height={450} className="aspect-video w-full object-cover" />

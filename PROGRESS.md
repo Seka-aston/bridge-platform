@@ -213,7 +213,7 @@ Branch `shadcn-redesign`. One step at a time, each reviewed by Aston before the 
   - [x] Batch 1: For Talents, For Schools, For Companies, For Ecosystem, Ventures Lab (approved 8 Nov 2026)
   - [x] Batch 2: Programmes list, programme detail and apply flow (approved 8 Nov 2026)
   - [ ] Batch 3: Resources, articles, About, Impact, booking, Bridge AI, Learning, Skills Passport, Opportunities, public passport, legal pages, and the new log in, create account and password reset screens (approved 8 Nov 2026)
-- [ ] Step 6: Platform shell
+- [ ] Step 6: Platform shell (approved by Aston, 8 November 2026)
 - [ ] Step 7: Dashboards (Student, Company, School, Admin)
 - [ ] Step 8: Clean-up and QA
 
@@ -230,6 +230,13 @@ Decisions (Aston, 8 Nov 2026):
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-08 — Redesign Step 6: platform shell
+- Dashboard frame rebuilt on the shadcn Sidebar for all four roles: light grey sidebar (menu in two groups, Settings and the account menu at the foot), collapses to icons with tooltips (panel button or Ctrl/⌘+B), slide-in panel on phones; slim top bar with breadcrumb, search (Ctrl/⌘+K, shadcn Command) and notifications (Popover).
+- Shared dashboard parts on shadcn with unchanged props: page header (24px title), Panel (Card as a section), one StatCard design, ProgressBar, EmptyState (Empty), DataTable (shadcn Table), ListItem, DetailDrawer (Sheet; focus returns to the opener).
+- New: `DataGrid` (shadcn Table + TanStack: search, sortable headers, pages, empty state) for Step 7; dashboard `loading.tsx` (skeleton) and `error.tsx` (retry) inside the frame.
+- shadcn Card can render as a section or article; Table can name its scroll frame for keyboard scrolling.
+- Checked: every dashboard journey (lesson complete, messages both ways, apply then company message and notification, talent drawer, admin creates a programme that appears publicly).
 
 ### 2026-11-08 — Redesign Step 5, batch 3: remaining public pages and the new log in
 - Log in replaces "Sign in as…" (Aston's request): email and password, Google, Microsoft and LinkedIn buttons, "Forgot password?" and "Create an account". Prototype rules (Aston's choices): the four sample users' emails (now in `data/users.ts`) open their dashboards with any password; other emails get "No account found"; social buttons are simulated and open the Student dashboard; sign-up and password reset are simulated with honest confirmations. A "Demo accounts" panel lists the emails and holds "Reset demo data". Copy in `content/auth.ts` (Draft). DEMO.md, CLAUDE.md section 9 and the prototype scope above updated.

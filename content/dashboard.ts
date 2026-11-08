@@ -51,6 +51,16 @@ export const dashboardText = {
   allOption: "All",
   showing: "Showing {n} of {total}",
   noResults: { title: "No matches", body: "Try a different search or filter." },
+  // Redesign Step 6 (NEW, Draft)
+  breadcrumb: "Breadcrumb",
+  searchShortcut: "Search…",
+  loading: "Loading this page",
+  error: {
+    title: "This page couldn't load",
+    body: "Something went wrong on our side. Your demo data in this tab is safe.",
+    retry: "Try again",
+  },
+  pagination: { previous: "Previous", next: "Next", range: "{from}–{to} of {total}", none: "0 results" },
 };
 
 const settings: NavLink = { label: "Settings", slug: "settings", icon: "settings", checkpoint: 13 };

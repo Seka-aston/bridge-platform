@@ -1,23 +1,40 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
-  Award, BarChart3, Bell, BookOpen, Briefcase, Building2, ChevronDown, ClipboardCheck, FileCheck2, LayoutGrid,
-  Library, LogOut, Menu, MessageSquare, Search, Settings, Sparkles, Star, Users, X, type LucideIcon,
+  Award, BarChart3, Bell, BookOpen, Briefcase, Building2, ChevronsUpDown, ClipboardCheck, FileCheck2, Globe, LayoutGrid,
+  Library, LogOut, MessageSquare, Search, Settings, Sparkles, Star, Users, type LucideIcon,
 } from "lucide-react";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useState, type ReactNode } from "react";
 import { Logo } from "@/components/Logo";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import { Command, CommandDialog, CommandEmpty, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Kbd } from "@/components/ui/kbd";
+import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
+import {
+  Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuButton,
+  SidebarMenuItem, SidebarProvider, SidebarRail, SidebarSeparator, SidebarTrigger, useSidebar,
+} from "@/components/ui/sidebar";
 import { dashboardText as t, noticeText, type IconKey, type NavLink } from "@/content/dashboard";
 import { readNotices } from "@/lib/prototypeStore";
 
 /*
-  Dashboard frame from Aston's student dashboard design (7 Nov 2026), used for all four roles:
-  - white rounded top bar: logo, pill menu (centre), search, notifications, account
-  - white icon rail on the left (1024px+), each icon with a tooltip and an accessible name
-  - light grey-green page background
-  Below 1024px the pill menu and rail fold into one menu (native <dialog>: focus trapped,
-  Escape closes). Search is a dialog; notifications and account are small menus.
+  Dashboard frame for all four roles (redesign Step 6), built on the shadcn Sidebar:
+  - light grey sidebar: logo, the role's menu in two groups, Settings and the account menu at
+    the foot; collapses to icons (with tooltips) with the panel button or Ctrl/⌘+B; on phones
+    it opens as a slide-in panel
+  - slim top bar: panel button, breadcrumb, search (Ctrl/⌘+K) and notifications
+  Aston's student dashboard design defines what each dashboard contains, not how it looks
+  (8 Nov 2026).
 */
 
 const icons: Record<IconKey, LucideIcon> = {
@@ -41,9 +58,6 @@ type Props = {
   children: ReactNode;
 };
 
-const ring = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900";
-const roundBtn = `inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-gray-50 text-navy-900 hover:bg-green-50 ${ring}`;
-
 function hrefFor(base: string, slug: string) {
   return slug ? `${base}/${slug}` : base;
 }
@@ -52,87 +66,69 @@ function when(daysAgo: number) {
   return t.daysAgo[String(daysAgo)] ?? t.daysAgo.n.replace("{n}", String(daysAgo));
 }
 
-// Small dropdown that closes on Escape or a click elsewhere.
-function useDisclosure() {
+const initials = (name: string) =>
+  name
+    .split(/[\s-]+/)
+    .map((p) => p[0])
+    .join("")
+    .slice(0, 2);
+
+// ---------- Search (Command palette) ----------
+function SearchCommand({ items }: { items: SearchItem[] }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (!open) return;
-    const onDown = (e: PointerEvent) => !ref.current?.contains(e.target as Node) && setOpen(false);
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-        (ref.current?.querySelector("button") as HTMLButtonElement | null)?.focus();
+      if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((o) => !o);
       }
     };
-    document.addEventListener("pointerdown", onDown);
     document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("pointerdown", onDown);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
-  return { open, setOpen, ref };
-}
-
-function SearchDialog({ items }: { items: SearchItem[] }) {
-  const ref = useRef<HTMLDialogElement>(null);
-  const [q, setQ] = useState("");
-  const query = q.trim().toLowerCase();
-  const results = query ? items.filter((i) => `${i.label} ${i.meta}`.toLowerCase().includes(query)).slice(0, 8) : items.slice(0, 6);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
   return (
     <>
-      <button type="button" aria-label={t.search} onClick={() => ref.current?.showModal()} className={roundBtn}>
-        <Search aria-hidden className="size-5" />
-      </button>
-      <dialog
-        ref={ref}
-        aria-label={t.searchTitle}
-        onClick={(e) => e.target === ref.current && ref.current?.close()}
-        className="mx-auto mt-24 w-[calc(100%-2rem)] max-w-xl rounded-panel bg-white p-0 backdrop:bg-navy-900/60"
-      >
-        <div className="p-5">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="text-h3 text-navy-900">{t.searchTitle}</h2>
-            <button type="button" onClick={() => ref.current?.close()} aria-label={t.close} className={`inline-flex size-10 items-center justify-center rounded-full hover:bg-green-50 ${ring}`}>
-              <X aria-hidden className="size-5" />
-            </button>
-          </div>
-          <label className="mt-4 block">
-            <span className="sr-only">{t.search}</span>
-            <input
-              type="search"
-              autoFocus
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder={t.searchPlaceholder}
-              className={`w-full rounded-full border border-gray-500 px-4 py-3 text-gray-800 ${ring}`}
-            />
-          </label>
-          <ul className="mt-4 max-h-80 overflow-y-auto" aria-live="polite">
-            {results.length === 0 ? (
-              <li className="px-3 py-4 text-gray-700">{t.searchEmpty}</li>
-            ) : (
-              results.map((r) => (
-                <li key={r.href + r.label}>
-                  <Link href={r.href} onClick={() => ref.current?.close()} className={`block rounded-tile px-3 py-2.5 hover:bg-gray-50 ${ring}`}>
-                    <span className="block font-semibold text-navy-900">{r.label}</span>
-                    <span className="block text-sm text-gray-700">{r.meta}</span>
-                  </Link>
-                </li>
-              ))
-            )}
-          </ul>
-        </div>
-      </dialog>
+      <Button variant="outline" className="hidden w-56 justify-between text-muted-foreground md:inline-flex lg:w-72" onClick={() => setOpen(true)}>
+        <span className="flex items-center gap-2">
+          <Search data-icon="inline-start" aria-hidden /> {t.searchShortcut}
+        </span>
+        <Kbd aria-hidden>Ctrl K</Kbd>
+      </Button>
+      <Button variant="ghost" size="icon" className="md:hidden" aria-label={t.search} onClick={() => setOpen(true)}>
+        <Search />
+      </Button>
+      <CommandDialog open={open} onOpenChange={setOpen} title={t.searchTitle} description={t.searchPlaceholder}>
+        <Command>
+          <CommandInput placeholder={t.searchPlaceholder} />
+          <CommandList>
+            <CommandEmpty>{t.searchEmpty}</CommandEmpty>
+            {items.map((r) => (
+              <CommandItem
+                key={r.href + r.label}
+                value={`${r.label} ${r.meta}`}
+                onSelect={() => {
+                  setOpen(false);
+                  router.push(r.href);
+                }}
+              >
+                <span className="flex min-w-0 flex-col">
+                  <span className="truncate font-medium text-heading">{r.label}</span>
+                  <span className="truncate text-xs text-muted-foreground">{r.meta}</span>
+                </span>
+              </CommandItem>
+            ))}
+          </CommandList>
+        </Command>
+      </CommandDialog>
     </>
   );
 }
 
+// ---------- Notifications ----------
 function Notifications({ items: sample, role }: { items: Notice[]; role: string }) {
-  const { open, setOpen, ref } = useDisclosure();
   const [read, setRead] = useState(false);
-  // Live notifications from other roles in this browser session (Checkpoint 11), newest first.
+  // Live notifications from other roles in this browser session, newest first.
   const [live, setLive] = useState<Notice[]>([]);
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- browser-only storage, read after mount
@@ -141,242 +137,209 @@ function Notifications({ items: sample, role }: { items: Notice[]; role: string 
   const items = [...live, ...sample];
   const unread = read ? 0 : items.filter((i) => i.unread).length;
   return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-label={`${t.notifications}${unread ? `, ${t.unread.replace("{n}", String(unread))}` : ""}`}
-        onClick={() => {
-          setOpen(!open);
-          setRead(true);
-        }}
-        className={roundBtn}
-      >
-        <Bell aria-hidden className="size-5" />
-        {unread > 0 && <span aria-hidden className="absolute right-3 top-3 size-2.5 rounded-full bg-amber-500 ring-2 ring-gray-50" />}
-      </button>
-      {open && (
-        <div className="absolute right-0 top-full z-40 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-tile border border-gray-200 bg-white p-2 shadow-card-hover">
-          <p className="px-3 py-2 font-bold text-navy-900">{t.notifications}</p>
-          <ul>
-            {items.map((n) => (
-              <li key={n.id} className="rounded-control px-3 py-2.5">
-                <p className="text-gray-800">{n.text}</p>
-                <p className="text-sm text-gray-500">{n.daysAgo < 0 ? noticeText.live : when(n.daysAgo)}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
+    <Popover onOpenChange={(o) => o && setRead(true)}>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="icon" className="relative" aria-label={`${t.notifications}${unread ? `, ${t.unread.replace("{n}", String(unread))}` : ""}`}>
+          <Bell />
+          {unread > 0 && <span aria-hidden className="absolute top-2 right-2 size-2 rounded-full bg-brand-amber ring-2 ring-background" />}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-80 p-0">
+        <PopoverHeader className="border-b px-4 py-3">
+          <PopoverTitle>{t.notifications}</PopoverTitle>
+          {unread > 0 && <PopoverDescription>{t.unread.replace("{n}", String(unread))}</PopoverDescription>}
+        </PopoverHeader>
+        <ul className="max-h-96 divide-y overflow-y-auto">
+          {items.map((n) => (
+            <li key={n.id} className="flex gap-3 px-4 py-3 text-sm">
+              <span aria-hidden className={`mt-1.5 size-2 shrink-0 rounded-full ${n.unread ? "bg-primary" : "bg-transparent"}`} />
+              <div>
+                <p>{n.text}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{n.daysAgo < 0 ? noticeText.live : when(n.daysAgo)}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </PopoverContent>
+    </Popover>
   );
 }
 
+// ---------- Account menu (sidebar footer) ----------
 function AccountMenu({ user, roleLabel }: { user: { name: string }; roleLabel: string }) {
-  const { open, setOpen, ref } = useDisclosure();
+  const { isMobile } = useSidebar();
   return (
-    <div ref={ref} className="relative">
-      <button type="button" aria-expanded={open} aria-label={t.accountMenu} onClick={() => setOpen(!open)} className={`flex items-center gap-1 rounded-full ${ring}`}>
-        <span aria-hidden className="inline-flex size-12 items-center justify-center rounded-full bg-green-700 text-lg font-bold text-white">
-          {user.name[0]}
-        </span>
-        <ChevronDown aria-hidden className="hidden size-5 text-navy-900 sm:block lg:hidden xl:block" />
-      </button>
-      {open && (
-        <div className="absolute right-0 top-full z-40 mt-2 w-64 rounded-tile border border-gray-200 bg-white p-2 shadow-card-hover">
-          <div className="px-3 py-2">
-            <p className="font-bold text-navy-900">{user.name}</p>
-            <p className="text-sm text-gray-700">
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <SidebarMenuButton size="lg" aria-label={t.accountMenu} className="data-[state=open]:bg-sidebar-accent">
+          <Avatar size="sm">
+            <AvatarFallback className="bg-primary text-xs font-semibold text-primary-foreground">{initials(user.name)}</AvatarFallback>
+          </Avatar>
+          <span className="grid flex-1 text-left leading-tight">
+            <span className="truncate font-semibold text-heading">{user.name}</span>
+            <span className="truncate text-xs text-muted-foreground">
               {t.sampleUser} · {roleLabel}
-            </p>
-          </div>
-          <Link href="/sign-in" className={`block rounded-control px-3 py-2 font-semibold text-gray-800 hover:bg-gray-50 ${ring}`}>
-            {t.switchUser}
-          </Link>
-          <Link href="/" className={`block rounded-control px-3 py-2 font-semibold text-gray-800 hover:bg-gray-50 ${ring}`}>
-            {t.signOut}
-          </Link>
-        </div>
-      )}
-    </div>
+            </span>
+          </span>
+          <ChevronsUpDown className="ml-auto" />
+        </SidebarMenuButton>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side={isMobile ? "top" : "right"} align="end" className="w-60">
+        <DropdownMenuLabel className="font-normal">
+          <p className="font-semibold text-heading">{user.name}</p>
+          <p className="text-xs text-muted-foreground">
+            {t.sampleUser} · {roleLabel}
+          </p>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem asChild>
+            <Link href="/sign-in">
+              <LogOut /> {t.switchUser}
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/">
+              <Globe /> {t.signOut}
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
-function RailButton({ href, label, icon: Icon, active }: { href: string; label: string; icon: LucideIcon; active: boolean }) {
+function NavItem({ n, base, active }: { n: NavLink; base: string; active: boolean }) {
+  const { setOpenMobile } = useSidebar();
+  const Icon = icons[n.icon];
   return (
-    <li className="group relative">
-      <Link
-        href={href}
-        aria-label={label}
-        aria-current={active ? "page" : undefined}
-        className={`inline-flex size-14 items-center justify-center rounded-full transition-colors duration-150 ${ring} ${
-          active ? "bg-green-700 text-white" : "text-navy-900 hover:bg-green-50"
-        }`}
-      >
-        <Icon aria-hidden className="size-6" />
-      </Link>
-      {/* Tooltip on hover and keyboard focus */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute left-full top-1/2 z-20 ml-3 hidden -translate-y-1/2 whitespace-nowrap rounded-control bg-navy-900 px-3 py-1.5 text-sm font-semibold text-white group-focus-within:block group-hover:block"
-      >
-        {label}
-      </span>
-    </li>
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild isActive={active} tooltip={n.label}>
+        <Link href={hrefFor(base, n.slug)} aria-current={active ? "page" : undefined} onClick={() => setOpenMobile(false)}>
+          <Icon />
+          <span>{n.label}</span>
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+}
+
+// ---------- Breadcrumb: dashboard › section › item ----------
+function Crumbs({ base, title, nav, searchItems }: { base: string; title: string; nav: NavLink[]; searchItems: SearchItem[] }) {
+  const pathname = usePathname() ?? base;
+  const rest = pathname.slice(base.length).split("/").filter(Boolean);
+  const section = rest[0] ? nav.find((n) => n.slug === rest[0]) : undefined;
+  const itemLabel = rest[1] ? (searchItems.find((s) => s.href === pathname)?.label ?? rest[1]) : undefined;
+  const trail: { label: string; href?: string }[] = [{ label: title, href: rest.length ? base : undefined }];
+  if (section) trail.push({ label: section.label, href: itemLabel ? hrefFor(base, section.slug) : undefined });
+  if (itemLabel) trail.push({ label: itemLabel });
+  return (
+    <Breadcrumb aria-label={t.breadcrumb} className="min-w-0">
+      <BreadcrumbList className="flex-nowrap">
+        {trail.map((c, i) => (
+          <Fragment key={c.label + i}>
+            {i > 0 && <BreadcrumbSeparator className={i < trail.length - 1 ? "hidden sm:block" : undefined} />}
+            <BreadcrumbItem className={i < trail.length - 1 ? "hidden sm:inline-flex" : "min-w-0"}>
+              {c.href ? (
+                <BreadcrumbLink asChild>
+                  <Link href={c.href}>{c.label}</Link>
+                </BreadcrumbLink>
+              ) : (
+                <BreadcrumbPage className="truncate">{c.label}</BreadcrumbPage>
+              )}
+            </BreadcrumbItem>
+          </Fragment>
+        ))}
+      </BreadcrumbList>
+    </Breadcrumb>
   );
 }
 
 export function DashboardShell({ role, base, title, roleLabel, user, nav, searchItems, notifications, children }: Props) {
   const pathname = usePathname();
-  const menuRef = useRef<HTMLDialogElement>(null);
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
-  const isActive = (slug: string) => pathname === hrefFor(base, slug);
-  const top = nav.filter((n) => n.top);
-  const rail1 = nav.filter((n) => n.rail === 1);
-  const rail2 = nav.filter((n) => n.rail === 2);
+  const isActive = (slug: string) => (slug ? pathname === hrefFor(base, slug) || pathname.startsWith(`${hrefFor(base, slug)}/`) : pathname === base);
   const settings = nav.find((n) => n.slug === "settings");
+  const main = nav.filter((n) => n.slug !== "settings" && n.rail !== 2);
+  const more = nav.filter((n) => n.slug !== "settings" && n.rail === 2);
 
   return (
-    <div className="min-h-dvh bg-gray-50 px-3 py-4 sm:px-6 sm:py-6">
+    <SidebarProvider>
       <a
         href="#main"
-        className="sr-only rounded-control bg-white px-4 py-2 font-semibold text-navy-900 focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-50 focus:outline-2 focus:outline-navy-900"
+        className="sr-only rounded-md bg-background px-4 py-2 text-sm font-semibold text-heading focus:not-sr-only focus:fixed focus:top-3 focus:left-4 focus:z-50 focus:outline-2 focus:outline-ring"
       >
         {t.skipLink}
       </a>
-
-      {/* Top bar */}
-      <header className="sticky top-3 z-30 mx-auto flex max-w-[90rem] items-center gap-3 rounded-panel bg-white px-3 py-3 shadow-soft sm:px-5">
-        <button
-          ref={menuButtonRef}
-          type="button"
-          onClick={() => menuRef.current?.showModal()}
-          aria-label={t.openMenu}
-          className={`${roundBtn} lg:hidden`}
-        >
-          <Menu aria-hidden className="size-5" />
-        </button>
-        <Link href={base} aria-label={`${title}: ${t.overview}`} className={`shrink-0 rounded-sm ${ring}`}>
-          <Logo size={36} className="h-8 w-auto sm:h-9" />
-        </Link>
-        <span
-          title={t.prototypeHint}
-          className="hidden shrink-0 whitespace-nowrap rounded-full border border-dashed border-gray-500 px-2.5 py-0.5 text-eyebrow uppercase text-gray-700 md:inline-flex 2xl:hidden"
-        >
-          {t.prototypeShort}
-        </span>
-
-        <nav aria-label={t.navLabel} className="mx-auto hidden lg:block">
-          <ul className="flex items-center gap-1 rounded-full bg-gray-50 p-1.5">
-            {top.map((n) => {
-              const active = isActive(n.slug);
-              return (
-                <li key={n.slug}>
-                  <Link
-                    href={hrefFor(base, n.slug)}
-                    aria-current={active ? "page" : undefined}
-                    className={`inline-flex whitespace-nowrap rounded-full px-4 py-2.5 font-semibold transition-colors duration-150 xl:px-5 ${ring} ${
-                      active ? "bg-white text-navy-900 shadow-soft" : "text-gray-700 hover:text-navy-900"
-                    }`}
-                  >
-                    {n.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-
-        <div className="ml-auto flex items-center gap-2 lg:ml-0">
-          <span
-            title={t.prototypeHint}
-            className="mr-1 hidden shrink-0 whitespace-nowrap rounded-full border border-dashed border-gray-500 px-2.5 py-0.5 text-eyebrow uppercase text-gray-700 2xl:inline-flex"
-          >
-            {t.prototypeLabel}
-          </span>
-          <SearchDialog items={searchItems} />
-          <Notifications items={notifications} role={role} />
-          <AccountMenu user={user} roleLabel={roleLabel} />
-        </div>
-      </header>
-
-      {/* Menu for screens below 1024px */}
-      <dialog
-        ref={menuRef}
-        aria-label={t.navLabel}
-        onClick={(e) => e.target === menuRef.current && menuRef.current?.close()}
-        onClose={() => menuButtonRef.current?.focus()}
-        className="m-0 h-dvh max-h-dvh w-80 max-w-[85vw] bg-white p-0 backdrop:bg-navy-900/60 lg:hidden"
-      >
-        <div className="flex h-full flex-col gap-6 p-5">
-          <div className="flex items-center justify-between">
-            <Logo size={32} />
-            <button type="button" onClick={() => menuRef.current?.close()} aria-label={t.closeMenu} className={roundBtn}>
-              <X aria-hidden className="size-5" />
-            </button>
-          </div>
-          <span className="self-start rounded-full border border-dashed border-gray-500 px-2.5 py-0.5 text-eyebrow uppercase text-gray-700">
-            {t.prototypeLabel}
-          </span>
-          <nav aria-label={t.navLabel} className="flex-1 overflow-y-auto">
-            <ul className="space-y-1">
-              {nav.map((n) => {
-                const Icon = icons[n.icon];
-                const active = isActive(n.slug);
-                return (
-                  <li key={n.slug}>
-                    <Link
-                      href={hrefFor(base, n.slug)}
-                      onClick={() => menuRef.current?.close()}
-                      aria-current={active ? "page" : undefined}
-                      className={`flex items-center gap-3 rounded-full px-4 py-3 font-semibold ${ring} ${
-                        active ? "bg-green-700 text-white" : "text-navy-900 hover:bg-gray-50"
-                      }`}
-                    >
-                      <Icon aria-hidden className="size-5" /> {n.label}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-          <div className="space-y-1 border-t border-gray-200 pt-4">
-            <Link href="/sign-in" className={`block rounded-full px-4 py-2.5 font-semibold text-navy-900 hover:bg-gray-50 ${ring}`}>
-              {t.switchUser}
+      <Sidebar collapsible="icon" aria-label={t.navLabel}>
+        <SidebarHeader>
+          <div className="flex h-10 items-center gap-2 px-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
+            <Link href={base} aria-label={`${title}: ${t.overview}`} className="rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+              <Logo size={28} className="group-data-[collapsible=icon]:hidden" />
+              <Image src="/brand/bridge-symbol.svg" alt="" aria-hidden width={14} height={24} unoptimized className="hidden h-6 w-auto group-data-[collapsible=icon]:block" />
             </Link>
-            <Link href="/" className={`block rounded-full px-4 py-2.5 font-semibold text-navy-900 hover:bg-gray-50 ${ring}`}>
-              {t.signOut}
-            </Link>
+            <Badge variant="sample" className="ml-auto group-data-[collapsible=icon]:hidden" title={t.prototypeHint}>
+              {t.prototypeShort}
+            </Badge>
           </div>
-        </div>
-      </dialog>
-
-      <div className="mx-auto mt-6 max-w-[90rem] lg:grid lg:grid-cols-[5.5rem_1fr] lg:gap-6">
-        {/* Icon rail */}
-        <aside className="hidden lg:block">
-          <nav aria-label={t.railLabel} className="sticky top-32 flex flex-col items-center gap-4">
-            {[rail1, rail2].map((group, i) => (
-              <ul key={i} className="flex flex-col gap-2 rounded-full bg-white p-2 shadow-soft">
-                {group.map((n) => (
-                  <RailButton key={n.slug} href={hrefFor(base, n.slug)} label={n.label} icon={icons[n.icon]} active={isActive(n.slug)} />
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {main.map((n) => (
+                  <NavItem key={n.slug} n={n} base={base} active={isActive(n.slug)} />
                 ))}
-              </ul>
-            ))}
-            {settings && (
-              <ul className="rounded-full bg-white p-2 shadow-soft">
-                <RailButton href={hrefFor(base, settings.slug)} label={settings.label} icon={Settings} active={isActive(settings.slug)} />
-              </ul>
-            )}
-            <ul className="rounded-full bg-white p-2 shadow-soft">
-              <RailButton href="/sign-in" label={t.switchUser} icon={LogOut} active={false} />
-            </ul>
-          </nav>
-        </aside>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+          {more.length > 0 && (
+            <>
+              <SidebarSeparator className="mx-0" />
+              <SidebarGroup>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {more.map((n) => (
+                      <NavItem key={n.slug} n={n} base={base} active={isActive(n.slug)} />
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </>
+          )}
+          {settings && (
+            <SidebarGroup className="mt-auto">
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <NavItem n={settings} base={base} active={isActive(settings.slug)} />
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          )}
+        </SidebarContent>
+        <SidebarFooter className="border-t">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <AccountMenu user={user} roleLabel={roleLabel} />
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+        <SidebarRail />
+      </Sidebar>
 
-        <main id="main" className="min-w-0">
+      <SidebarInset className="min-w-0">
+        <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b bg-background px-4 md:px-6">
+          <SidebarTrigger className="-ml-1.5" />
+          <Separator orientation="vertical" className="mr-1 h-4! self-center" />
+          <Crumbs base={base} title={title} nav={nav} searchItems={searchItems} />
+          <div className="ml-auto flex items-center gap-1 md:gap-2">
+            <SearchCommand items={searchItems} />
+            <Notifications items={notifications} role={role} />
+          </div>
+        </header>
+        <main id="main" className="mx-auto w-full max-w-7xl min-w-0 flex-1 p-4 md:p-6 lg:p-8">
           {children}
         </main>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

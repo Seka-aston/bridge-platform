@@ -1,9 +1,7 @@
 "use client";
 
-import {
-  type ColumnDef, type SortingState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable,
-} from "@tanstack/react-table";
-import { ArrowRight, ArrowUpDown, BadgeCheck, BookOpen, Clock, MoreHorizontal, Search, Users } from "lucide-react";
+import { DataGrid, SortHeader, type ColumnDef } from "@/components/dashboard/DataGrid";
+import { ArrowRight, BadgeCheck, BookOpen, Clock, MoreHorizontal, Users } from "lucide-react";
 import { Fragment, useState } from "react";
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts";
 import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount } from "@/components/ui/avatar";
@@ -12,13 +10,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemSeparator, ItemTitle } from "@/components/ui/item";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Caption } from "@/components/ui/typography";
 import { reports } from "@/data/admin";
 import { courses } from "@/data/student";
 import { type TalentProfile, talentProfiles } from "@/data/talent";
@@ -29,11 +24,7 @@ const initials = (name: string) => name.split(" ").map((p) => p[0]).join("").sli
 const columns: ColumnDef<TalentProfile>[] = [
   {
     accessorKey: "name",
-    header: ({ column }) => (
-      <Button variant="ghost" size="sm" className="-ml-2.5" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-        Name <ArrowUpDown data-icon="inline-end" />
-      </Button>
-    ),
+    header: ({ column }) => <SortHeader label="Name" sorted={column.getIsSorted()} onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")} />,
     cell: ({ row }) => (
       <div className="flex items-center gap-3">
         <Avatar size="sm">
@@ -86,89 +77,16 @@ const columns: ColumnDef<TalentProfile>[] = [
 ];
 
 function TalentTable() {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [filter, setFilter] = useState("");
-  // TanStack Table manages its own state, so the React Compiler skips this component (expected).
-  // eslint-disable-next-line react-hooks/incompatible-library
-  const table = useReactTable({
-    data: talentProfiles,
-    columns,
-    state: { sorting, globalFilter: filter },
-    onSortingChange: setSorting,
-    onGlobalFilterChange: setFilter,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: { pagination: { pageSize: 3 } },
-  });
-  const rows = table.getRowModel().rows;
-  const total = table.getFilteredRowModel().rows.length;
-  const { pageIndex, pageSize } = table.getState().pagination;
-
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <InputGroup className="w-full sm:w-72">
-          <InputGroupAddon>
-            <Search />
-          </InputGroupAddon>
-          <InputGroupInput aria-label="Filter talent" placeholder="Filter by name, skill or discipline" value={filter} onChange={(e) => setFilter(e.target.value)} />
-        </InputGroup>
-        <Badge variant="sample">Sample profiles</Badge>
-      </div>
-      <div className="relative overflow-hidden rounded-xl border">
-        <Table>
-          <TableHeader className="bg-muted">
-            {table.getHeaderGroups().map((hg) => (
-              <TableRow key={hg.id}>
-                {hg.headers.map((h) => (
-                  <TableHead key={h.id}>{h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}</TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {rows.length ? (
-              rows.map((r) => (
-                <TableRow key={r.id}>
-                  {r.getVisibleCells().map((c) => (
-                    <TableCell key={c.id}>{flexRender(c.column.columnDef.cell, c.getContext())}</TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-40">
-                  <Empty className="p-0">
-                    <EmptyHeader>
-                      <EmptyMedia variant="icon">
-                        <Search />
-                      </EmptyMedia>
-                      <EmptyTitle>No talent matches “{filter}”</EmptyTitle>
-                      <EmptyDescription>Try a skill such as SQL, or clear the filter.</EmptyDescription>
-                    </EmptyHeader>
-                  </Empty>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-between gap-3">
-        <Caption className="tabular-nums">
-          {total === 0 ? "0 results" : `Showing ${pageIndex * pageSize + 1}–${Math.min(total, (pageIndex + 1) * pageSize)} of ${total}`}
-        </Caption>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-            Previous
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-            Next
-          </Button>
-        </div>
-      </div>
-    </div>
+    <DataGrid
+      data={talentProfiles}
+      columns={columns}
+      caption="Sample talent profiles"
+      searchLabel="Filter talent"
+      searchPlaceholder="Filter by name, skill or discipline"
+      pageSize={3}
+      toolbar={<Badge variant="sample" className="ml-auto">Sample profiles</Badge>}
+    />
   );
 }
 

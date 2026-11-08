@@ -57,7 +57,7 @@ export function CoursePage({ courseId }: { courseId: string }) {
         <ArrowLeft aria-hidden className="size-4" /> {t.back}
       </Link>
 
-      <section aria-labelledby="course-title" className="grid gap-6 rounded-panel bg-white p-5 md:grid-cols-[16rem_1fr] md:p-8">
+      <section aria-labelledby="course-title" className="grid gap-6 rounded-panel bg-white p-5 md:p-8 lg:grid-cols-[16rem_minmax(0,1fr)]">
         <div className={`relative flex h-40 items-center justify-center rounded-tile ${tones[course.tone]}`}>
           <span className="absolute left-3 top-3 rounded-full bg-navy-900/40 px-2.5 py-0.5 text-sm font-semibold text-white">
             {studentText.courses.module.replace("{n}", String(course.module))}

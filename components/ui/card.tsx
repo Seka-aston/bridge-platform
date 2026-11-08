@@ -1,13 +1,15 @@
 import * as React from "react"
 import { cn } from "cn"
 
+// `as` lets a card be a <section> or <article> (Bridge addition), so panels keep their meaning.
 function Card({
   className,
   size = "default",
+  as: Tag = "div",
   ...props
-}: React.ComponentProps<"div"> & { size?: "default" | "sm" }) {
+}: React.ComponentProps<"div"> & { size?: "default" | "sm"; as?: "div" | "section" | "article" }) {
   return (
-    <div
+    <Tag
       data-slot="card"
       data-size={size}
       className={cn(

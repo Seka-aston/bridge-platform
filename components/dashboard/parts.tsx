@@ -1,12 +1,22 @@
+import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
-import { Button } from "@/components/Button";
+import { Button } from "@/components/ui/button";
+import { Card, CardAction, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import { Progress } from "@/components/ui/progress";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { PageTitle, SectionTitle } from "@/components/ui/typography";
+import { cn } from "@/lib/utils";
 
 /*
-  Dashboard building blocks (Checkpoint 6). Server-friendly: no client state here.
-  Interactive pieces (drawer, filters) live in their own client files.
+  Shared dashboard building blocks (redesign Step 6), on shadcn/ui. Server-friendly: no client
+  state here. Same props as before, so every dashboard screen uses them unchanged.
+  Dashboards are denser than marketing pages: 24px page titles, 18px section titles, 14px text.
 */
 
+// Page header pattern: title, short description, primary action(s) on the right.
+// (The breadcrumb lives in the top bar.) `large` is kept for the overview's welcome line.
 export function DashPageHeader({
   title,
   description,
@@ -16,27 +26,27 @@ export function DashPageHeader({
   title: ReactNode;
   description?: ReactNode;
   actions?: ReactNode;
-  large?: boolean; // the overview's big welcome line
+  large?: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-4 px-1 lg:flex-row lg:items-end lg:justify-between">
-      <div>
-        <h1 className={`text-navy-900 ${large ? "text-display-mobile md:text-display" : "text-h2-mobile md:text-h2"}`}>{title}</h1>
-        {description && <p className={`mt-2 max-w-2xl text-gray-700 ${large ? "text-body-lg" : ""}`}>{description}</p>}
+    <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div className="min-w-0">
+        <PageTitle className={cn(large && "md:text-3xl")}>{title}</PageTitle>
+        {description && <div className="mt-1.5 max-w-2xl text-sm text-muted-foreground">{description}</div>}
       </div>
-      {actions && <div className="flex shrink-0 flex-wrap gap-3">{actions}</div>}
+      {actions && <div className="flex shrink-0 flex-wrap gap-2">{actions}</div>}
     </div>
   );
 }
 
-// A titled white panel that groups a table, list or chart.
+// A titled card that groups a table, list or chart.
 export function Panel({
   title,
   id,
   children,
   action,
   subtitle,
-  className = "",
+  className,
 }: {
   title: string;
   id: string;
@@ -46,33 +56,32 @@ export function Panel({
   className?: string;
 }) {
   return (
-    <section aria-labelledby={id} className={`min-w-0 rounded-panel bg-white p-5 md:p-8 ${className}`}>
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <div>
-          <h2 id={id} className="text-h3 text-navy-900 md:text-panel">
-            {title}
-          </h2>
-          {subtitle && <p className="mt-1 text-gray-700">{subtitle}</p>}
-        </div>
-        {action}
-      </div>
-      {children}
-    </section>
+    <Card as="section" aria-labelledby={id} className={cn("min-w-0", className)}>
+      <CardHeader>
+        <SectionTitle id={id}>{title}</SectionTitle>
+        {subtitle && <CardDescription>{subtitle}</CardDescription>}
+        {action && <CardAction>{action}</CardAction>}
+      </CardHeader>
+      <CardContent className="min-w-0">{children}</CardContent>
+    </Card>
   );
 }
 
+// One stat card design for every dashboard.
 export function StatCard({ label, value, icon: Icon, hint }: { label: string; value: ReactNode; icon: LucideIcon; hint?: string }) {
   return (
-    <div className="rounded-panel bg-white p-6">
-      <div className="flex items-center justify-between gap-3">
-        <p className="font-semibold text-gray-700">{label}</p>
-        <span className="inline-flex size-9 items-center justify-center rounded-control bg-green-50">
-          <Icon aria-hidden className="size-5 text-green-700" />
-        </span>
-      </div>
-      <p className="mt-3 text-h2-mobile text-navy-900">{value}</p>
-      {hint && <p className="mt-1 text-sm text-gray-500">{hint}</p>}
-    </div>
+    <Card size="sm">
+      <CardHeader>
+        <CardDescription className="font-medium">{label}</CardDescription>
+        <CardAction>
+          <Icon aria-hidden className="size-4 text-muted-foreground" />
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        <p className="text-2xl leading-none font-semibold text-heading tabular-nums">{value}</p>
+        {hint && <p className="mt-2 text-xs text-muted-foreground">{hint}</p>}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -85,23 +94,14 @@ export function ProgressBar({ label, value, hideLabel = false }: { label: string
   return (
     <div>
       {!hideLabel && (
-        <div className="mb-1.5 flex items-center justify-between gap-3">
-          <span className="text-gray-800">{label}</span>
-          <span className="font-semibold text-navy-900">{value}%</span>
+        <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
+          <span>{label}</span>
+          <span className="font-medium text-heading tabular-nums">{value}%</span>
         </div>
       )}
       <div className="flex items-center gap-3">
-        <div
-          role="progressbar"
-          aria-label={label}
-          aria-valuenow={value}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          className="h-2 w-full overflow-hidden rounded-full bg-gray-200"
-        >
-          <div className="h-full rounded-full bg-green-700" style={{ width: `${value}%` }} />
-        </div>
-        {hideLabel && <span className="w-10 shrink-0 text-right font-semibold text-navy-900">{value}%</span>}
+        <Progress value={value} aria-label={label} />
+        {hideLabel && <span className="w-10 shrink-0 text-right text-sm font-medium text-heading tabular-nums">{value}%</span>}
       </div>
     </div>
   );
@@ -119,25 +119,27 @@ export function EmptyState({
   action?: { label: string; href: string };
 }) {
   return (
-    <div className="flex flex-col items-center rounded-panel border border-dashed border-gray-500 bg-white px-6 py-12 text-center">
-      <span className="inline-flex size-12 items-center justify-center rounded-full bg-green-50">
-        <Icon aria-hidden className="size-6 text-green-700" />
-      </span>
-      <p className="mt-4 text-h3 text-navy-900">{title}</p>
-      <p className="mt-2 max-w-md text-gray-700">{body}</p>
+    <Empty className="border bg-card">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <Icon />
+        </EmptyMedia>
+        <EmptyTitle>{title}</EmptyTitle>
+        <EmptyDescription>{body}</EmptyDescription>
+      </EmptyHeader>
       {action && (
-        <div className="mt-6">
-          <Button href={action.href} variant="outline" shape="pill">
-            {action.label}
+        <EmptyContent>
+          <Button asChild variant="outline" size="sm">
+            <Link href={action.href}>{action.label}</Link>
           </Button>
-        </div>
+        </EmptyContent>
       )}
-    </div>
+    </Empty>
   );
 }
 
-// Simple, accessible table. On narrow screens it scrolls sideways inside its own frame
-// (keyboard users can focus the frame to scroll it).
+// Simple, accessible table on the shadcn Table. Narrow screens scroll it sideways inside its
+// own frame. For sorting, filtering and pages, use DataGrid (components/dashboard/DataGrid.tsx).
 export type Column = { key: string; header: string; className?: string };
 
 export function DataTable({
@@ -149,48 +151,47 @@ export function DataTable({
   columns: Column[];
   rows: { key: string; cells: Record<string, ReactNode> }[];
 }) {
-  // `relative` keeps screen-reader-only labels inside this scrolling frame, so they can't widen the page.
   return (
-    <div role="region" aria-label={caption} tabIndex={0} className="relative overflow-x-auto rounded-control focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900">
-      <table className="w-full min-w-[40rem] border-collapse text-left">
-        <caption className="sr-only">{caption}</caption>
-        <thead>
-          <tr className="border-b border-gray-200">
+    <div className="overflow-hidden rounded-lg border">
+      <Table className="min-w-[40rem]" scrollLabel={caption}>
+        <TableCaption className="sr-only">{caption}</TableCaption>
+        <TableHeader className="bg-muted">
+          <TableRow>
             {columns.map((c) => (
-              <th key={c.key} scope="col" className={`px-3 py-3 text-eyebrow uppercase text-gray-700 ${c.className ?? ""}`}>
+              <TableHead key={c.key} scope="col" className={c.className}>
                 {c.header}
-              </th>
+              </TableHead>
             ))}
-          </tr>
-        </thead>
-        <tbody>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {rows.map((r) => (
-            <tr key={r.key} className="border-b border-gray-200 last:border-0">
+            <TableRow key={r.key}>
               {columns.map((c, i) =>
                 i === 0 ? (
-                  <th key={c.key} scope="row" className={`px-3 py-3 font-semibold text-navy-900 ${c.className ?? ""}`}>
+                  <TableHead key={c.key} scope="row" className={cn("h-auto py-2.5 font-medium text-heading", c.className)}>
                     {r.cells[c.key]}
-                  </th>
+                  </TableHead>
                 ) : (
-                  <td key={c.key} className={`px-3 py-3 text-gray-800 ${c.className ?? ""}`}>
+                  <TableCell key={c.key} className={cn("py-2.5", c.className)}>
                     {r.cells[c.key]}
-                  </td>
+                  </TableCell>
                 ),
               )}
-            </tr>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }
 
 export function ListItem({ title, meta, end }: { title: ReactNode; meta?: ReactNode; end?: ReactNode }) {
   return (
-    <li className="flex items-center justify-between gap-4 border-b border-gray-200 py-3 last:border-0">
+    <li className="flex items-center justify-between gap-4 border-b py-3 text-sm last:border-0">
       <div className="min-w-0">
-        <p className="font-semibold text-navy-900">{title}</p>
-        {meta && <p className="text-sm text-gray-700">{meta}</p>}
+        <p className="font-medium text-heading">{title}</p>
+        {meta && <p className="text-muted-foreground">{meta}</p>}
       </div>
       {end && <div className="shrink-0">{end}</div>}
     </li>
