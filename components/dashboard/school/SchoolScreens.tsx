@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { ShieldCheck, Users } from "lucide-react";
-import { Button } from "@/components/Button";
+import { Button } from "@/components/ui/button";
 import { SettingsView } from "@/components/dashboard/SettingsView";
 import { settingsText } from "@/content/dashboard";
 import { DashPageHeader } from "@/components/dashboard/parts";
@@ -9,7 +10,7 @@ import {
 import { roleText, schoolText as t } from "@/content/dashboard";
 import { sampleUsers } from "@/data/users";
 
-// School dashboard (Checkpoint 9), same layout as the student and company overviews.
+// School dashboard (redesign Step 7, on shadcn/ui), same layout as the Student and Company overviews.
 
 const base = "/dashboard/school";
 const firstName = sampleUsers.school.name.split(" ")[0];
@@ -24,7 +25,7 @@ export function SchoolOverview() {
           title={
             <>
               {before}
-              <span className="text-green-700">
+              <span className="text-primary">
                 {firstName}
                 {after}
               </span>
@@ -33,20 +34,28 @@ export function SchoolOverview() {
           description={<SchoolWelcomeLine />}
           actions={
             <>
-              <Button href={`${base}/students`} variant="outline" shape="pill" size="lg">
-                <Users aria-hidden className="size-5" /> {t.studentsCta}
+              <Button asChild variant="outline">
+                <Link href={`${base}/students`}>
+                  <Users data-icon="inline-start" aria-hidden /> {t.studentsCta}
+                </Link>
               </Button>
-              <Button href={`${base}/students#verify`} shape="pill" size="lg">
-                <ShieldCheck aria-hidden className="size-5" /> {t.verifyCta}
+              <Button asChild>
+                <Link href={`${base}/students#verify`}>
+                  <ShieldCheck data-icon="inline-start" aria-hidden /> {t.verifyCta}
+                </Link>
               </Button>
             </>
           }
         />
-        <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[1fr_24rem]">
-          <ClassesPanel href={`${base}/students`} />
-          <SchoolSnapshot href={`${base}/profile`} />
-          <VerificationPanel limit={4} />
-          <SchoolToday firstName={firstName} studentsHref={`${base}/students#verify`} placementsHref={`${base}/placements`} programmesHref={`${base}/programmes`} />
+        <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
+          <div className="min-w-0 space-y-6">
+            <ClassesPanel href={`${base}/students`} />
+            <VerificationPanel limit={4} />
+          </div>
+          <div className="min-w-0 space-y-6">
+            <SchoolSnapshot href={`${base}/profile`} />
+            <SchoolToday firstName={firstName} studentsHref={`${base}/students#verify`} placementsHref={`${base}/placements`} programmesHref={`${base}/programmes`} />
+          </div>
         </div>
       </div>
     </SchoolDataProvider>

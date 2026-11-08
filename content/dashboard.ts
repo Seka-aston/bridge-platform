@@ -440,6 +440,8 @@ export const schoolText = {
     columns: { learner: "Learner", company: "Company", role: "Role", status: "Status", period: "Period" },
     status: { applied: "Applied", "in-placement": "In placement", completed: "Completed" },
     note: "Companies are sample employers. Bridge never guarantees a placement.",
+    searchLabel: "Search placements",
+    allStatuses: "All statuses",
   },
   profile: {
     title: "Institution profile",

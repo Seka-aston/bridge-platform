@@ -35,6 +35,7 @@ export const placements = [
   { id: "pl4", talentId: "sample-6", company: "Sample Workshop", role: "Fabrication placement", status: "in-placement" as PlacementStatus, period: "Sep 2026–Feb 2027" },
   { id: "pl5", talentId: "sample-5", company: "Sample Tech Company", role: "Back-End Developer Intern", status: "applied" as PlacementStatus, period: "Applied" },
 ];
+export type Placement = (typeof placements)[number];
 
 // How many of the school's learners take part in each Bridge programme (sample figures).
 export const programmeParticipation: Record<string, number> = {

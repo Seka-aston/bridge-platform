@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, CalendarClock, CheckCircle2, FilePlus2, Info, Search, SearchX, Star, Users } from "lucide-react";
+import { CalendarClock, CheckCircle2, FilePlus2, Info, Search, SearchX, Star, Users } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { DataGrid, SortHeader, type ColumnDef } from "@/components/dashboard/DataGrid";
+import { SummaryPanel, ToolbarSelect } from "@/components/dashboard/kit";
 import { DetailDrawer } from "@/components/dashboard/DetailDrawer";
 import { EmptyState, Panel } from "@/components/dashboard/parts";
 import { isActiveStage, useCompanyData, type CompanyApplicant } from "@/components/dashboard/company/CompanyData";
@@ -72,24 +73,6 @@ function useProfileDrawer() {
     </DetailDrawer>
   );
   return { open: setOpenId, drawer };
-}
-
-// Compact filter for a table toolbar: the trigger is named by aria-label, and its value ("All roles") shows what it filters.
-function ToolbarSelect({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
-  return (
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger aria-label={label} className="w-full bg-background sm:w-48">
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        {options.map((o) => (
-          <SelectItem key={o.value} value={o.value}>
-            {o.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
 }
 
 // A labelled shadcn Select for filters. Radix Select can't use "" as a value, so "any" stands for "no filter".
@@ -163,46 +146,24 @@ export function RecommendedTalent({ href }: { href: string }) {
 export function HiringSnapshot({ href }: { href: string }) {
   const { postings, applicants, shortlist } = useCompanyData();
   const s = t.snapshot;
-  const openRoles = postings.filter((p) => p.status === "open").length;
-  const stats = [
-    { value: applicants.filter((a) => isActiveStage(a.stage)).length, label: s.stats.applicants },
-    { value: applicants.filter((a) => a.stage === "interview").length, label: s.stats.interviews },
-    { value: shortlist.length, label: s.stats.shortlisted },
-  ];
   return (
-    <Panel
+    <SummaryPanel
+      id="snapshot-title"
       title={s.title}
       subtitle={s.subtitle}
-      id="snapshot-title"
-      action={
-        <Button asChild variant="ghost" size="icon-sm">
-          <Link href={href} aria-label={s.open}>
-            <ArrowUpRight />
-          </Link>
-        </Button>
-      }
-    >
-      <div className="space-y-4">
-        <div className="surface-navy relative overflow-hidden rounded-xl p-5">
-          <span aria-hidden className="pointer-events-none absolute -right-14 -bottom-20 size-44 rounded-full border-[18px] border-brand-green/25" />
-          <p className="relative text-xs font-semibold tracking-[0.08em] uppercase">{s.cardLabel}</p>
-          <p className="relative mt-6 text-sm text-muted-foreground">{s.rolesOpen}</p>
-          <p className="relative mt-1 flex items-baseline gap-2">
-            <span className="font-heading text-4xl leading-none font-bold tabular-nums">{openRoles}</span>
-            <span className="text-sm font-medium">{s.rolesUnit}</span>
-          </p>
-          <p className="relative mt-6 border-t border-border pt-3 text-sm font-semibold">{company.name}</p>
-        </div>
-        <dl className="grid grid-cols-3 divide-x rounded-lg border">
-          {stats.map((x) => (
-            <div key={x.label} className="flex flex-col gap-1 p-3">
-              <dt className="text-xs leading-tight text-muted-foreground">{x.label}</dt>
-              <dd className="order-first text-xl leading-none font-semibold text-heading tabular-nums">{x.value}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-    </Panel>
+      href={href}
+      hrefLabel={s.open}
+      cardLabel={s.cardLabel}
+      bigLabel={s.rolesOpen}
+      big={postings.filter((p) => p.status === "open").length}
+      unit={s.rolesUnit}
+      footer={company.name}
+      stats={[
+        { value: applicants.filter((a) => isActiveStage(a.stage)).length, label: s.stats.applicants },
+        { value: applicants.filter((a) => a.stage === "interview").length, label: s.stats.interviews },
+        { value: shortlist.length, label: s.stats.shortlisted },
+      ]}
+    />
   );
 }
 

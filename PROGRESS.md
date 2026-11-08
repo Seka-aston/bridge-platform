@@ -217,7 +217,7 @@ Branch `shadcn-redesign`. One step at a time, each reviewed by Aston before the 
 - [ ] Step 7: Dashboards (Student, Company, School, Admin)
   - [x] Student (approved 8 Nov 2026)
   - [x] Company (approved 8 Nov 2026)
-  - [ ] School
+  - [x] School (approved 8 Nov 2026)
   - [ ] Admin
 - [ ] Step 8: Clean-up and QA
 
@@ -472,4 +472,12 @@ Decisions (Aston, 8 Nov 2026):
 - Talent discovery: search box, shadcn dropdowns and a checkbox instead of browser-default controls.
 - Opportunities and Applicants use the shared sortable, searchable table; Applicants' role and stage filters sit in the table toolbar. The posting form is a shadcn dialog; stage changes use a shadcn dropdown; confirmations also show as toasts. The dashed tip box is now an info alert.
 - Tests: Company journeys pass (tabs, talent search and filters, shortlist, focus return, new posting with validation, close posting, applicant filters and stage change); cross-dashboard journeys pass; no accessibility issues in dialogs and drawers; no sideways scrolling at 768 and 375px; full sweep of 60 pages at four widths: 0 issues.
+
+### 2026-11-08 — Redesign Step 7: School dashboard
+- Company dashboard approved, committed and pushed.
+- School screens rebuilt on shadcn/ui with the same layout as the Student and Company overviews: class cards (icon, level, learners, average progress), navy institution snapshot, verification requests list, tabbed "what's next today?".
+- Students, Programmes and Placements use the shared sortable, searchable table; class and placement-status filters sit in the table toolbar. Verification and student details open in the drawer; adding a facilitator is a shadcn dialog; confirmations also show as toasts.
+- Shared pieces moved into `components/dashboard/kit.tsx` (navy summary card, figure strip, today tabs, initials avatar, toolbar dropdown); the Company snapshot now uses them too. Today tabs in the narrow side column show labels only, so "Programmes" fits.
+- Fixed: when a drawer's opening button disappears (a verified request leaves the list), focus now returns to that panel instead of being lost.
+- Tests: School journeys pass, including Diane adds a skill → school verifies → Diane sees it verified; Company, Student and cross-dashboard journeys rerun and pass; no accessibility issues in drawers and dialogs; no sideways scrolling at 768 and 375px; full sweep of 60 pages at four widths: 0 issues.
 

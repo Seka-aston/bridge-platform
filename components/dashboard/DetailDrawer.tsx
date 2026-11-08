@@ -12,8 +12,13 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 
 export function DetailDrawer({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
   const returnTo = useRef<HTMLElement | null>(null);
+  const returnArea = useRef<HTMLElement | null>(null);
   useEffect(() => {
-    if (open) returnTo.current = document.activeElement as HTMLElement | null;
+    if (!open) return;
+    returnTo.current = document.activeElement as HTMLElement | null;
+    // If the button that opened the drawer is gone when it closes (e.g. a verified request leaves
+    // the list), focus goes to the panel it was in instead of being lost.
+    returnArea.current = returnTo.current?.closest<HTMLElement>("section, main") ?? document.getElementById("main");
   }, [open]);
   return (
     <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
@@ -23,6 +28,10 @@ export function DetailDrawer({ open, onClose, title, children }: { open: boolean
           if (returnTo.current?.isConnected) {
             e.preventDefault();
             returnTo.current.focus();
+          } else if (returnArea.current?.isConnected) {
+            e.preventDefault();
+            if (!returnArea.current.hasAttribute("tabindex")) returnArea.current.setAttribute("tabindex", "-1");
+            returnArea.current.focus();
           }
         }}
       >

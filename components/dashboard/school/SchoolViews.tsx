@@ -1,29 +1,38 @@
 "use client";
 
-import { BadgeCheck, BookOpen, Briefcase, CheckCircle2, Clock, GraduationCap, Info, ShieldCheck, Users, UserPlus } from "lucide-react";
+import Link from "next/link";
+import { BadgeCheck, Briefcase, CheckCircle2, Clock, GraduationCap, Info, ShieldCheck, UserPlus } from "lucide-react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Button } from "@/components/Button";
+import { toast } from "sonner";
+import { StatusPill } from "@/components/StatusPill";
 import { TalentCard } from "@/components/TalentCard";
+import { DataGrid, SortHeader, type ColumnDef } from "@/components/dashboard/DataGrid";
 import { DetailDrawer } from "@/components/dashboard/DetailDrawer";
-import { DataTable, EmptyState, Panel, ProgressBar } from "@/components/dashboard/parts";
-import { ago, ColorTile, Pill, ring, SummaryPanel, TodayTabs } from "@/components/dashboard/kit";
+import { ago, InitialsAvatar, SummaryPanel, TodayAction, TodayItem, TodayTabs, TodayText, ToolbarSelect } from "@/components/dashboard/kit";
+import { EmptyState, Panel, ProgressBar } from "@/components/dashboard/parts";
 import { ErrorSummary, TextField } from "@/components/forms/Fields";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
+import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import { noticeText, schoolText as t, sharedText } from "@/content/dashboard";
 import { formText } from "@/content/pages";
+import { talentCardText } from "@/content/ui";
 import { learnerProgress } from "@/data/dashboard";
-import { programmes } from "@/data/programmes";
+import { programmes, type Programme } from "@/data/programmes";
 import {
-  classes, facilitators as sampleFacilitators, placements, programmeParticipation, school, verificationRequests, type Facilitator, type PlacementStatus, type VerificationRequest,
+  classes, facilitators as sampleFacilitators, placements, programmeParticipation, school, verificationRequests, type Facilitator, type Placement, type PlacementStatus, type VerificationRequest,
 } from "@/data/school";
 import { skills as studentSkills, type Skill } from "@/data/student";
-import { talentProfiles } from "@/data/talent";
+import { talentProfiles, type TalentProfile } from "@/data/talent";
 import { formatDate, programmeStatus, todayInKigali, type ProgrammeStatus } from "@/lib/programmes";
 import { addNotice, isEmail, readSession, VERIFY_STORE } from "@/lib/prototypeStore";
-import { StatusPill } from "@/components/StatusPill";
-import { talentCardText } from "@/content/ui";
 
 /*
-  School dashboard (Checkpoint 9), in the student dashboard's visual language.
+  School dashboard (redesign Step 7, on shadcn/ui).
   Connected journey: skills the student adds (or has pending) arrive here as verification
   requests; verifying one marks it verified on the student's Skills Passport.
   Everything changed is kept in this browser tab only.
@@ -115,12 +124,14 @@ function useSchool() {
 }
 
 const avg = (ids: string[]) => Math.round(ids.reduce((s, id) => s + (learnerProgress[id] ?? 0), 0) / ids.length);
-const placementLook: Record<PlacementStatus, string> = {
-  applied: "border border-navy-900 text-navy-900",
-  "in-placement": "bg-green-50 text-green-700",
-  completed: "bg-green-700 text-white",
-};
+const placementVariant = { applied: "upcoming", "in-placement": "secondary", completed: "default" } as const;
+const PlacementBadge = ({ status }: { status: PlacementStatus }) => <Badge variant={placementVariant[status]}>{t.placements.status[status]}</Badge>;
 const pendingOf = (requests: Request[], decisions: Ctx["decisions"]) => requests.filter((r) => !decisions[keyOf(r.talentId, r.skill)]);
+const ANY = "any";
+const sortHeader = (label: string) =>
+  function Header({ column }: { column: { getIsSorted: () => false | "asc" | "desc"; toggleSorting: (desc?: boolean) => void } }) {
+    return <SortHeader label={label} sorted={column.getIsSorted()} onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")} />;
+  };
 
 // ---------- Overview ----------
 
@@ -132,21 +143,45 @@ export function SchoolWelcomeLine() {
 
 export function ClassesPanel({ href }: { href: string }) {
   return (
-    <Panel title={t.classes.title} subtitle={t.classes.subtitle} id="classes-title" action={<Button href={href} variant="text">{t.classes.viewAll}</Button>}>
-      <ul className="grid gap-4 sm:grid-cols-2 min-[87.5rem]:grid-cols-3">
-        {classes.map((c, i) => (
-          <li key={c.id}>
-            <ColorTile
-              index={i}
-              big={`${avg(c.learnerIds)}%`}
-              chip={c.level}
-              title={c.name}
-              detail={c.learnerIds.length === 1 ? t.classes.learnerOne : t.classes.learners.replace("{n}", String(c.learnerIds.length))}
-            >
-              <ProgressBar label={`${c.name}: ${t.students.progressLabel}`} value={avg(c.learnerIds)} hideLabel />
-            </ColorTile>
-          </li>
-        ))}
+    <Panel
+      title={t.classes.title}
+      subtitle={t.classes.subtitle}
+      id="classes-title"
+      action={
+        <Button asChild variant="outline" size="sm">
+          <Link href={href}>{t.classes.viewAll}</Link>
+        </Button>
+      }
+    >
+      <ul className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
+        {classes.map((c) => {
+          const pct = avg(c.learnerIds);
+          return (
+            <li key={c.id}>
+              <article className="flex h-full flex-col gap-4 rounded-xl bg-card p-4 text-sm shadow-xs ring-1 ring-border">
+                <div className="flex items-start justify-between gap-3">
+                  <span aria-hidden className="inline-flex size-10 items-center justify-center rounded-lg bg-secondary text-primary">
+                    <GraduationCap className="size-5" />
+                  </span>
+                  <Badge variant="outline">{c.level}</Badge>
+                </div>
+                <div>
+                  <h3 className="font-heading text-base leading-snug font-semibold text-heading">{c.name}</h3>
+                  <p className="mt-0.5 text-muted-foreground">
+                    {c.learnerIds.length === 1 ? t.classes.learnerOne : t.classes.learners.replace("{n}", String(c.learnerIds.length))}
+                  </p>
+                </div>
+                <div className="mt-auto space-y-2">
+                  <Progress value={pct} aria-label={`${c.name}: ${t.students.progressLabel}`} />
+                  <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
+                    <span>{t.students.progressLabel}</span>
+                    <span className="font-medium text-heading tabular-nums">{pct}%</span>
+                  </div>
+                </div>
+              </article>
+            </li>
+          );
+        })}
       </ul>
     </Panel>
   );
@@ -172,9 +207,9 @@ export function SchoolSnapshot({ href }: { href: string }) {
       unit={s.unit}
       footer={school.name}
       stats={[
-        { icon: Users, value: talentProfiles.length, label: s.stats.learners },
-        { icon: Briefcase, value: placements.filter((p) => p.status !== "applied").length, label: s.stats.placed },
-        { icon: BookOpen, value: Object.keys(programmeParticipation).length, label: s.stats.programmes },
+        { value: talentProfiles.length, label: s.stats.learners },
+        { value: placements.filter((p) => p.status !== "applied").length, label: s.stats.placed },
+        { value: Object.keys(programmeParticipation).length, label: s.stats.programmes },
       ]}
     />
   );
@@ -188,31 +223,43 @@ export function VerificationPanel({ limit }: { limit?: number }) {
   const pending = pendingOf(requests, decisions);
   const shown = limit ? pending.slice(0, limit) : pending;
   const current = requests.find((r) => r.id === openId);
-  if (!ready) return <div className="min-h-40 rounded-panel bg-white" />;
+  if (!ready) return <Skeleton className="h-48 w-full rounded-xl" />;
+  const choose = (r: Request, d: "verified" | "declined") => {
+    decide(r, d);
+    setResult(d);
+    toast.success(d === "verified" ? v.approved : v.declined);
+  };
   return (
     <Panel title={v.title} subtitle={v.subtitle} id="verify-title">
       {shown.length === 0 ? (
         <EmptyState icon={ShieldCheck} title={v.empty.title} body={v.empty.body} />
       ) : (
-        <ul className="space-y-1">
+        <ul className="divide-y rounded-lg border">
           {shown.map((r) => {
             const p = byId(r.talentId);
             return (
-              <li key={r.id} className="flex flex-wrap items-center gap-4 rounded-tile px-3 py-3 hover:bg-gray-50">
-                <span aria-hidden className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-navy-900 font-bold text-white">
-                  {p.name.split(" ").map((w) => w[0]).join("")}
-                </span>
+              <li key={r.id} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
+                <InitialsAvatar name={p.name} />
                 <div className="min-w-40 flex-1">
-                  <p className="font-semibold text-navy-900">
+                  <p className="font-medium text-heading">
                     {r.skill} · {p.name}
                   </p>
-                  <p className="text-sm text-gray-700">
+                  <p className="text-xs text-muted-foreground">
                     {r.evidence ? v.evidence.replace("{e}", r.evidence) : v.noEvidence} · {r.fromSession ? v.fromSession : ago(r.daysAgo)}
                   </p>
                 </div>
-                <Button variant="navy" shape="pill" onClick={() => { setOpenId(r.id); setResult(null); }}>
+                <Button
+                  variant="navy"
+                  size="sm"
+                  onClick={() => {
+                    setOpenId(r.id);
+                    setResult(null);
+                  }}
+                >
                   {v.review}
-                  <span className="sr-only">: {r.skill}, {p.name}</span>
+                  <span className="sr-only">
+                    : {r.skill}, {p.name}
+                  </span>
                 </Button>
               </li>
             );
@@ -221,19 +268,23 @@ export function VerificationPanel({ limit }: { limit?: number }) {
       )}
       <DetailDrawer open={!!current} onClose={() => setOpenId(null)} title={current ? `${current.skill} · ${byId(current.talentId).name}` : ""}>
         {current && (
-          <div className="space-y-5">
-            <p className="text-gray-800">{current.evidence ? v.evidence.replace("{e}", current.evidence) : v.noEvidence}</p>
-            <p className="rounded-tile bg-gray-50 p-3 text-sm text-gray-700">{v.note}</p>
+          <div className="space-y-5 text-sm">
+            <p>{current.evidence ? v.evidence.replace("{e}", current.evidence) : v.noEvidence}</p>
+            <Alert>
+              <Info aria-hidden />
+              <AlertDescription>{v.note}</AlertDescription>
+            </Alert>
             {result ? (
-              <p role="status" className="flex items-start gap-2 rounded-tile bg-green-50 p-4 text-gray-800">
-                <CheckCircle2 aria-hidden className="mt-0.5 size-5 shrink-0 text-green-700" /> {result === "verified" ? v.approved : v.declined}
-              </p>
+              <Alert variant="success" role="status">
+                <CheckCircle2 aria-hidden />
+                <AlertDescription>{result === "verified" ? v.approved : v.declined}</AlertDescription>
+              </Alert>
             ) : (
-              <div className="flex flex-wrap gap-3">
-                <Button shape="pill" onClick={() => { decide(current, "verified"); setResult("verified"); }}>
-                  <BadgeCheck aria-hidden className="size-5" /> {v.approve}
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={() => choose(current, "verified")}>
+                  <BadgeCheck data-icon="inline-start" aria-hidden /> {v.approve}
                 </Button>
-                <Button variant="outline" shape="pill" onClick={() => { decide(current, "declined"); setResult("declined"); }}>
+                <Button variant="outline" onClick={() => choose(current, "declined")}>
                   {v.decline}
                 </Button>
               </div>
@@ -263,11 +314,8 @@ export function SchoolToday({ firstName, studentsHref, placementsHref, programme
           icon: ShieldCheck,
           content: (
             <>
-              <h3 className="text-h3 text-navy-900">{t.verify.title}</h3>
-              <p className="mt-1 text-gray-700">{n === 0 ? d.verifyNone : n === 1 ? d.verifyOne : d.verifyBody.replace("{n}", String(n))}</p>
-              <div className="mt-5">
-                <Button href={studentsHref} variant="outline" shape="pill">{d.verifyAction}</Button>
-              </div>
+              <TodayText title={t.verify.title} body={n === 0 ? d.verifyNone : n === 1 ? d.verifyOne : d.verifyBody.replace("{n}", String(n))} />
+              <TodayAction href={studentsHref} label={d.verifyAction} />
             </>
           ),
         },
@@ -277,18 +325,15 @@ export function SchoolToday({ firstName, studentsHref, placementsHref, programme
           icon: Briefcase,
           content: (
             <>
-              <h3 className="text-h3 text-navy-900">{d.placementsTitle}</h3>
-              <ul className="mt-3 space-y-3">
+              <TodayText title={d.placementsTitle} />
+              <ul className="space-y-2">
                 {inPlacement.map((p) => (
-                  <li key={p.id} className="rounded-tile bg-green-50 p-4">
-                    <p className="font-bold text-navy-900">{byId(p.talentId).name} · {p.company}</p>
-                    <p className="text-gray-700">{p.role} · {p.period}</p>
+                  <li key={p.id}>
+                    <TodayItem icon={Briefcase} title={`${byId(p.talentId).name} · ${p.company}`} detail={`${p.role} · ${p.period}`} />
                   </li>
                 ))}
               </ul>
-              <div className="mt-5">
-                <Button href={placementsHref} variant="outline" shape="pill">{d.placementsAction}</Button>
-              </div>
+              <TodayAction href={placementsHref} label={d.placementsAction} />
             </>
           ),
         },
@@ -298,22 +343,17 @@ export function SchoolToday({ firstName, studentsHref, placementsHref, programme
           icon: GraduationCap,
           content: (
             <>
-              <h3 className="text-h3 text-navy-900">{d.programmesTitle}</h3>
-              {open.length === 0 ? (
-                <p className="mt-1 text-gray-700">{d.programmesNone}</p>
-              ) : (
-                <ul className="mt-3 space-y-3">
+              <TodayText title={d.programmesTitle} body={open.length === 0 ? d.programmesNone : undefined} />
+              {open.length > 0 && (
+                <ul className="space-y-2">
                   {open.map((p) => (
-                    <li key={p.id} className="rounded-tile bg-green-50 p-4">
-                      <p className="font-bold text-navy-900">{p.name}</p>
-                      <p className="text-gray-700">{formatDate(p.closesOn)}</p>
+                    <li key={p.id}>
+                      <TodayItem icon={GraduationCap} title={p.name} detail={formatDate(p.closesOn)} />
                     </li>
                   ))}
                 </ul>
               )}
-              <div className="mt-5">
-                <Button href={programmesHref} variant="outline" shape="pill">{d.programmesAction}</Button>
-              </div>
+              <TodayAction href={programmesHref} label={d.programmesAction} />
             </>
           ),
         },
@@ -324,75 +364,98 @@ export function SchoolToday({ firstName, studentsHref, placementsHref, programme
 
 // ---------- Students ----------
 
+type StudentRow = TalentProfile & { className: string; classId: string; progress: number; placement?: Placement };
+
 export function StudentsView() {
   const s = t.students;
-  const [q, setQ] = useState("");
-  const [cls, setCls] = useState("");
+  const [cls, setCls] = useState(ANY);
   const [openId, setOpenId] = useState<string | null>(null);
-  const classOf = (id: string) => classes.find((c) => c.learnerIds.includes(id));
-  const query = q.trim().toLowerCase();
-  const shown = talentProfiles.filter(
-    (p) => (!cls || classOf(p.id)?.id === cls) && (!query || p.name.toLowerCase().includes(query) || p.skills.some((x) => x.toLowerCase().includes(query))),
-  );
+  const rows: StudentRow[] = talentProfiles
+    .map((p) => {
+      const c = classes.find((x) => x.learnerIds.includes(p.id));
+      return { ...p, className: c ? `${c.name} · ${c.level}` : "", classId: c?.id ?? "", progress: learnerProgress[p.id] ?? 0, placement: placements.find((x) => x.talentId === p.id) };
+    })
+    .filter((p) => cls === ANY || p.classId === cls);
   const current = openId ? byId(openId) : null;
-  const field = `mt-2 block w-full rounded-full border border-gray-500 bg-white px-4 py-2.5 text-gray-800 ${ring}`;
+
+  const columns = useMemo<ColumnDef<StudentRow, unknown>[]>(
+    () => [
+      {
+        id: "name",
+        accessorFn: (r) => `${r.name} ${r.skills.join(" ")}`,
+        header: s.columns.name,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-3">
+            <InitialsAvatar name={row.original.name} />
+            <span className="font-medium text-heading">{row.original.name}</span>
+          </div>
+        ),
+      },
+      { accessorKey: "className", header: s.columns.class, enableGlobalFilter: false },
+      {
+        accessorKey: "progress",
+        header: sortHeader(s.columns.progress),
+        cell: ({ row }) => (
+          <div className="w-40">
+            <ProgressBar label={`${row.original.name}: ${s.progressLabel}`} value={row.original.progress} hideLabel />
+          </div>
+        ),
+        enableGlobalFilter: false,
+      },
+      {
+        accessorKey: "verification",
+        header: s.columns.verification,
+        cell: ({ row }) =>
+          row.original.verification === "verified" ? (
+            <Badge variant="verified">
+              <BadgeCheck data-icon="inline-start" aria-hidden /> {talentCardText.verified}
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="text-muted-foreground">
+              <Clock data-icon="inline-start" aria-hidden /> {talentCardText.inProgress}
+            </Badge>
+          ),
+        enableGlobalFilter: false,
+      },
+      {
+        id: "placement",
+        header: s.columns.placement,
+        cell: ({ row }) => (row.original.placement ? <PlacementBadge status={row.original.placement.status} /> : <span className="text-muted-foreground">{s.noPlacement}</span>),
+      },
+      {
+        id: "action",
+        header: () => <span className="sr-only">{t.verify.review}</span>,
+        cell: ({ row }) => (
+          <div className="text-right">
+            <Button variant="outline" size="sm" onClick={() => setOpenId(row.original.id)}>
+              {t.verify.review}
+              <span className="sr-only">: {row.original.name}</span>
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    [s],
+  );
+
   return (
-    <section aria-label={s.title} className="rounded-panel bg-white p-5 md:p-8">
-      <div className="grid gap-4 md:grid-cols-[2fr_1fr]">
-        <label className="block font-semibold text-navy-900">
-          {s.search}
-          <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={s.searchPlaceholder} className={field} />
-        </label>
-        <label className="block font-semibold text-navy-900">
-          {s.classLabel}
-          <select value={cls} onChange={(e) => setCls(e.target.value)} className={field}>
-            <option value="">{s.allClasses}</option>
-            {classes.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name} · {c.level}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-      <div className="mt-6">
-        <DataTable
-          caption={s.title}
-          columns={[
-            { key: "name", header: s.columns.name },
-            { key: "class", header: s.columns.class },
-            { key: "progress", header: s.columns.progress, className: "w-48" },
-            { key: "verification", header: s.columns.verification },
-            { key: "placement", header: s.columns.placement },
-            { key: "action", header: "", className: "text-right" },
-          ]}
-          rows={shown.map((p) => {
-            const pl = placements.find((x) => x.talentId === p.id);
-            const c = classOf(p.id);
-            return {
-              key: p.id,
-              cells: {
-                name: p.name,
-                class: c ? `${c.name} · ${c.level}` : "",
-                progress: <ProgressBar label={`${p.name}: ${s.progressLabel}`} value={learnerProgress[p.id] ?? 0} hideLabel />,
-                verification:
-                  p.verification === "verified" ? (
-                    <span className="inline-flex items-center gap-1.5 font-semibold text-green-700"><BadgeCheck aria-hidden className="size-4" /> {talentCardText.verified}</span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 text-gray-700"><Clock aria-hidden className="size-4" /> {talentCardText.inProgress}</span>
-                  ),
-                placement: pl ? <Pill label={t.placements.status[pl.status]} look={placementLook[pl.status]} /> : <span className="text-gray-500">{s.noPlacement}</span>,
-                action: (
-                  <button type="button" onClick={() => setOpenId(p.id)} className={`rounded-sm font-semibold text-green-700 underline-offset-4 hover:text-green-800 hover:underline ${ring}`}>
-                    {t.verify.review}
-                    <span className="sr-only">: {p.name}</span>
-                  </button>
-                ),
-              },
-            };
-          })}
-        />
-      </div>
+    <>
+      <DataGrid
+        data={rows}
+        columns={columns}
+        caption={s.title}
+        searchLabel={s.search}
+        searchPlaceholder={s.searchPlaceholder}
+        toolbar={
+          <ToolbarSelect
+            label={s.classLabel}
+            value={cls}
+            onChange={setCls}
+            className="sm:w-60"
+            options={[{ value: ANY, label: s.allClasses }, ...classes.map((c) => ({ value: c.id, label: `${c.name} · ${c.level}` }))]}
+          />
+        }
+      />
       <DetailDrawer open={!!current} onClose={() => setOpenId(null)} title={current?.name ?? ""}>
         {current && (
           <div className="space-y-5">
@@ -401,81 +464,95 @@ export function StudentsView() {
           </div>
         )}
       </DetailDrawer>
-    </section>
+    </>
   );
 }
 
 // ---------- Programmes ----------
 
+type ProgrammeRow = Programme & { status: ProgrammeStatus; learners: number };
+
 export function SchoolProgrammesView() {
   const { today, sessionProgrammeApps, ready } = useSchool();
   const p = t.programmes;
-  if (!ready) return <div className="min-h-40 rounded-panel bg-white" />;
+  const columns = useMemo<ColumnDef<ProgrammeRow, unknown>[]>(
+    () => [
+      { accessorKey: "name", header: p.columns.name, cell: ({ row }) => <span className="font-medium text-heading">{row.original.name}</span> },
+      { accessorKey: "status", header: p.columns.status, cell: ({ row }) => <StatusPill status={row.original.status} /> },
+      {
+        accessorKey: "learners",
+        header: sortHeader(p.columns.learners),
+        cell: ({ row }) => (
+          <span className="inline-flex flex-wrap items-center gap-2 tabular-nums">
+            {row.original.learners}
+            {sessionProgrammeApps.includes(row.original.id) && <Badge variant="secondary">{p.sessionApplied}</Badge>}
+          </span>
+        ),
+      },
+      { id: "dates", header: p.columns.dates, cell: ({ row }) => p.datesRange.replace("{opens}", formatDate(row.original.opensOn)).replace("{closes}", formatDate(row.original.closesOn)) },
+    ],
+    [p, sessionProgrammeApps],
+  );
+  if (!ready) return <Skeleton className="h-48 w-full rounded-xl" />;
+  const rows = programmes.map((x) => ({ ...x, status: programmeStatus(x, today), learners: programmeParticipation[x.id] ?? 0 }));
   return (
-    <section aria-label={p.title} className="rounded-panel bg-white p-5 md:p-8">
-      <DataTable
-        caption={p.title}
-        columns={[
-          { key: "name", header: p.columns.name },
-          { key: "status", header: p.columns.status },
-          { key: "learners", header: p.columns.learners },
-          { key: "dates", header: p.columns.dates },
-        ]}
-        rows={programmes.map((x) => {
-          const status: ProgrammeStatus = programmeStatus(x, today);
-          return {
-            key: x.id,
-            cells: {
-              name: x.name,
-              status: <StatusPill status={status} />,
-              learners: (
-                <span>
-                  {programmeParticipation[x.id] ?? 0}
-                  {sessionProgrammeApps.includes(x.id) && <span className="ml-2 text-sm font-semibold text-green-700">{p.sessionApplied}</span>}
-                </span>
-              ),
-              dates: p.datesRange.replace("{opens}", formatDate(x.opensOn)).replace("{closes}", formatDate(x.closesOn)),
-            },
-          };
-        })}
-      />
-      <p className="mt-4 flex items-center gap-2 text-sm text-gray-700">
+    <div className="space-y-3">
+      <DataGrid data={rows} columns={columns} caption={p.title} />
+      <p className="flex items-center gap-2 text-xs text-muted-foreground">
         <Info aria-hidden className="size-4" /> {p.sample}
       </p>
-    </section>
+    </div>
   );
 }
 
 // ---------- Placements ----------
 
+type PlacementRow = Placement & { learner: string };
+
 export function PlacementsView() {
   const p = t.placements;
+  const [status, setStatus] = useState(ANY);
+  const rows: PlacementRow[] = placements.filter((x) => status === ANY || x.status === status).map((x) => ({ ...x, learner: byId(x.talentId).name }));
+  const columns = useMemo<ColumnDef<PlacementRow, unknown>[]>(
+    () => [
+      {
+        accessorKey: "learner",
+        header: p.columns.learner,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-3">
+            <InitialsAvatar name={row.original.learner} />
+            <span className="font-medium text-heading">{row.original.learner}</span>
+          </div>
+        ),
+      },
+      { accessorKey: "company", header: p.columns.company },
+      { accessorKey: "role", header: p.columns.role },
+      { accessorKey: "status", header: p.columns.status, cell: ({ row }) => <PlacementBadge status={row.original.status} />, enableGlobalFilter: false },
+      { accessorKey: "period", header: p.columns.period, enableGlobalFilter: false },
+    ],
+    [p],
+  );
   return (
-    <section aria-label={p.title} className="rounded-panel bg-white p-5 md:p-8">
-      <DataTable
+    <div className="space-y-3">
+      <DataGrid
+        data={rows}
+        columns={columns}
         caption={p.title}
-        columns={[
-          { key: "learner", header: p.columns.learner },
-          { key: "company", header: p.columns.company },
-          { key: "role", header: p.columns.role },
-          { key: "status", header: p.columns.status },
-          { key: "period", header: p.columns.period },
-        ]}
-        rows={placements.map((x) => ({
-          key: x.id,
-          cells: {
-            learner: byId(x.talentId).name,
-            company: x.company,
-            role: x.role,
-            status: <Pill label={p.status[x.status]} look={placementLook[x.status]} />,
-            period: x.period,
-          },
-        }))}
+        searchLabel={p.searchLabel}
+        searchPlaceholder={p.searchLabel}
+        toolbar={
+          <ToolbarSelect
+            label={p.columns.status}
+            value={status}
+            onChange={setStatus}
+            options={[{ value: ANY, label: p.allStatuses }, ...(Object.keys(p.status) as PlacementStatus[]).map((k) => ({ value: k, label: p.status[k] }))]}
+          />
+        }
       />
-      <p className="mt-4 flex items-center gap-2 text-sm text-gray-700">
+      <p className="flex items-center gap-2 text-xs text-muted-foreground">
         <Info aria-hidden className="size-4" /> {p.note}
       </p>
-    </section>
+    </div>
   );
 }
 
@@ -485,11 +562,10 @@ export function InstitutionProfileView() {
   const { facilitators, addFacilitator } = useSchool();
   const p = t.profile;
   const f = p.form;
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
   const [v, setV] = useState({ name: "", subject: "", email: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [done, setDone] = useState(false);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -505,28 +581,30 @@ export function InstitutionProfileView() {
     }
     addFacilitator({ id: `f-${Date.now()}`, name: v.name.trim(), subject: v.subject.trim(), email: v.email.trim() });
     setV({ name: "", subject: "", email: "" });
-    setDone(true);
-    dialogRef.current?.close();
+    setOpen(false);
+    toast.success(sharedText.saved);
   }
 
   return (
-    <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[24rem_1fr]">
+    <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[22rem_minmax(0,1fr)]">
       <Panel title={p.details} id="details-title">
-        <dl className="space-y-4">
-          <div>
-            <dt className="font-semibold text-navy-900">{p.location}</dt>
-            <dd className="text-gray-700">{school.location}</dd>
+        <dl className="divide-y text-sm">
+          <div className="pb-3">
+            <dt className="text-xs text-muted-foreground">{p.location}</dt>
+            <dd className="mt-0.5 font-medium text-heading">{school.location}</dd>
           </div>
-          <div>
-            <dt className="font-semibold text-navy-900">{p.type}</dt>
-            <dd className="text-gray-700">{school.type}</dd>
+          <div className="py-3">
+            <dt className="text-xs text-muted-foreground">{p.type}</dt>
+            <dd className="mt-0.5 font-medium text-heading">{school.type}</dd>
           </div>
-          <div>
-            <dt className="font-semibold text-navy-900">{p.disciplines}</dt>
+          <div className="pt-3">
+            <dt className="text-xs text-muted-foreground">{p.disciplines}</dt>
             <dd>
-              <ul className="mt-2 flex flex-wrap gap-2">
+              <ul className="mt-2 flex flex-wrap gap-1.5">
                 {school.disciplines.map((d) => (
-                  <li key={d} className="rounded-full bg-gray-50 px-3 py-1 text-sm font-semibold text-navy-900">{d}</li>
+                  <li key={d}>
+                    <Badge variant="outline">{d}</Badge>
+                  </li>
                 ))}
               </ul>
             </dd>
@@ -537,45 +615,47 @@ export function InstitutionProfileView() {
         title={p.facilitators}
         id="fac-title"
         action={
-          <Button shape="pill" onClick={() => dialogRef.current?.showModal()}>
-            <UserPlus aria-hidden className="size-5" /> {p.addFacilitator}
+          <Button size="sm" onClick={() => setOpen(true)}>
+            <UserPlus data-icon="inline-start" aria-hidden /> {p.addFacilitator}
           </Button>
         }
       >
-        {done && <p role="status" className="mb-4 rounded-tile bg-green-50 p-4 text-gray-800">{sharedText.saved}</p>}
-        <ul className="grid gap-3 md:grid-cols-2">
+        <ul className="grid gap-2 md:grid-cols-2">
           {facilitators.map((x) => (
-            <li key={x.id} className="flex items-center gap-3 rounded-tile bg-gray-50 p-4">
-              <span aria-hidden className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-green-700 font-bold text-white">
-                {x.name.split(" ").map((w) => w[0]).join("").slice(0, 2)}
-              </span>
-              <div className="min-w-0">
-                <p className="font-semibold text-navy-900">{x.name}</p>
-                <p className="text-sm text-gray-700">{x.subject}</p>
-                <p className="truncate text-sm text-gray-700">{x.email}</p>
-              </div>
+            <li key={x.id}>
+              <Item variant="outline" size="sm">
+                <ItemMedia>
+                  <InitialsAvatar name={x.name} />
+                </ItemMedia>
+                <ItemContent className="min-w-0">
+                  <ItemTitle className="text-heading">{x.name}</ItemTitle>
+                  <ItemDescription>{x.subject}</ItemDescription>
+                  <ItemDescription className="truncate">{x.email}</ItemDescription>
+                </ItemContent>
+              </Item>
             </li>
           ))}
         </ul>
       </Panel>
-      <dialog
-        ref={dialogRef}
-        aria-labelledby="fac-form-title"
-        onClick={(e) => e.target === dialogRef.current && dialogRef.current?.close()}
-        className="m-auto w-[calc(100%-2rem)] max-w-md rounded-panel bg-white p-0 backdrop:bg-navy-900/60"
-      >
-        <form noValidate onSubmit={submit} className="space-y-5 p-6">
-          <h2 id="fac-form-title" className="text-h3 text-navy-900">{f.title}</h2>
-          <ErrorSummary title={formText.errorSummaryTitle} errors={errors} labels={{ "fac-name": f.name, "fac-subject": f.subject, "fac-email": f.email }} summaryRef={summaryRef} />
-          <TextField id="fac-name" label={f.name} required value={v.name} onChange={(x) => setV({ ...v, name: x })} error={errors["fac-name"]} />
-          <TextField id="fac-subject" label={f.subject} required value={v.subject} onChange={(x) => setV({ ...v, subject: x })} error={errors["fac-subject"]} />
-          <TextField id="fac-email" type="email" label={f.email} required value={v.email} onChange={(x) => setV({ ...v, email: x })} error={errors["fac-email"]} />
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="outline" shape="pill" onClick={() => dialogRef.current?.close()}>{f.cancel}</Button>
-            <Button type="submit" shape="pill">{f.submit}</Button>
-          </div>
-        </form>
-      </dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <form noValidate onSubmit={submit} className="grid gap-5">
+            <DialogHeader>
+              <DialogTitle>{f.title}</DialogTitle>
+            </DialogHeader>
+            <ErrorSummary title={formText.errorSummaryTitle} errors={errors} labels={{ "fac-name": f.name, "fac-subject": f.subject, "fac-email": f.email }} summaryRef={summaryRef} />
+            <TextField id="fac-name" label={f.name} required value={v.name} onChange={(x) => setV({ ...v, name: x })} error={errors["fac-name"]} />
+            <TextField id="fac-subject" label={f.subject} required value={v.subject} onChange={(x) => setV({ ...v, subject: x })} error={errors["fac-subject"]} />
+            <TextField id="fac-email" type="email" label={f.email} required value={v.email} onChange={(x) => setV({ ...v, email: x })} error={errors["fac-email"]} />
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                {f.cancel}
+              </Button>
+              <Button type="submit">{f.submit}</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
