@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { AudiencePanel } from "@/components/AudiencePanel";
 import { ArticleCard } from "@/components/ArticleCard";
 import { BridgeAiPreview } from "@/components/BridgeAiPreview";
-import { Button } from "@/components/Button";
+import Link from "next/link";
 import { Badge } from "@/components/Badge";
 import { CtaBand } from "@/components/CtaBand";
 import { Hero } from "@/components/Hero";
@@ -14,6 +14,8 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { StatList } from "@/components/StatItem";
 import { StoryCard } from "@/components/StoryCard";
 import { TalentCard } from "@/components/TalentCard";
+import { TextLink } from "@/components/TextLink";
+import { Button } from "@/components/ui/button";
 import {
   bridgeAi,
   ecosystem,
@@ -50,7 +52,11 @@ export default function Home() {
 
       {/* 3. Trust and credibility */}
       <HomeSection id="trust" labelledBy="trust-title">
-        <SectionHeading id="trust-title" title={trust.heading} supporting={trust.supporting} />
+        <SectionHeading
+          id="trust-title"
+          title={trust.heading}
+          supporting={trust.supporting}
+        />
         <div className="mt-12">
           <StatList stats={trust.stats} />
         </div>
@@ -88,11 +94,13 @@ export default function Home() {
       {/* 6. Programmes and Ventures Lab */}
       <HomeSection id="programmes" labelledBy="programmes-title" tone="green">
         <SectionTop
-          heading={<SectionHeading id="programmes-title" title={programmes.heading} />}
+          heading={
+            <SectionHeading id="programmes-title" title={programmes.heading} />
+          }
           action={
-            <Button variant="text" href={programmes.cta.href}>
+            <TextLink href={programmes.cta.href}>
               {programmes.cta.label}
-            </Button>
+            </TextLink>
           }
         />
         <div className="mt-12">
@@ -104,7 +112,12 @@ export default function Home() {
 
       {/* 7. Talent discovery */}
       <HomeSection id="talent" labelledBy="talent-title">
-        <SectionHeading id="talent-title" eyebrow={talent.eyebrow} title={talent.headline} supporting={talent.supporting} />
+        <SectionHeading
+          id="talent-title"
+          eyebrow={talent.eyebrow}
+          title={talent.headline}
+          supporting={talent.supporting}
+        />
         <ul className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {talentProfiles.slice(0, 3).map((p) => (
             <li key={p.id}>
@@ -113,11 +126,11 @@ export default function Home() {
           ))}
         </ul>
         <div className="mt-10 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
-          <Button href={talent.primary.href} size="lg">
-            {talent.primary.label}
+          <Button asChild size="xl">
+            <Link href={talent.primary.href}>{talent.primary.label}</Link>
           </Button>
-          <Button href={talent.secondary.href} variant="secondary" size="lg">
-            {talent.secondary.label}
+          <Button asChild size="xl" variant="secondary">
+            <Link href={talent.secondary.href}>{talent.secondary.label}</Link>
           </Button>
         </div>
       </HomeSection>
@@ -135,9 +148,7 @@ export default function Home() {
               className="mt-6"
             />
             <div className="mt-8">
-              <Button variant="text" href={bridgeAi.cta.href} size="lg">
-                {bridgeAi.cta.label}
-              </Button>
+              <TextLink href={bridgeAi.cta.href}>{bridgeAi.cta.label}</TextLink>
             </div>
           </div>
           <BridgeAiPreview capabilities={bridgeAi.capabilities} />
@@ -148,11 +159,11 @@ export default function Home() {
       {showImpact && (
         <HomeSection id="impact" labelledBy="impact-title">
           <SectionTop
-            heading={<SectionHeading id="impact-title" title={impact.headline} />}
+            heading={
+              <SectionHeading id="impact-title" title={impact.headline} />
+            }
             action={
-              <Button variant="text" href={impact.cta.href}>
-                {impact.cta.label}
-              </Button>
+              <TextLink href={impact.cta.href}>{impact.cta.label}</TextLink>
             }
           />
           <ul className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -173,13 +184,17 @@ export default function Home() {
 
       {/* 10. How Bridge works */}
       <HomeSection id="how-it-works" labelledBy="how-title" tone="green">
-        <SectionHeading id="how-title" title={howItWorks.headline} align="center" />
+        <SectionHeading
+          id="how-title"
+          title={howItWorks.headline}
+          align="center"
+        />
         <div className="mt-12">
           <JourneySteps steps={howItWorks.steps} />
         </div>
         <div className="mt-12 flex justify-center">
-          <Button href={howItWorks.cta.href} size="lg">
-            {howItWorks.cta.label}
+          <Button asChild size="xl">
+            <Link href={howItWorks.cta.href}>{howItWorks.cta.label}</Link>
           </Button>
         </div>
       </HomeSection>
@@ -188,11 +203,11 @@ export default function Home() {
       {visibleArticles.length > 0 && (
         <HomeSection id="insights" labelledBy="insights-title">
           <SectionTop
-            heading={<SectionHeading id="insights-title" title={insights.headline} />}
+            heading={
+              <SectionHeading id="insights-title" title={insights.headline} />
+            }
             action={
-              <Button variant="text" href={insights.cta.href}>
-                {insights.cta.label}
-              </Button>
+              <TextLink href={insights.cta.href}>{insights.cta.label}</TextLink>
             }
           />
           <ul className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -206,7 +221,7 @@ export default function Home() {
       )}
 
       {/* 12. Final conversion */}
-      <section aria-label={finalCta.headline} className="bg-white">
+      <section aria-label={finalCta.headline} className="bg-background">
         {/* Top spacing comes from the white Insights section above; add our own if that section is hidden. */}
         <div
           className={`mx-auto max-w-content px-gutter pb-section-mobile md:pb-section ${

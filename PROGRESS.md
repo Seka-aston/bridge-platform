@@ -208,7 +208,7 @@ Branch `shadcn-redesign`. One step at a time, each reviewed by Aston before the 
 - [x] Step 1: Audit and "before" screenshots (118 screenshots: 59 pages at 1440 and 375px)
 - [x] Step 2: Foundation: shadcn set up, Bridge theme, components installed, `/components-preview` rebuilt (approved 8 Nov 2026)
 - [x] Step 3: Shared layout: header, footer, section heading, CTA band, every card type, badges (approved 8 Nov 2026)
-- [ ] Step 4: Homepage
+- [x] Step 4: Homepage (approved 8 Nov 2026)
 - [ ] Step 5: Public pages
 - [ ] Step 6: Platform shell
 - [ ] Step 7: Dashboards (Student, Company, School, Admin)
@@ -227,6 +227,12 @@ Decisions (Aston, 8 Nov 2026):
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-08 — Redesign Step 4: homepage
+- Hero rebuilt on the navy section helper, the type scale and shadcn buttons; the hero visual's passport and opportunity cards are shadcn Cards with Avatar and Badges; lines and nodes use theme tokens. Layout, copy and motion unchanged.
+- Homepage uses shadcn buttons directly; new `components/TextLink.tsx` for "text link with arrow".
+- No old style names left on the homepage. "After" screenshots saved in `screenshots/after` (local only).
+- Checked: approving a figure in the admin dashboard still removes its Draft label on the homepage.
 
 ### 2026-11-08 — Redesign Step 3: shared layout
 - Header rebuilt on the shadcn Navigation Menu, with a slide-in Sheet menu on phones and tablets. Full menu from 1024px (was 1280px). Navy at the top of the homepage, solid white once scrolled.

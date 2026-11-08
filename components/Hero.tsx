@@ -1,20 +1,23 @@
-import { Button } from "@/components/Button";
-import { hero } from "@/content/home";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { HeroVisual } from "@/components/HeroVisual";
+import { Button } from "@/components/ui/button";
+import { Display, Eyebrow, Lead } from "@/components/ui/typography";
+import { hero } from "@/content/home";
 
 /*
-  Homepage hero (spec 4.2.3), in navy and green rather than the spec's emerald and amber
-  (CLAUDE.md section 4). Eyebrow, H1, supporting line, three CTAs.
-  The right-hand column holds the hero ecosystem visual.
+  Homepage hero (spec 4.2.3), in navy and green rather than the spec's emerald and amber.
+  Eyebrow, H1, supporting line, three CTAs. The right-hand column holds the ecosystem visual,
+  the one expressive moment of the site (redesign brief section 6).
 */
 
 export function Hero() {
   return (
-    <section aria-labelledby="hero-title" className="relative isolate overflow-hidden bg-navy-900">
+    <section aria-labelledby="hero-title" className="surface-navy relative isolate overflow-hidden">
       <div className="mx-auto grid max-w-content items-center gap-12 px-gutter py-section-mobile md:py-section lg:grid-cols-[1.1fr_1fr]">
         <div>
-          <p className="text-eyebrow uppercase text-white">{hero.eyebrow}</p>
-          <h1 id="hero-title" className="mt-4 text-balance text-display-mobile text-white md:text-display">
+          <Eyebrow className="text-foreground">{hero.eyebrow}</Eyebrow>
+          <Display id="hero-title" className="mt-5">
             {/* Keep hyphenated words such as "Real-World" on one line. */}
             {hero.headline.split(" ").map((word, i) => (
               <span key={i}>
@@ -22,19 +25,21 @@ export function Hero() {
                 {word.includes("-") ? <span className="whitespace-nowrap">{word}</span> : word}
               </span>
             ))}
-          </h1>
-          <p className="mt-6 max-w-xl text-pretty text-body-lg text-white">{hero.supporting}</p>
-          <div className="mt-10 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
-            <Button href={hero.primary.href} size="lg" onDark>
-              {hero.primary.label}
+          </Display>
+          <Lead className="mt-6 max-w-xl text-pretty text-foreground/90">{hero.supporting}</Lead>
+          <div className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+            <Button asChild size="xl">
+              <Link href={hero.primary.href}>{hero.primary.label}</Link>
             </Button>
-            <Button href={hero.secondary.href} variant="secondary" size="lg" onDark>
-              {hero.secondary.label}
+            <Button asChild size="xl" variant="secondary">
+              <Link href={hero.secondary.href}>{hero.secondary.label}</Link>
             </Button>
           </div>
           <p className="mt-6">
-            <Button href={hero.additional.href} variant="textOnDark" size="lg">
-              {hero.additional.label}
+            <Button asChild variant="link" size="lg">
+              <Link href={hero.additional.href}>
+                {hero.additional.label} <ArrowRight data-icon="inline-end" aria-hidden />
+              </Link>
             </Button>
           </p>
         </div>
