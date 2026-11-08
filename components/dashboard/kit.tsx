@@ -13,13 +13,10 @@ import { sharedText } from "@/content/dashboard";
 import { cn } from "@/lib/utils";
 
 /*
-  Shared dashboard pieces on shadcn/ui (redesign Step 7), used by the School and Admin
-  dashboards (and the Company snapshot): navy summary card with a strip of figures, the tabbed
+  Shared dashboard pieces on shadcn/ui (redesign Step 7), used by the Company, School
+  and Admin dashboards: navy summary card with a strip of figures, the tabbed
   "what's next today?" panel, initials avatars and compact table-toolbar dropdowns.
 */
-
-// Kept for the Admin dashboard until its own redesign.
-export const ring = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
 
 export function ago(n: number) {
   return sharedText.agoDays[String(n)] ?? sharedText.agoDays.n.replace("{n}", String(n));
@@ -185,9 +182,4 @@ export function ToolbarSelect({
       </SelectContent>
     </Select>
   );
-}
-
-// Kept for the Admin dashboard until its own redesign.
-export function Pill({ label, look }: { label: string; look: string }) {
-  return <span className={`inline-flex whitespace-nowrap rounded-full px-3 py-0.5 text-sm font-semibold ${look}`}>{label}</span>;
 }

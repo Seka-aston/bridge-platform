@@ -498,6 +498,7 @@ export const adminText = {
     description: "Create and edit programmes. Status is always worked out from the dates, never typed by hand.",
     columns: { name: "Programme", status: "Status", opens: "Applications open", closes: "Applications close", ends: "Programme ends" },
     edit: "Edit",
+    searchLabel: "Search programmes",
     sessionApplied: "1 application this session",
     form: {
       createTitle: "New programme",
@@ -524,6 +525,9 @@ export const adminText = {
     status: { pending: "Awaiting approval", approved: "Approved", changes: "Changes requested" },
     approve: "Approve",
     requestChanges: "Request changes",
+    searchLabel: "Search content",
+    approvedToast: "Approved: {item}",
+    changesToast: "Changes requested: {item}",
     note: "Prototype: decisions are kept in this browser tab. Approved items lose their Draft badge on the public site in the same tab.",
   },
   reports: {

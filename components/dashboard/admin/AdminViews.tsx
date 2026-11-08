@@ -1,30 +1,36 @@
 "use client";
 
-import { CalendarClock, CheckCircle2, FileCheck2, Hourglass, Info, Plus, Users } from "lucide-react";
+import Link from "next/link";
+import { CheckCircle2, Info, Plus } from "lucide-react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Button } from "@/components/Button";
+import { toast } from "sonner";
 import { StatusPill } from "@/components/StatusPill";
+import { DataGrid, SortHeader, type ColumnDef } from "@/components/dashboard/DataGrid";
 import { DetailDrawer } from "@/components/dashboard/DetailDrawer";
-import { DataTable, Panel } from "@/components/dashboard/parts";
-import { ago, Pill, ring, SummaryPanel, TodayTabs } from "@/components/dashboard/kit";
+import { ago, InitialsAvatar, SummaryPanel, TodayAction, TodayTabs, TodayText, ToolbarSelect } from "@/components/dashboard/kit";
+import { Panel } from "@/components/dashboard/parts";
 import { ErrorSummary, TextArea, TextField } from "@/components/forms/Fields";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import { adminText as t, sharedText } from "@/content/dashboard";
 import { footer, trust } from "@/content/home";
 import { formText } from "@/content/pages";
 import { extraUsers, type UserRow } from "@/data/admin";
 import { articles } from "@/data/articles";
+import { company } from "@/data/company";
 import { programmes as samplePrograms, type Programme } from "@/data/programmes";
+import { school } from "@/data/school";
 import { talentProfiles } from "@/data/talent";
 import { sampleUsers } from "@/data/users";
-import { school } from "@/data/school";
-import { company } from "@/data/company";
-import { formatDate, programmeStatus, todayInKigali } from "@/lib/programmes";
+import { formatDate, programmeStatus, todayInKigali, type ProgrammeStatus } from "@/lib/programmes";
 import { APPROVAL_STORE, PROGRAMME_EDITS_STORE, readSession } from "@/lib/prototypeStore";
 
 /*
-  Admin dashboard (Checkpoint 10), in the student dashboard's visual language.
+  Admin dashboard (redesign Step 7, on shadcn/ui).
   Programme status is always calculated from the dates (CLAUDE.md, component 8).
-  Changes are kept in this browser tab; showing them on the public site is Checkpoint 11.
+  Changes are kept in this browser tab and show on the public site in the same tab.
 */
 
 const PROG_STORE = PROGRAMME_EDITS_STORE;
@@ -136,14 +142,8 @@ const pendingCount = (items: ApprovalItem[], d: Record<string, Decision>) => ite
 export function AdminWelcomeLine() {
   const { ready, items, decisions, programmes, today } = useAdmin();
   if (!ready) return <span>&nbsp;</span>;
-  return (
-    <>
-      {(() => {
-        const open = programmes.filter((p) => programmeStatus(p, today) === "open").length;
-        return (open === 1 ? t.welcomeLineOne : t.welcomeLine).replace("{pending}", String(pendingCount(items, decisions))).replace("{open}", String(open));
-      })()}
-    </>
-  );
+  const open = programmes.filter((p) => programmeStatus(p, today) === "open").length;
+  return <>{(open === 1 ? t.welcomeLineOne : t.welcomeLine).replace("{pending}", String(pendingCount(items, decisions))).replace("{open}", String(open))}</>;
 }
 
 export function AdminSnapshot({ href }: { href: string }) {
@@ -163,9 +163,9 @@ export function AdminSnapshot({ href }: { href: string }) {
       unit={s.unit}
       footer="Bridge"
       stats={[
-        { icon: CalendarClock, value: count("open"), label: s.stats.open },
-        { icon: Hourglass, value: count("upcoming"), label: s.stats.upcoming },
-        { icon: FileCheck2, value: pendingCount(items, decisions), label: s.stats.pending },
+        { value: count("open"), label: s.stats.open },
+        { value: count("upcoming"), label: s.stats.upcoming },
+        { value: pendingCount(items, decisions), label: s.stats.pending },
       ]}
     />
   );
@@ -179,11 +179,8 @@ export function AdminToday({ firstName, contentHref, programmesHref, usersHref }
   const invited = users.filter((u) => u.status === "Invited").length;
   const block = (title: string, body: string, href: string, action: string) => (
     <>
-      <h3 className="text-h3 text-navy-900">{title}</h3>
-      <p className="mt-1 text-gray-700">{body}</p>
-      <div className="mt-5">
-        <Button href={href} variant="outline" shape="pill">{action}</Button>
-      </div>
+      <TodayText title={title} body={body} />
+      <TodayAction href={href} label={action} />
     </>
   );
   return (
@@ -191,9 +188,9 @@ export function AdminToday({ firstName, contentHref, programmesHref, usersHref }
       id="atoday"
       title={d.title.replace("{name}", firstName)}
       tabs={[
-        { key: "approve", label: d.tabs.approve, icon: FileCheck2, content: block(t.content.title, pending ? d.approveBody.replace("{n}", String(pending)) : d.approveNone, contentHref, d.approveAction) },
-        { key: "programmes", label: d.tabs.programmes, icon: CalendarClock, content: block(t.programmes.title, d.programmesBody.replace("{n}", String(open)), programmesHref, d.programmesAction) },
-        { key: "users", label: d.tabs.users, icon: Users, content: block(t.users.title, d.usersBody.replace("{n}", String(invited)), usersHref, d.usersAction) },
+        { key: "approve", label: d.tabs.approve, content: block(t.content.title, pending ? d.approveBody.replace("{n}", String(pending)) : d.approveNone, contentHref, d.approveAction) },
+        { key: "programmes", label: d.tabs.programmes, content: block(t.programmes.title, d.programmesBody.replace("{n}", String(open)), programmesHref, d.programmesAction) },
+        { key: "users", label: d.tabs.users, content: block(t.users.title, d.usersBody.replace("{n}", String(invited)), usersHref, d.usersAction) },
       ]}
     />
   );
@@ -202,24 +199,25 @@ export function AdminToday({ firstName, contentHref, programmesHref, usersHref }
 // ---------- Programme manager ----------
 
 type FormV = { name: string; summary: string; opensOn: string; closesOn: string; endsOn: string };
+type ProgrammeRow = Programme & { status: ProgrammeStatus; applied: boolean };
+const emptyProgramme: FormV = { name: "", summary: "", opensOn: "", closesOn: "", endsOn: "" };
 
 export function ProgrammeManager({ compact = false }: { compact?: boolean }) {
   const { programmes, saveProgramme, today, ready, sessionApps } = useAdmin();
   const p = t.programmes;
   const f = p.form;
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Programme | null>(null);
-  const [v, setV] = useState<FormV>({ name: "", summary: "", opensOn: "", closesOn: "", endsOn: "" });
+  const [v, setV] = useState<FormV>(emptyProgramme);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [saved, setSaved] = useState(false);
 
-  function openForm(prog: Programme | null) {
+  const openForm = useCallback((prog: Programme | null) => {
     setEditing(prog);
-    setV(prog ? { name: prog.name, summary: prog.summary, opensOn: prog.opensOn, closesOn: prog.closesOn, endsOn: prog.endsOn } : { name: "", summary: "", opensOn: "", closesOn: "", endsOn: "" });
+    setV(prog ? { name: prog.name, summary: prog.summary, opensOn: prog.opensOn, closesOn: prog.closesOn, endsOn: prog.endsOn } : emptyProgramme);
     setErrors({});
-    dialogRef.current?.showModal();
-  }
+    setOpen(true);
+  }, []);
   const previewStatus = v.opensOn && v.closesOn && v.endsOn && today ? programmeStatus({ ...(editing ?? samplePrograms[0]), ...v }, today) : null;
 
   function save(e: React.FormEvent) {
@@ -250,156 +248,212 @@ export function ProgrammeManager({ compact = false }: { compact?: boolean }) {
       approved: false,
     };
     saveProgramme({ ...base, ...v, name: v.name.trim(), summary: v.summary.trim() });
-    setSaved(true);
-    dialogRef.current?.close();
+    setOpen(false);
+    toast.success(sharedText.saved);
   }
 
-  const shown = compact ? programmes.slice(0, 5) : programmes;
+  const columns = useMemo<ColumnDef<ProgrammeRow, unknown>[]>(
+    () => [
+      {
+        accessorKey: "name",
+        header: p.columns.name,
+        cell: ({ row }) => (
+          <span>
+            <span className="block font-medium text-heading">{row.original.name}</span>
+            {row.original.applied && (
+              <Badge variant="secondary" className="mt-1">
+                {p.sessionApplied}
+              </Badge>
+            )}
+          </span>
+        ),
+      },
+      { accessorKey: "status", header: p.columns.status, cell: ({ row }) => <StatusPill status={row.original.status} />, enableGlobalFilter: false },
+      {
+        accessorKey: "opensOn",
+        header: ({ column }) => <SortHeader label={p.columns.opens} sorted={column.getIsSorted()} onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")} />,
+        cell: ({ row }) => formatDate(row.original.opensOn),
+        enableGlobalFilter: false,
+      },
+      {
+        accessorKey: "closesOn",
+        header: ({ column }) => <SortHeader label={p.columns.closes} sorted={column.getIsSorted()} onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")} />,
+        cell: ({ row }) => formatDate(row.original.closesOn),
+        enableGlobalFilter: false,
+      },
+      {
+        id: "action",
+        header: () => <span className="sr-only">{p.edit}</span>,
+        cell: ({ row }) => (
+          <div className="text-right">
+            <Button variant="outline" size="sm" onClick={() => openForm(row.original)}>
+              {p.edit}
+              <span className="sr-only">: {row.original.name}</span>
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    [p, openForm],
+  );
+
+  if (!ready) return <Skeleton className="h-48 w-full rounded-xl" />;
+  const rows: ProgrammeRow[] = (compact ? programmes.slice(0, 5) : programmes).map((x) => ({ ...x, status: programmeStatus(x, today), applied: sessionApps.includes(x.id) }));
   return (
     <>
-      {!compact && (
-        <div className="flex justify-end">
-          <Button shape="pill" onClick={() => openForm(null)}>
-            <Plus aria-hidden className="size-5" /> {t.newProgrammeCta}
-          </Button>
-        </div>
-      )}
-      {saved && <p role="status" className="mt-4 rounded-tile bg-green-50 p-4 text-gray-800">{sharedText.saved}</p>}
-      <section aria-label={p.title} className={compact ? "" : "mt-6 rounded-panel bg-white p-5 md:p-8"}>
-        {ready && (
-          <DataTable
-            caption={p.title}
-            columns={[
-              { key: "name", header: p.columns.name },
-              { key: "status", header: p.columns.status },
-              { key: "opens", header: p.columns.opens },
-              { key: "closes", header: p.columns.closes },
-              { key: "action", header: "", className: "text-right" },
-            ]}
-            rows={shown.map((x) => ({
-              key: x.id,
-              cells: {
-                name: (
-                  <span>
-                    {x.name}
-                    {sessionApps.includes(x.id) && <span className="block text-sm font-semibold text-green-700">{t.programmes.sessionApplied}</span>}
-                  </span>
-                ),
-                status: <StatusPill status={programmeStatus(x, today)} />,
-                opens: formatDate(x.opensOn),
-                closes: formatDate(x.closesOn),
-                action: (
-                  <button type="button" onClick={() => openForm(x)} className={`rounded-sm font-semibold text-green-700 underline-offset-4 hover:text-green-800 hover:underline ${ring}`}>
-                    {p.edit}
-                    <span className="sr-only">: {x.name}</span>
-                  </button>
-                ),
-              },
-            }))}
-          />
-        )}
-      </section>
+      <DataGrid
+        data={rows}
+        // The overview's narrow column drops "Applications open"; the Programmes page shows every column.
+        columns={compact ? columns.filter((c) => (c as { accessorKey?: string }).accessorKey !== "opensOn") : columns}
+        caption={p.title}
+        searchLabel={compact ? undefined : p.searchLabel}
+        searchPlaceholder={p.searchLabel}
+        toolbar={
+          compact ? undefined : (
+            <Button className="sm:ml-auto" onClick={() => openForm(null)}>
+              <Plus data-icon="inline-start" aria-hidden /> {t.newProgrammeCta}
+            </Button>
+          )
+        }
+      />
 
-      <dialog
-        ref={dialogRef}
-        aria-labelledby="pg-form-title"
-        onClick={(e) => e.target === dialogRef.current && dialogRef.current?.close()}
-        className="m-auto max-h-[90dvh] w-[calc(100%-2rem)] max-w-xl overflow-y-auto rounded-panel bg-white p-0 backdrop:bg-navy-900/60"
-      >
-        <form noValidate onSubmit={save} className="space-y-5 p-6">
-          <h2 id="pg-form-title" className="text-h3 text-navy-900">{editing ? f.editTitle.replace("{name}", editing.name) : f.createTitle}</h2>
-          <p className="flex items-start gap-2 text-sm text-gray-700"><Info aria-hidden className="mt-0.5 size-4 shrink-0" /> {f.prototype}</p>
-          <ErrorSummary
-            title={formText.errorSummaryTitle}
-            errors={errors}
-            labels={{ "pg-name": f.name, "pg-summary": f.summary, "pg-opens": f.opensOn, "pg-closes": f.closesOn, "pg-ends": f.endsOn }}
-            summaryRef={summaryRef}
-          />
-          <TextField id="pg-name" label={f.name} required value={v.name} onChange={(x) => setV({ ...v, name: x })} error={errors["pg-name"]} />
-          <TextArea id="pg-summary" label={f.summary} required value={v.summary} onChange={(x) => setV({ ...v, summary: x })} error={errors["pg-summary"]} />
-          <div className="grid gap-5 sm:grid-cols-3">
-            <TextField id="pg-opens" type="date" label={f.opensOn} required value={v.opensOn} onChange={(x) => setV({ ...v, opensOn: x })} error={errors["pg-opens"]} />
-            <TextField id="pg-closes" type="date" label={f.closesOn} required value={v.closesOn} onChange={(x) => setV({ ...v, closesOn: x })} error={errors["pg-closes"]} />
-            <TextField id="pg-ends" type="date" label={f.endsOn} required value={v.endsOn} onChange={(x) => setV({ ...v, endsOn: x })} error={errors["pg-ends"]} />
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Button variant="outline" shape="pill" onClick={() => setV({ ...v, opensOn: today, closesOn: v.closesOn && v.closesOn >= today ? v.closesOn : today })}>{f.openNow}</Button>
-            <Button variant="outline" shape="pill" onClick={() => setV({ ...v, closesOn: today, opensOn: v.opensOn && v.opensOn <= today ? v.opensOn : today })}>{f.closeNow}</Button>
-          </div>
-          <p aria-live="polite" className="flex items-center gap-2 font-semibold text-navy-900">
-            {previewStatus && (
-              <>
-                {f.statusPreview.replace("{status}", "")} <StatusPill status={previewStatus} />
-              </>
-            )}
-          </p>
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="outline" shape="pill" onClick={() => dialogRef.current?.close()}>{f.cancel}</Button>
-            <Button type="submit" shape="pill">{f.save}</Button>
-          </div>
-        </form>
-      </dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-2xl">
+          <form noValidate onSubmit={save} className="grid gap-5">
+            <DialogHeader>
+              <DialogTitle>{editing ? f.editTitle.replace("{name}", editing.name) : f.createTitle}</DialogTitle>
+              <DialogDescription className="flex items-start gap-2">
+                <Info aria-hidden className="mt-0.5 size-4 shrink-0" /> {f.prototype}
+              </DialogDescription>
+            </DialogHeader>
+            <ErrorSummary
+              title={formText.errorSummaryTitle}
+              errors={errors}
+              labels={{ "pg-name": f.name, "pg-summary": f.summary, "pg-opens": f.opensOn, "pg-closes": f.closesOn, "pg-ends": f.endsOn }}
+              summaryRef={summaryRef}
+            />
+            <TextField id="pg-name" label={f.name} required value={v.name} onChange={(x) => setV({ ...v, name: x })} error={errors["pg-name"]} />
+            <TextArea id="pg-summary" label={f.summary} required value={v.summary} onChange={(x) => setV({ ...v, summary: x })} error={errors["pg-summary"]} />
+            <div className="grid gap-5 sm:grid-cols-3">
+              <TextField id="pg-opens" type="date" label={f.opensOn} required value={v.opensOn} onChange={(x) => setV({ ...v, opensOn: x })} error={errors["pg-opens"]} />
+              <TextField id="pg-closes" type="date" label={f.closesOn} required value={v.closesOn} onChange={(x) => setV({ ...v, closesOn: x })} error={errors["pg-closes"]} />
+              <TextField id="pg-ends" type="date" label={f.endsOn} required value={v.endsOn} onChange={(x) => setV({ ...v, endsOn: x })} error={errors["pg-ends"]} />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" variant="outline" size="sm" onClick={() => setV({ ...v, opensOn: today, closesOn: v.closesOn && v.closesOn >= today ? v.closesOn : today })}>
+                {f.openNow}
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={() => setV({ ...v, closesOn: today, opensOn: v.opensOn && v.opensOn <= today ? v.opensOn : today })}>
+                {f.closeNow}
+              </Button>
+            </div>
+            <p aria-live="polite" className="flex min-h-6 items-center gap-2 text-sm font-medium text-heading">
+              {previewStatus && (
+                <>
+                  {f.statusPreview.replace("{status}", "")} <StatusPill status={previewStatus} />
+                </>
+              )}
+            </p>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                {f.cancel}
+              </Button>
+              <Button type="submit">{f.save}</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
 
 // ---------- Content approvals ----------
 
-const decisionLook: Record<"pending" | Decision, string> = {
-  pending: "border border-dashed border-gray-500 text-gray-700",
-  approved: "bg-green-700 text-white",
-  changes: "border border-navy-900 text-navy-900",
-};
+// Awaiting approval uses the Draft colours, because these are exactly the items shown as Draft on the site.
+const decisionVariant = { pending: "draft", approved: "open", changes: "upcoming" } as const;
+type ApprovalRow = ApprovalItem & { decision?: Decision };
 
 export function ContentApprovals({ compact = false }: { compact?: boolean }) {
   const { items, decisions, decide, ready } = useAdmin();
   const c = t.content;
-  if (!ready) return <div className="min-h-40" />;
-  const shown = compact ? items.filter((i) => !decisions[i.key]).slice(0, 4) : items;
+  const choose = useCallback(
+    (i: ApprovalItem, d: Decision, from: HTMLElement) => {
+      // The row's buttons are replaced by a tick, so keep keyboard users moving: focus the next
+      // item still waiting for a decision, or the table if none is left.
+      const table = from.closest("table");
+      const rowIndex = from.closest("tr")?.sectionRowIndex ?? 0;
+      decide(i.key, d);
+      toast.success((d === "approved" ? c.approvedToast : c.changesToast).replace("{item}", i.label));
+      requestAnimationFrame(() => {
+        const next = [...(table?.tBodies[0]?.rows ?? [])].slice(rowIndex).map((r) => r.querySelector("button")).find(Boolean);
+        (next ?? table?.closest<HTMLElement>("[role=region]"))?.focus();
+      });
+    },
+    [decide, c],
+  );
+  const columns = useMemo<ColumnDef<ApprovalRow, unknown>[]>(
+    () => [
+      { accessorKey: "label", header: c.columns.item, cell: ({ row }) => <span className="font-medium text-heading">{row.original.label}</span> },
+      { id: "type", accessorFn: (r) => c.types[r.type], header: c.columns.type },
+      {
+        id: "status",
+        header: c.columns.status,
+        cell: ({ row }) => <Badge variant={decisionVariant[row.original.decision ?? "pending"]}>{c.status[row.original.decision ?? "pending"]}</Badge>,
+      },
+      {
+        id: "action",
+        header: () => <span className="sr-only">{c.approve}</span>,
+        cell: ({ row }) =>
+          row.original.decision ? (
+            <CheckCircle2 aria-hidden className="ml-auto size-5 text-primary" />
+          ) : (
+            <span className="flex justify-end gap-2">
+              <Button variant="navy" size="sm" onClick={(e) => choose(row.original, "approved", e.currentTarget)}>
+                {c.approve}
+                <span className="sr-only">: {row.original.label}</span>
+              </Button>
+              <Button variant="outline" size="sm" onClick={(e) => choose(row.original, "changes", e.currentTarget)}>
+                {c.requestChanges}
+                <span className="sr-only">: {row.original.label}</span>
+              </Button>
+            </span>
+          ),
+      },
+    ],
+    [c, choose],
+  );
+  if (!ready) return <Skeleton className="h-48 w-full rounded-xl" />;
+  const rows: ApprovalRow[] = (compact ? items.filter((i) => !decisions[i.key]).slice(0, 4) : items).map((i) => ({ ...i, decision: decisions[i.key] }));
   return (
-    <div>
-      <DataTable
+    <div className="space-y-3">
+      <DataGrid
+        data={rows}
+        // The overview's narrow column drops "Type"; the Content approvals page shows every column.
+        columns={compact ? columns.filter((col) => col.id !== "type") : columns}
         caption={c.title}
-        columns={[
-          { key: "item", header: c.columns.item },
-          { key: "type", header: c.columns.type },
-          { key: "status", header: c.columns.status },
-          { key: "action", header: "", className: "text-right" },
-        ]}
-        rows={shown.map((i) => {
-          const d = decisions[i.key];
-          return {
-            key: i.key,
-            cells: {
-              item: i.label,
-              type: c.types[i.type],
-              status: <Pill label={c.status[d ?? "pending"]} look={decisionLook[d ?? "pending"]} />,
-              action: d ? (
-                <CheckCircle2 aria-hidden className="ml-auto size-5 text-green-700" />
-              ) : (
-                <span className="flex justify-end gap-2">
-                  <Button variant="navy" shape="pill" onClick={() => decide(i.key, "approved")}>
-                    {c.approve}
-                    <span className="sr-only">: {i.label}</span>
-                  </Button>
-                  <Button variant="outline" shape="pill" onClick={() => decide(i.key, "changes")}>
-                    {c.requestChanges}
-                    <span className="sr-only">: {i.label}</span>
-                  </Button>
-                </span>
-              ),
-            },
-          };
-        })}
+        searchLabel={compact ? undefined : c.searchLabel}
+        searchPlaceholder={c.searchLabel}
+        pageSize={25}
       />
-      <p className="mt-4 flex items-start gap-2 text-sm text-gray-700"><Info aria-hidden className="mt-0.5 size-4 shrink-0" /> {c.note}</p>
+      <p className="flex items-start gap-2 text-xs text-muted-foreground">
+        <Info aria-hidden className="mt-0.5 size-4 shrink-0" /> {c.note}
+      </p>
     </div>
   );
 }
 
 export function ApprovalsPanel({ href }: { href: string }) {
   return (
-    <Panel title={t.content.title} subtitle={t.content.description} id="approvals-title" action={<Button href={href} variant="text">{t.approvalsCta}</Button>}>
+    <Panel
+      title={t.content.title}
+      subtitle={t.content.description}
+      id="approvals-title"
+      action={
+        <Button asChild variant="outline" size="sm">
+          <Link href={href}>{t.approvalsCta}</Link>
+        </Button>
+      }
+    >
       <ContentApprovals compact />
     </Panel>
   );
@@ -407,65 +461,80 @@ export function ApprovalsPanel({ href }: { href: string }) {
 
 // ---------- Users ----------
 
+const ANY = "any";
+
 export function UsersView() {
   const { users } = useAdmin();
   const u = t.users;
-  const [role, setRole] = useState("");
-  const [q, setQ] = useState("");
+  const [role, setRole] = useState(ANY);
   const [openId, setOpenId] = useState<string | null>(null);
-  const query = q.trim().toLowerCase();
-  const shown = users.filter((x) => (!role || x.role === role) && (!query || `${x.name} ${x.organisation}`.toLowerCase().includes(query)));
+  const rows = users.filter((x) => role === ANY || x.role === role);
   const current = users.find((x) => x.id === openId);
-  const field = `mt-2 block w-full rounded-full border border-gray-500 bg-white px-4 py-2.5 text-gray-800 ${ring}`;
+  const columns = useMemo<ColumnDef<UserRow, unknown>[]>(
+    () => [
+      {
+        accessorKey: "name",
+        header: u.columns.name,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-3">
+            <InitialsAvatar name={row.original.name} />
+            <span className="font-medium text-heading">{row.original.name}</span>
+          </div>
+        ),
+      },
+      { accessorKey: "role", header: u.columns.role, enableGlobalFilter: false },
+      { accessorKey: "organisation", header: u.columns.organisation },
+      {
+        accessorKey: "status",
+        header: u.columns.status,
+        cell: ({ row }) => (
+          <Badge variant={row.original.status === "Active" ? "open" : "archived"} className={row.original.status === "Active" ? undefined : "border-dashed"}>
+            {u.status[row.original.status]}
+          </Badge>
+        ),
+        enableGlobalFilter: false,
+      },
+      {
+        accessorKey: "joinedDaysAgo",
+        header: ({ column }) => <SortHeader label={u.columns.joined} sorted={column.getIsSorted()} onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")} />,
+        cell: ({ row }) => ago(row.original.joinedDaysAgo),
+        enableGlobalFilter: false,
+      },
+      {
+        id: "action",
+        header: () => <span className="sr-only">{u.details}</span>,
+        cell: ({ row }) => (
+          <div className="text-right">
+            <Button variant="outline" size="sm" onClick={() => setOpenId(row.original.id)}>
+              {u.details}
+              <span className="sr-only">: {row.original.name}</span>
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    [u],
+  );
   return (
-    <section aria-label={u.title} className="rounded-panel bg-white p-5 md:p-8">
-      <div className="grid gap-4 md:grid-cols-[2fr_1fr]">
-        <label className="block font-semibold text-navy-900">
-          {u.search}
-          <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={u.searchPlaceholder} className={field} />
-        </label>
-        <label className="block font-semibold text-navy-900">
-          {u.role}
-          <select value={role} onChange={(e) => setRole(e.target.value)} className={field}>
-            <option value="">{u.allRoles}</option>
-            {["Student", "School", "Company", "Admin"].map((r) => (
-              <option key={r}>{r}</option>
-            ))}
-          </select>
-        </label>
-      </div>
-      <div className="mt-6">
-        <DataTable
-          caption={u.title}
-          columns={[
-            { key: "name", header: u.columns.name },
-            { key: "role", header: u.columns.role },
-            { key: "organisation", header: u.columns.organisation },
-            { key: "status", header: u.columns.status },
-            { key: "joined", header: u.columns.joined },
-            { key: "action", header: "", className: "text-right" },
-          ]}
-          rows={shown.map((x) => ({
-            key: x.id,
-            cells: {
-              name: x.name,
-              role: x.role,
-              organisation: x.organisation,
-              status: <Pill label={u.status[x.status]} look={x.status === "Active" ? "bg-green-50 text-green-700" : "border border-dashed border-gray-500 text-gray-700"} />,
-              joined: ago(x.joinedDaysAgo),
-              action: (
-                <button type="button" onClick={() => setOpenId(x.id)} className={`rounded-sm font-semibold text-green-700 underline-offset-4 hover:text-green-800 hover:underline ${ring}`}>
-                  {u.details}
-                  <span className="sr-only">: {x.name}</span>
-                </button>
-              ),
-            },
-          }))}
-        />
-      </div>
+    <>
+      <DataGrid
+        data={rows}
+        columns={columns}
+        caption={u.title}
+        searchLabel={u.search}
+        searchPlaceholder={u.searchPlaceholder}
+        toolbar={
+          <ToolbarSelect
+            label={u.role}
+            value={role}
+            onChange={setRole}
+            options={[{ value: ANY, label: u.allRoles }, ...["Student", "School", "Company", "Admin"].map((r) => ({ value: r, label: r }))]}
+          />
+        }
+      />
       <DetailDrawer open={!!current} onClose={() => setOpenId(null)} title={current?.name ?? ""}>
         {current && (
-          <dl className="space-y-4">
+          <dl className="divide-y text-sm">
             {(
               [
                 [u.columns.role, current.role],
@@ -474,14 +543,14 @@ export function UsersView() {
                 [u.columns.joined, ago(current.joinedDaysAgo)],
               ] as [string, string][]
             ).map(([k, val]) => (
-              <div key={k}>
-                <dt className="font-semibold text-navy-900">{k}</dt>
-                <dd className="text-gray-700">{val}</dd>
+              <div key={k} className="py-3 first:pt-0">
+                <dt className="text-xs text-muted-foreground">{k}</dt>
+                <dd className="mt-0.5 font-medium text-heading">{val}</dd>
               </div>
             ))}
           </dl>
         )}
       </DetailDrawer>
-    </section>
+    </>
   );
 }

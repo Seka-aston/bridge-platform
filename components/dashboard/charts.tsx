@@ -1,8 +1,11 @@
+import { ChevronRight } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { sharedText } from "@/content/dashboard";
 
 /*
-  Simple accessible charts for admin reports (Checkpoint 10), following the dataviz method:
-  - one series per chart, one hue (green-700, 5.3:1 on white), so no legend: the title names it
+  Simple accessible charts for admin reports (Checkpoint 10; shadcn tokens since redesign Step 7),
+  following the dataviz method:
+  - one series per chart, one hue (primary green-700, 5.3:1 on white), so no legend: the title names it
   - thin bars with a 4px rounded end away from the baseline, 2px gaps, recessive gridlines
   - hover AND keyboard focus show a tooltip; every bar is reachable with Tab
   - values are always available as text: a "Show as table" view sits under each chart
@@ -13,26 +16,33 @@ type Datum = { label: string; value: number };
 
 function TableView({ data, labelHeader }: { data: Datum[]; labelHeader: string }) {
   return (
-    <details className="mt-4">
-      <summary className="cursor-pointer rounded-sm font-semibold text-green-700 hover:text-green-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900">
+    <details className="group/details mt-4">
+      <summary className="inline-flex cursor-pointer list-none items-center gap-1 rounded-sm text-sm font-medium text-link hover:text-link-hover hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring [&::-webkit-details-marker]:hidden">
+        <ChevronRight aria-hidden className="size-4 transition-transform group-open/details:rotate-90" />
         {sharedText.showTable}
       </summary>
-      <table className="mt-3 w-full text-left">
-        <thead>
-          <tr className="border-b border-gray-200">
-            <th scope="col" className="py-2 pr-4 text-sm font-semibold text-gray-700">{labelHeader}</th>
-            <th scope="col" className="py-2 text-right text-sm font-semibold text-gray-700">{sharedText.value}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((d) => (
-            <tr key={d.label} className="border-b border-gray-200 last:border-0">
-              <th scope="row" className="py-2 pr-4 font-normal text-gray-800">{d.label}</th>
-              <td className="py-2 text-right font-semibold text-navy-900">{d.value}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="mt-3 overflow-hidden rounded-lg border">
+        <Table>
+          <TableHeader className="bg-muted">
+            <TableRow>
+              <TableHead scope="col">{labelHeader}</TableHead>
+              <TableHead scope="col" className="text-right">
+                {sharedText.value}
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((d) => (
+              <TableRow key={d.label}>
+                <TableHead scope="row" className="h-auto py-2 font-normal text-foreground">
+                  {d.label}
+                </TableHead>
+                <TableCell className="py-2 text-right font-medium text-heading tabular-nums">{d.value}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </details>
   );
 }
@@ -41,7 +51,7 @@ function Tooltip({ children }: { children: React.ReactNode }) {
   return (
     <span
       role="presentation"
-      className="pointer-events-none absolute -top-10 left-1/2 z-10 hidden -translate-x-1/2 whitespace-nowrap rounded-control bg-navy-900 px-2.5 py-1 text-sm font-semibold text-white group-hover:block group-focus:block"
+      className="pointer-events-none absolute -top-10 left-1/2 z-10 hidden -translate-x-1/2 whitespace-nowrap rounded-md bg-brand-navy px-2.5 py-1 text-xs font-medium text-white shadow-md group-hover:block group-focus:block"
     >
       {children}
     </span>
@@ -56,15 +66,15 @@ export function BarChart({ data, labelHeader }: { data: Datum[]; labelHeader: st
       <ul className="space-y-0.5">
         {data.map((d) => (
           <li key={d.label} className="grid grid-cols-[minmax(8rem,14rem)_1fr] items-center gap-3 py-1.5">
-            <span className="text-sm text-gray-800">{d.label}</span>
+            <span className="text-sm">{d.label}</span>
             <span
               tabIndex={0}
               role="img"
               aria-label={`${d.label}: ${d.value}`}
-              className="group relative flex items-center gap-2 rounded-sm py-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900"
+              className="group relative flex items-center gap-2 rounded-sm py-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
-              <span className="h-3 rounded-r-sm bg-green-700" style={{ width: `${(d.value / max) * 85}%` }} />
-              <span className="text-sm font-semibold text-navy-900">{d.value}</span>
+              <span className="h-3 rounded-r-sm bg-primary" style={{ width: `${(d.value / max) * 85}%` }} />
+              <span className="text-sm font-medium text-heading tabular-nums">{d.value}</span>
               <Tooltip>
                 {d.label}: {d.value}
               </Tooltip>
@@ -86,8 +96,8 @@ export function ColumnChart({ data, labelHeader }: { data: Datum[]; labelHeader:
     <figure>
       <div className="relative h-52 pl-8">
         {grid.map((g) => (
-          <div key={g} className="absolute left-8 right-0 border-t border-gray-200" style={{ bottom: `${(g / top) * 100}%` }}>
-            <span className="absolute -left-8 -top-2.5 w-6 text-right text-sm text-gray-500">{g}</span>
+          <div key={g} className="absolute left-8 right-0 border-t border-border" style={{ bottom: `${(g / top) * 100}%` }}>
+            <span className="absolute -left-8 -top-2.5 w-6 text-right text-xs text-muted-foreground tabular-nums">{g}</span>
           </div>
         ))}
         <ul className="relative flex h-full items-end gap-0.5">
@@ -97,11 +107,11 @@ export function ColumnChart({ data, labelHeader }: { data: Datum[]; labelHeader:
                 tabIndex={0}
                 role="img"
                 aria-label={`${d.label}: ${d.value}`}
-                className="group relative mx-auto flex h-full w-full max-w-10 items-end justify-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900"
+                className="group relative mx-auto flex h-full w-full max-w-10 items-end justify-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
-                <span className="w-3/5 rounded-t-sm bg-green-700" style={{ height: `${(d.value / top) * 100}%` }} />
+                <span className="w-3/5 rounded-t-sm bg-primary" style={{ height: `${(d.value / top) * 100}%` }} />
                 {i === data.length - 1 && (
-                  <span className="absolute text-sm font-semibold text-navy-900" style={{ bottom: `calc(${(d.value / top) * 100}% + 4px)` }}>
+                  <span className="absolute text-xs font-medium text-heading tabular-nums" style={{ bottom: `calc(${(d.value / top) * 100}% + 4px)` }}>
                     {d.value}
                   </span>
                 )}
@@ -115,7 +125,7 @@ export function ColumnChart({ data, labelHeader }: { data: Datum[]; labelHeader:
       </div>
       <ul aria-hidden className="mt-2 flex gap-0.5 pl-8">
         {data.map((d) => (
-          <li key={d.label} className="flex-1 text-center text-sm text-gray-700">
+          <li key={d.label} className="flex-1 text-center text-xs text-muted-foreground">
             {d.label}
           </li>
         ))}

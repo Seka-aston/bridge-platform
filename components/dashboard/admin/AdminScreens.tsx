@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { BadgeCheck, Briefcase, FileCheck2, Handshake, Plus, Users } from "lucide-react";
-import { Button } from "@/components/Button";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { BarChart, ColumnChart } from "@/components/dashboard/charts";
 import { SettingsView } from "@/components/dashboard/SettingsView";
 import { settingsText } from "@/content/dashboard";
@@ -11,7 +13,7 @@ import { adminText as t, roleText, sharedText } from "@/content/dashboard";
 import { reports } from "@/data/admin";
 import { sampleUsers } from "@/data/users";
 
-// Admin dashboard (Checkpoint 10), same layout as the other overviews.
+// Admin dashboard (redesign Step 7, on shadcn/ui), same layout as the other overviews.
 
 const base = "/dashboard/admin";
 const firstName = sampleUsers.admin.name.split(" ")[0];
@@ -26,7 +28,7 @@ export function AdminOverview() {
           title={
             <>
               {before}
-              <span className="text-green-700">
+              <span className="text-primary">
                 {firstName}
                 {after}
               </span>
@@ -35,22 +37,39 @@ export function AdminOverview() {
           description={<AdminWelcomeLine />}
           actions={
             <>
-              <Button href={`${base}/content`} variant="outline" shape="pill" size="lg">
-                <FileCheck2 aria-hidden className="size-5" /> {t.approvalsCta}
+              <Button asChild variant="outline">
+                <Link href={`${base}/content`}>
+                  <FileCheck2 data-icon="inline-start" aria-hidden /> {t.approvalsCta}
+                </Link>
               </Button>
-              <Button href={`${base}/programmes`} shape="pill" size="lg">
-                <Plus aria-hidden className="size-5" /> {t.newProgrammeCta}
+              <Button asChild>
+                <Link href={`${base}/programmes`}>
+                  <Plus data-icon="inline-start" aria-hidden /> {t.newProgrammeCta}
+                </Link>
               </Button>
             </>
           }
         />
-        <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[1fr_24rem]">
-          <Panel title={t.programmes.title} subtitle={t.programmes.description} id="aprog-title" action={<Button href={`${base}/programmes`} variant="text">{roleText.admin.nav[2].label}</Button>}>
-            <ProgrammeManager compact />
-          </Panel>
-          <AdminSnapshot href={`${base}/reports`} />
-          <ApprovalsPanel href={`${base}/content`} />
-          <AdminToday firstName={firstName} contentHref={`${base}/content`} programmesHref={`${base}/programmes`} usersHref={`${base}/users`} />
+        <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
+          <div className="min-w-0 space-y-6">
+            <Panel
+              title={t.programmes.title}
+              subtitle={t.programmes.description}
+              id="aprog-title"
+              action={
+                <Button asChild variant="outline" size="sm">
+                  <Link href={`${base}/programmes`}>{roleText.admin.nav[2].label}</Link>
+                </Button>
+              }
+            >
+              <ProgrammeManager compact />
+            </Panel>
+            <ApprovalsPanel href={`${base}/content`} />
+          </div>
+          <div className="min-w-0 space-y-6">
+            <AdminSnapshot href={`${base}/reports`} />
+            <AdminToday firstName={firstName} contentHref={`${base}/content`} programmesHref={`${base}/programmes`} usersHref={`${base}/users`} />
+          </div>
         </div>
       </div>
     </AdminDataProvider>
@@ -59,7 +78,7 @@ export function AdminOverview() {
 
 function SampleNote() {
   return (
-    <span className="inline-flex rounded-full border border-dashed border-gray-500 px-2.5 py-0.5 text-eyebrow uppercase text-gray-700">{sharedText.sampleFigures}</span>
+    <Badge variant="sample">{sharedText.sampleFigures}</Badge>
   );
 }
 
@@ -107,9 +126,7 @@ export const adminScreens: Record<string, () => React.ReactElement> = {
   content: screen(
     t.content.title,
     t.content.description,
-    <section aria-label={t.content.title} className="rounded-panel bg-white p-5 md:p-8">
-      <ContentApprovals />
-    </section>,
+    <ContentApprovals />,
   ),
   reports: ReportsScreen,
   settings: screen(settingsText.title, settingsText.description, <SettingsView role="admin" />),

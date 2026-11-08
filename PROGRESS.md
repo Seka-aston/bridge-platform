@@ -214,11 +214,11 @@ Branch `shadcn-redesign`. One step at a time, each reviewed by Aston before the 
   - [x] Batch 2: Programmes list, programme detail and apply flow (approved 8 Nov 2026)
   - [x] Batch 3: Resources, articles, About, Impact, booking, Bridge AI, Learning, Skills Passport, Opportunities, public passport, legal pages, and the new log in, create account and password reset screens (approved 8 Nov 2026)
 - [x] Step 6: Platform shell (approved by Aston, 8 November 2026)
-- [ ] Step 7: Dashboards (Student, Company, School, Admin)
+- [x] Step 7: Dashboards (Student, Company, School, Admin) (approved 8 Nov 2026)
   - [x] Student (approved 8 Nov 2026)
   - [x] Company (approved 8 Nov 2026)
   - [x] School (approved 8 Nov 2026)
-  - [ ] Admin
+  - [x] Admin (approved 8 Nov 2026)
 - [ ] Step 8: Clean-up and QA
 
 Decisions (Aston, 8 Nov 2026):
@@ -480,4 +480,14 @@ Decisions (Aston, 8 Nov 2026):
 - Shared pieces moved into `components/dashboard/kit.tsx` (navy summary card, figure strip, today tabs, initials avatar, toolbar dropdown); the Company snapshot now uses them too. Today tabs in the narrow side column show labels only, so "Programmes" fits.
 - Fixed: when a drawer's opening button disappears (a verified request leaves the list), focus now returns to that panel instead of being lost.
 - Tests: School journeys pass, including Diane adds a skill → school verifies → Diane sees it verified; Company, Student and cross-dashboard journeys rerun and pass; no accessibility issues in drawers and dialogs; no sideways scrolling at 768 and 375px; full sweep of 60 pages at four widths: 0 issues.
+
+### 2026-11-08 — Redesign Step 7: Admin dashboard
+- School dashboard approved, committed and pushed.
+- Admin screens rebuilt on shadcn/ui with the same layout as the other overviews: programmes and content approvals on the left (compact tables drop one column so they fit), navy platform snapshot and tabbed "what's next today?" on the right.
+- Programmes, Content approvals and Users use the shared sortable, searchable table (Users has a role filter). The programme form is a shadcn dialog with the calendar date pickers and live status preview; approvals and saves confirm with toasts.
+- "Awaiting approval" uses the Draft label colours, since these are the items shown as Draft on the site.
+- Report charts restyled on the shared colours; "Show as table" opens a shadcn table. Tooltips still appear on hover and keyboard focus.
+- After Approve or Request changes, focus moves to the next item still waiting (the row's buttons are replaced by a tick).
+- No dashboard uses the old pill, the old focus-ring helper or the old Button adapter any more.
+- Tests: Admin journeys pass (approve removes a Draft badge on the homepage, content search, users filter and search, programme edit and validation, reports table and keyboard tooltip); Student, Company, School and cross-dashboard journeys rerun and pass, including the admin's new programme appearing on the public site; no accessibility issues in dialogs and drawers; no sideways scrolling at 768 and 375px; full sweep of 60 pages at four widths: 0 issues.
 
