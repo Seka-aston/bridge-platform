@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Check } from "lucide-react";
 import { Suspense } from "react";
 import { Badge } from "@/components/Badge";
-import { Button } from "@/components/Button";
+import { CheckList } from "@/components/CheckList";
+import { LinkButton } from "@/components/LinkButton";
 import { FeatureGrid } from "@/components/FeatureGrid";
 import { FinalBand } from "@/components/FinalBand";
 import { HomeSection } from "@/components/HomeSection";
@@ -27,13 +27,13 @@ export default function VenturesLabPage() {
         supporting={c.header.supporting}
         actions={
           <>
-            <Button href={detailHref} size="lg">{c.applyCta}</Button>
-            <Button href={c.discoveryCta.href} size="lg" variant="outline">{c.discoveryCta.label}</Button>
+            <LinkButton href={detailHref}>{c.applyCta}</LinkButton>
+            <LinkButton href={c.discoveryCta.href} variant="outline">{c.discoveryCta.label}</LinkButton>
           </>
         }
       >
         {prototypeMode && (
-          <p className="mt-6 flex flex-wrap items-center gap-3 text-body-lg font-semibold text-navy-900">
+          <p className="mt-6 flex flex-wrap items-center gap-3 text-lg font-semibold text-heading">
             {c.figuresLine} <Badge kind="draft" />
           </p>
         )}
@@ -77,14 +77,7 @@ export default function VenturesLabPage() {
       {programme && (
         <HomeSection id="eligibility" labelledBy="eligibility-title" tone="green">
           <SectionHeading id="eligibility-title" title={c.eligibilityTitle} supporting={c.eligibilityNote} draft />
-          <ul className="mt-8 grid max-w-3xl gap-3">
-            {programme.eligibility.map((e) => (
-              <li key={e} className="flex gap-3 rounded-control bg-white p-4 text-gray-800">
-                <Check aria-hidden className="mt-0.5 size-5 shrink-0 text-green-700" />
-                {e}
-              </li>
-            ))}
-          </ul>
+          <CheckList items={programme.eligibility} className="mt-8 max-w-3xl" />
         </HomeSection>
       )}
 

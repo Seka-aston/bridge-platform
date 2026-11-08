@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Button } from "@/components/Button";
+import { LinkButton } from "@/components/LinkButton";
 import { FeatureGrid } from "@/components/FeatureGrid";
 import { FinalBand } from "@/components/FinalBand";
 import { HomeSection } from "@/components/HomeSection";
@@ -24,8 +24,8 @@ export default function ForTalentsPage() {
         supporting={c.header.body}
         actions={
           <>
-            <Button href={c.primary.href} size="lg">{c.primary.label}</Button>
-            <Button href={c.secondary.href} size="lg" variant="outline">{c.secondary.label}</Button>
+            <LinkButton href={c.primary.href}>{c.primary.label}</LinkButton>
+            <LinkButton href={c.secondary.href} variant="outline">{c.secondary.label}</LinkButton>
           </>
         }
       />

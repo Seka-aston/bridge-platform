@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Button } from "@/components/Button";
+import { LinkButton } from "@/components/LinkButton";
 import { FeatureGrid } from "@/components/FeatureGrid";
 import { FinalBand } from "@/components/FinalBand";
 import { HomeSection } from "@/components/HomeSection";
@@ -19,7 +19,7 @@ export default function ForSchoolsPage() {
         eyebrow={c.header.audience}
         title={c.header.headline}
         supporting={c.header.body}
-        actions={<Button href={c.primary.href} size="lg">{c.primary.label}</Button>}
+        actions={<LinkButton href={c.primary.href}>{c.primary.label}</LinkButton>}
       />
 
       <HomeSection id="challenges" labelledBy="challenges-title">

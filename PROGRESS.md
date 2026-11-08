@@ -210,6 +210,9 @@ Branch `shadcn-redesign`. One step at a time, each reviewed by Aston before the 
 - [x] Step 3: Shared layout: header, footer, section heading, CTA band, every card type, badges (approved 8 Nov 2026)
 - [x] Step 4: Homepage (approved 8 Nov 2026)
 - [ ] Step 5: Public pages
+  - [x] Batch 1: For Talents, For Schools, For Companies, For Ecosystem, Ventures Lab (approved 8 Nov 2026)
+  - [ ] Batch 2: Programmes list, programme detail and apply flow
+  - [ ] Batch 3: Resources, articles, About, Impact, booking, Bridge AI, Learning, Skills Passport, Opportunities, sign-in, legal pages
 - [ ] Step 6: Platform shell
 - [ ] Step 7: Dashboards (Student, Company, School, Admin)
 - [ ] Step 8: Clean-up and QA
@@ -227,6 +230,11 @@ Decisions (Aston, 8 Nov 2026):
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-08 — Redesign Step 5, batch 1: audience pages and Ventures Lab
+- For Talents, For Schools, For Companies, For Ecosystem and Ventures Lab use shadcn buttons directly; no old style names left.
+- New shared pieces: `LinkButton` (a shadcn Button that is a link) and `CheckList` (bordered rows with a tick, used for eligibility).
+- "After" screenshots saved locally.
 
 ### 2026-11-08 — Redesign Step 4: homepage
 - Hero rebuilt on the navy section helper, the type scale and shadcn buttons; the hero visual's passport and opportunity cards are shadcn Cards with Avatar and Badges; lines and nodes use theme tokens. Layout, copy and motion unchanged.
