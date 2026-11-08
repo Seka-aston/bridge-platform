@@ -201,11 +201,41 @@ Definition of done (CLAUDE.md section 10), honest status:
 
 **Aston reviews:** the pages listed above, each role's Settings, and the privacy effects.
 
+## Redesign on shadcn/ui (REDESIGN-BRIEF.md)
+
+Branch `shadcn-redesign`. One step at a time, each reviewed by Aston before the next. Screenshots are kept locally in `/screenshots` (git-ignored).
+
+- [x] Step 1: Audit and "before" screenshots (118 screenshots: 59 pages at 1440 and 375px)
+- [x] Step 2: Foundation: shadcn set up, Bridge theme, components installed, `/components-preview` rebuilt (approved 8 Nov 2026)
+- [ ] Step 3: Shared layout
+- [ ] Step 4: Homepage
+- [ ] Step 5: Public pages
+- [ ] Step 6: Platform shell
+- [ ] Step 7: Dashboards (Student, Company, School, Admin)
+- [ ] Step 8: Clean-up and QA
+
+Decisions (Aston, 8 Nov 2026):
+- His student dashboard design shows what belongs on a dashboard, not how it should look. All dashboards are redesigned on shadcn.
+- Fix every contrast issue, including field borders and switch tracks.
+- Focus ring stays navy on light backgrounds and white on navy.
+- Screenshots stay local only.
+- Step 2 review: Draft label is the amber tint with a pencil (option A); dashboard sidebar stays light grey; the neutral outline button replaces the old green outline; branch pushed for a Vercel preview link.
+
 ---
 
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-08 — Redesign Steps 1 and 2: audit and shadcn foundation
+- Step 1: audit of every page and component; 118 "before" screenshots saved locally.
+- Created branch `shadcn-redesign`; `/screenshots/` git-ignored.
+- shadcn/ui set up with the Vega style (the current name for "New York"), Radix and lucide icons; 44 components installed in `components/ui`. Also installed: react-hook-form, zod and resolvers (forms), TanStack Table v8 (tables; v9 changed its API), Recharts, Sonner, cmdk, react-day-picker and date-fns (all shadcn dependencies). Removed next-themes (light theme only).
+- Bridge theme in `app/globals.css`: brand colours as shadcn tokens. Contrast fixes: captions #626A75, field borders #80878F, secondary text green-700. New tokens: `brand-navy`, `heading`, `eyebrow-foreground`, `link`, `warning`; `surface-navy` utility flips text, links and the focus ring for navy sections.
+- Components adjusted for Bridge: focus ring (2px with 2px gap), primary hover green-800, Bridge button variants (navy, on-navy) and marketing sizes, Bridge badge variants (programme status, Draft, Preview, Sample, Verified), navy titles, stronger toggle and tab states.
+- Type scale as named components in `components/ui/typography.tsx`.
+- `/components-preview` rebuilt to show every component, variant and state.
+- Old tokens and components are kept, marked "legacy", until their pages are migrated (deleted in Step 8). Pages look unchanged so far.
 
 ### 2026-11-08 — Checkpoint 13: every unfinished page filled
 - New content files: `content/legal.ts` (privacy, terms, cookies), message threads in `data/messages.ts`, article bodies in `data/articles.ts`, lessons in `data/student.ts`. All new wording is marked Draft.

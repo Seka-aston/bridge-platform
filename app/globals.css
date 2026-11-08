@@ -1,9 +1,14 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Dark styles only apply inside a .dark parent. The prototype is light only, so they never apply. */
+@custom-variant dark (&:is(.dark *));
 
 /*
-  Bridge design tokens (CLAUDE.md section 4).
-  Every colour, type size, radius, shadow and layout value used in components
-  comes from here. Change a value once and it updates everywhere.
+  LEGACY Bridge tokens (CLAUDE.md section 4, before the shadcn redesign).
+  Still used by pages that have not been migrated yet. Deleted in Step 8 of
+  REDESIGN-BRIEF.md. New code must use the shadcn tokens further down.
 */
 
 @theme {
@@ -76,31 +81,181 @@
   --shadow-soft: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* Buttons, inputs */
   --shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-card-hover: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
 
-  /* ---------- Layout ----------
-     Spacing otherwise uses Tailwind's 4px scale. */
+/*
+  ============================================================================
+  Bridge theme for shadcn/ui (REDESIGN-BRIEF.md section 4)
+  Light theme only. Every value is a token, so dark mode can be added later.
+  Contrast checked 8 Nov 2026 (WCAG 2.1 AA): text 4.5:1, field borders,
+  switch tracks and focus rings 3:1.
+  ============================================================================
+*/
+:root {
+  /* Surfaces and text */
+  --background: #ffffff;
+  --foreground: #1f2937; /* gray-800, body text, 14.7:1 */
+  --card: #ffffff;
+  --card-foreground: #1f2937;
+  --popover: #ffffff;
+  --popover-foreground: #1f2937;
+
+  /* Brand */
+  --primary: #277a4d; /* green-700, buttons and links. White text 5.3:1 */
+  --primary-hover: #1f6340; /* green-800, hover and pressed. White text 7.2:1 */
+  --primary-foreground: #ffffff;
+  --secondary: #ebf7f0; /* green-50 */
+  --secondary-foreground: #277a4d; /* green-700, 4.8:1. The brief's green-600 fails (3.9:1) */
+  --heading: #1c3d6a; /* Headings (navy) */
+  --eyebrow-foreground: #277a4d; /* Eyebrow labels (green-700) */
+  --link: #277a4d; /* Text links (green-700) */
+  --link-hover: #1f6340;
+  --brand-navy: #1c3d6a; /* Headings, dark sections, footer. 10.9:1 on white */
+  --brand-navy-foreground: #ffffff;
+  --brand-green: #3aaa6d; /* Logo green: icons and illustrations only, never small text */
+  --brand-amber: #f8ac36; /* Logo amber: decorative accent only, navy text on it */
+
+  /* Neutrals */
+  --muted: #f4f6f5; /* gray-50, quiet backgrounds */
+  --muted-foreground: #626a75; /* Captions and metadata. 5.0:1 on muted, 5.5:1 on white */
+  --accent: #eef1f0; /* Hover background for menus and list rows */
+  --accent-foreground: #1f2937;
+  --border: #e5e7eb; /* gray-200, card and divider lines (decorative) */
+  --input: #80878f; /* Field borders and switch tracks. 3.2:1 or more on every light surface */
+  --ring: #1c3d6a; /* Focus ring: navy on light backgrounds (white on navy, see .surface-navy) */
+
+  /* Feedback */
+  --destructive: #b42318; /* Errors only. 6.6:1 on white */
+  --success: #277a4d;
+  --warning: #8a5a00; /* Text-safe amber, 5.9:1 on white */
+
+  --radius: 0.5rem; /* 8px: buttons, inputs, small elements. Cards are 12px (radius-xl) */
+
+  /* Charts: validated categorical order (dataviz checker, CVD-safe). Values are
+     always labelled and every chart has a table view. */
+  --chart-1: #3f6fae;
+  --chart-2: #2f8a58;
+  --chart-3: #d58916;
+  --chart-4: #5ba4d6;
+  --chart-5: #a65e2e;
+
+  /* Dashboard sidebar */
+  --sidebar: #f4f6f5;
+  --sidebar-foreground: #374151;
+  --sidebar-primary: #1c3d6a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e8ecea;
+  --sidebar-accent-foreground: #1c3d6a;
+  --sidebar-border: #e5e7eb;
+  --sidebar-ring: #1c3d6a;
+}
+
+/* Navy sections (hero, final band, footer): tokens flip so text, borders and the focus ring stay visible. */
+@utility surface-navy {
+  background-color: var(--brand-navy);
+  color: var(--brand-navy-foreground);
+  --foreground: #ffffff;
+  --muted-foreground: #c9d2dc; /* 7.1:1 on navy */
+  --border: rgb(255 255 255 / 0.2);
+  --ring: #ffffff;
+  --heading: #ffffff;
+  --eyebrow-foreground: #a7ddbf; /* Light green, 7.1:1 on navy (green-700 fails at 2.1:1) */
+  --link: #ffffff;
+  --link-hover: #c9d2dc;
+}
+
+/* White cards placed on a navy section (e.g. the hero visual) switch back to light-surface tokens. */
+.surface-navy [data-slot="card"] {
+  --foreground: #1f2937;
+  --muted-foreground: #626a75;
+  --border: #e5e7eb;
+  --ring: #1c3d6a;
+  --heading: #1c3d6a;
+  --eyebrow-foreground: #277a4d;
+  --link: #277a4d;
+  --link-hover: #1f6340;
+  color: var(--card-foreground);
+}
+
+/* Layout (kept from the original system; shared by old and new components) */
+@theme {
   --container-content: 1200px; /* Content max-width */
   --spacing-gutter: 1.5rem; /* 24px side padding */
   --spacing-section: 6rem; /* 96px section padding, desktop */
   --spacing-section-mobile: 4rem; /* 64px section padding, mobile */
 }
 
-/* The brand font is chosen in app/layout.tsx and arrives as --font-brand. */
 @theme inline {
   --font-sans: var(--font-brand), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-sans);
+
+  --color-black: #000000; /* Only for dialog and sheet overlays */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-heading: var(--heading);
+  --color-eyebrow-foreground: var(--eyebrow-foreground);
+  --color-link: var(--link);
+  --color-link-hover: var(--link-hover);
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-navy-foreground: var(--brand-navy-foreground);
+  --color-brand-green: var(--brand-green);
+  --color-brand-amber: var(--brand-amber);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* One radius system, derived from --radius */
+  --radius-sm: calc(var(--radius) - 4px); /* 4px: checkboxes, small chips */
+  --radius-md: var(--radius); /* 8px: buttons, inputs, menus */
+  --radius-lg: var(--radius); /* 8px: alerts, tab lists */
+  --radius-xl: calc(var(--radius) + 4px); /* 12px: cards, dialogs */
+  --radius-2xl: calc(var(--radius) + 8px); /* 16px */
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: 9999px; /* Pills: badges */
 }
 
 @layer base {
+  * {
+    @apply border-border outline-ring;
+  }
   /* Leave room for the sticky header whenever the browser scrolls to a link target or focused field. */
   html {
     scroll-padding-top: 6rem;
+    @apply font-sans;
   }
   body {
-    background-color: var(--color-white);
-    color: var(--color-gray-800);
-    font-family: var(--font-sans);
-    font-size: var(--text-body);
-    line-height: var(--text-body--line-height);
+    @apply bg-background text-foreground;
+    font-size: 1rem;
+    line-height: 1.5rem;
   }
 }
 
