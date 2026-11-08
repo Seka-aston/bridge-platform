@@ -1,46 +1,29 @@
 import type { Metadata } from "next";
-import { Briefcase, GraduationCap, School, ShieldCheck, type LucideIcon } from "lucide-react";
-import { Button } from "@/components/Button";
-import { PageHeader } from "@/components/PageHeader";
-import { ResetDemo } from "@/components/ResetDemo";
-import { roleText, signInText as t } from "@/content/dashboard";
-import { roles, sampleUsers, type Role } from "@/data/users";
+import Link from "next/link";
+import { AuthCard } from "@/components/auth/AuthCard";
+import { LoginForm } from "@/components/auth/LoginForm";
+import { authText } from "@/content/auth";
 
-export const metadata: Metadata = { title: "Sign in", robots: { index: false } };
+export const metadata: Metadata = { title: "Log in", robots: { index: false } };
 
-const icons: Record<Role, LucideIcon> = { student: GraduationCap, school: School, company: Briefcase, admin: ShieldCheck };
+const t = authText.login;
 
-// "Sign in as…" (Checkpoint 6): choose one of four sample users. No passwords; nothing is stored.
+// Log in (Aston, 8 Nov 2026): replaces the "Sign in as…" sample-account screen.
 export default function SignInPage() {
   return (
-    <main id="main" className="flex-1">
-      <PageHeader eyebrow={t.eyebrow} title={t.title} supporting={t.supporting} draft />
-      <div className="mx-auto max-w-content px-gutter py-section-mobile md:py-section">
-        <ul className="grid gap-6 md:grid-cols-2">
-          {roles.map((role) => {
-            const u = sampleUsers[role];
-            const Icon = icons[role];
-            return (
-              <li key={role} className="flex flex-col rounded-card border border-gray-200 bg-white p-6 shadow-card">
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex size-11 items-center justify-center rounded-control bg-green-50">
-                    <Icon aria-hidden className="size-6 text-green-700" />
-                  </span>
-                  <h2 className="text-h3 text-navy-900">{roleText[role].label}</h2>
-                </div>
-                <p className="mt-4 font-semibold text-navy-900">{u.name}</p>
-                <p className="text-gray-700">{u.detail}</p>
-                <div className="mt-auto pt-6">
-                  <Button href={`/dashboard/${role}`}>{t.continueAs.replace("{name}", u.name)}</Button>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-        <div className="mt-12">
-          <ResetDemo />
-        </div>
-      </div>
-    </main>
+    <AuthCard
+      title={t.title}
+      description={t.description}
+      footer={
+        <p className="text-muted-foreground">
+          {t.newHere}{" "}
+          <Link href="/sign-up" className="rounded-sm font-medium text-link underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+            {t.createAccount}
+          </Link>
+        </p>
+      }
+    >
+      <LoginForm />
+    </AuthCard>
   );
 }

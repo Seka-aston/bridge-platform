@@ -171,7 +171,7 @@ Build each one in isolation on a `/components-preview` page first, so Aston can 
 | Nav dropdown contents | Referenced as "shared in slides"; not yet supplied |
 | Booking tool for "Book a Discovery Call" | Not specified |
 | Programme data source | Prototype: shared sample data in `/data`. Real source not specified. |
-| Login destination | Prototype: "Sign in as…" screen with four sample users. Real login not specified. |
+| Login destination | Prototype (Aston, 8 Nov 2026): log in screen with email/password and simulated Google, Microsoft and LinkedIn buttons; the four sample users' emails open their dashboards with any password; simulated create-account and password-reset screens. Real login provider not specified. |
 | Approved stats, logos, testimonials, photos | Awaiting Bridge |
 | Official social accounts | Awaiting Bridge (the live footer's GitHub icon looks like a template leftover) |
 | Analytics setup | Not specified |

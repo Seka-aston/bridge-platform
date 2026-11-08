@@ -7,8 +7,8 @@ Four short journeys that show Bridge as one connected platform. About 15 minutes
 ## Before you start
 
 1. Use a laptop or desktop browser, full width. Everything also works on a phone, but the dashboards read best on a big screen.
-2. Open https://bridge-platform-eovr.vercel.app/sign-in and press **Reset demo data** at the bottom. This clears anything from a previous run.
-3. **Stay in the same browser tab for the whole demo.** The prototype keeps demo actions (applications, approvals, verifications) in that tab only. Use **Switch user** (account menu, top right of any dashboard) to move between people, rather than opening new tabs.
+2. Open https://bridge-platform-eovr.vercel.app/sign-in, open **Demo accounts** under the form and press **Reset demo data**. This clears anything from a previous run.
+3. **Stay in the same browser tab for the whole demo.** The prototype keeps demo actions (applications, approvals, verifications) in that tab only. Use **Switch user** (account menu, top right of any dashboard) to go back to the log in screen and log in as someone else, rather than opening new tabs.
 
 What to say once, at the start:
 
@@ -33,10 +33,10 @@ What to say once, at the start:
 
 *Shows: the Skills Passport, and how school and student connect.*
 
-1. Go to **Login** and choose **Continue as Diane M.** (student).
+1. Go to **Login**. Open **Demo accounts**, press **Use** next to Student (diane@sample.example), type any password and press **Log in**.
 2. Walk through the dashboard: courses, the Skills Passport card (14 verified skills), opportunities matched to her skills (*"No match percentages; we name the skills instead"*), and the weekly goal.
 3. Press **Add New Skill**, type `Docker Compose` and press **Add skill**. It appears as **Pending verification**.
-4. Open the account menu (top right), choose **Switch user**, then **Continue as Jean-Paul K.** (school).
+4. Open the account menu (top right), choose **Switch user**, then log in as Jean-Paul K. (School, jean-paul@sample-school.example, any password).
    - The bell shows *"Diane M. asked you to verify Docker Compose"*.
    - In **Verification requests**, press **Review** on Docker Compose, then **Verify skill**.
 5. Switch back to **Diane M.** The bell shows *"Your Docker Compose skill was verified by Sample TVET School"*, and **Skills Passport** now lists it as verified.
@@ -74,11 +74,13 @@ What to say once, at the start:
 
 > Everything you've seen runs on one shared set of sample data, so the story is the same whichever role you sign in as. Next steps are Bridge's real content: approved figures, programme dates, stories and official contact details. Then the decisions on hosting, booking, analytics and login.
 
-Press **Reset demo data** on the sign-in page before the next run.
+Press **Reset demo data** (log in screen, under **Demo accounts**) before the next run.
 
 ---
 
 ## Good to know
+
+- **Logging in:** the four demo emails are diane@sample.example (Student), jean-paul@sample-school.example (School), grace@sample-tech.example (Company) and eric@bridge.example (Admin). Any password works. The Google, Microsoft and LinkedIn buttons open the Student dashboard. Any other email shows "No account found".
 
 - **Phone or tablet:** every page works down to 375px wide. The dashboard menu moves into the menu button.
 - **If something looks "stuck":** you've probably switched tabs. Go back to the original tab, or reset and start the journey again.

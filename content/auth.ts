@@ -1,0 +1,70 @@
+// Log in, create account and password reset screens (Aston, 8 Nov 2026).
+// All wording is NEW (Draft): written for the prototype, awaiting Bridge approval.
+// Prototype: there are no real accounts. The four sample users' emails (data/users.ts) open
+// their dashboards with any password; social buttons and sign-up are simulated.
+
+export const authText = {
+  prototypeNote: "Prototype: there are no real accounts yet. Nothing you type is stored or sent.",
+  social: {
+    google: "Continue with Google",
+    microsoft: "Continue with Microsoft",
+    linkedin: "Continue with LinkedIn",
+    connecting: "Connecting to {provider}…",
+    providers: { google: "Google", microsoft: "Microsoft", linkedin: "LinkedIn" },
+  },
+  login: {
+    title: "Log in to Bridge",
+    description: "Welcome back. Log in to continue your journey.",
+    divider: "or log in with email",
+    email: "Email address",
+    password: "Password",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
+    forgot: "Forgot password?",
+    submit: "Log in",
+    submitting: "Logging in…",
+    passwordRequired: "Enter your password.",
+    noAccount: "No account found for this email. In this prototype, use one of the demo accounts below.",
+    newHere: "New to Bridge?",
+    createAccount: "Create an account",
+    demo: {
+      title: "Demo accounts",
+      body: "Any password works. Each account opens its own dashboard.",
+      use: "Use",
+      useLabel: "Use the {role} account",
+    },
+  },
+  signUp: {
+    title: "Create your Bridge account",
+    description: "Join Bridge to learn, prove your skills and connect to opportunity.",
+    divider: "or sign up with email",
+    fullName: "Full name",
+    email: "Email address",
+    password: "Password",
+    passwordHint: "At least 8 characters.",
+    passwordShort: "Use at least 8 characters.",
+    role: "I am joining as",
+    roles: { student: "A talent (student or graduate)", school: "A school or training institution", company: "A company" },
+    agree: "I agree to the Terms of Use and Privacy Policy.",
+    agreeLinks: { terms: { label: "Terms of Use", href: "/terms" }, privacy: { label: "Privacy Policy", href: "/privacy" } },
+    submit: "Create account",
+    submitting: "Creating account…",
+    success: {
+      title: "Account created",
+      body: "In this prototype new accounts aren't saved, so you'll explore the sample {role} dashboard instead.",
+      cta: "Explore the {role} dashboard",
+    },
+    haveAccount: "Already have an account?",
+    logIn: "Log in",
+  },
+  forgot: {
+    title: "Reset your password",
+    description: "Enter your email and we'll send you a link to reset your password.",
+    email: "Email address",
+    submit: "Send reset link",
+    submitting: "Sending…",
+    success: "If an account exists for {email}, a reset link is on its way.",
+    prototype: "Prototype: no email is sent.",
+    back: "Back to log in",
+  },
+};

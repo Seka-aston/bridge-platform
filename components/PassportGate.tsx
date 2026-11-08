@@ -2,6 +2,7 @@
 
 import { Lock } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { settingsText } from "@/content/dashboard";
 import { readStudentPrivacy } from "@/lib/privacy";
 
@@ -14,11 +15,15 @@ export function PassportGate({ children }: { children: ReactNode }) {
   }, []);
   if (isPublic) return <>{children}</>;
   return (
-    <div className="mx-auto max-w-2xl px-gutter py-section-mobile text-center md:py-section">
-      <span className="inline-flex size-14 items-center justify-center rounded-full bg-green-50">
-        <Lock aria-hidden className="size-6 text-green-700" />
-      </span>
-      <p className="mt-6 text-h3 text-navy-900">{settingsText.privacy.privateNotice}</p>
+    <div className="mx-auto max-w-2xl px-gutter py-section-mobile md:py-section">
+      <Empty className="border">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <Lock />
+          </EmptyMedia>
+          <EmptyTitle>{settingsText.privacy.privateNotice}</EmptyTitle>
+        </EmptyHeader>
+      </Empty>
     </div>
   );
 }

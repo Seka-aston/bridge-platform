@@ -10,7 +10,7 @@ Read this file with CLAUDE.md at the start of every session. Work on one checkpo
 
 **Not in scope yet:** real accounts and passwords, a database, sending emails, payments, a live AI chat, or real booking. These are faked convincingly and clearly marked, so a real backend can replace them later without redesigning anything.
 
-- **Login:** a "Sign in as…" screen with four sample users (Student, School, Company, Admin). No passwords.
+- **Login:** a log in screen with email and password and Google, Microsoft and LinkedIn buttons (Aston, 8 Nov 2026). The four sample users' emails open their dashboards with any password; social buttons open the Student dashboard; "Create an account" and "Forgot password?" are simulated. Nothing is stored.
 - **Data:** one shared sample dataset in `/data` (students, schools, companies, programmes, opportunities, applications, articles), used by every page so the story is consistent across roles.
 - **Changes during a demo** (e.g. a student applies to a programme) are kept in the browser for that session only.
 
@@ -209,10 +209,10 @@ Branch `shadcn-redesign`. One step at a time, each reviewed by Aston before the 
 - [x] Step 2: Foundation: shadcn set up, Bridge theme, components installed, `/components-preview` rebuilt (approved 8 Nov 2026)
 - [x] Step 3: Shared layout: header, footer, section heading, CTA band, every card type, badges (approved 8 Nov 2026)
 - [x] Step 4: Homepage (approved 8 Nov 2026)
-- [ ] Step 5: Public pages
+- [x] Step 5: Public pages (approved 8 Nov 2026)
   - [x] Batch 1: For Talents, For Schools, For Companies, For Ecosystem, Ventures Lab (approved 8 Nov 2026)
   - [x] Batch 2: Programmes list, programme detail and apply flow (approved 8 Nov 2026)
-  - [ ] Batch 3: Resources, articles, About, Impact, booking, Bridge AI, Learning, Skills Passport, Opportunities, sign-in, legal pages
+  - [ ] Batch 3: Resources, articles, About, Impact, booking, Bridge AI, Learning, Skills Passport, Opportunities, public passport, legal pages, and the new log in, create account and password reset screens (approved 8 Nov 2026)
 - [ ] Step 6: Platform shell
 - [ ] Step 7: Dashboards (Student, Company, School, Admin)
 - [ ] Step 8: Clean-up and QA
@@ -230,6 +230,12 @@ Decisions (Aston, 8 Nov 2026):
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-08 — Redesign Step 5, batch 3: remaining public pages and the new log in
+- Log in replaces "Sign in as…" (Aston's request): email and password, Google, Microsoft and LinkedIn buttons, "Forgot password?" and "Create an account". Prototype rules (Aston's choices): the four sample users' emails (now in `data/users.ts`) open their dashboards with any password; other emails get "No account found"; social buttons are simulated and open the Student dashboard; sign-up and password reset are simulated with honest confirmations. A "Demo accounts" panel lists the emails and holds "Reset demo data". Copy in `content/auth.ts` (Draft). DEMO.md, CLAUDE.md section 9 and the prototype scope above updated.
+- Booking form moved to react-hook-form + zod with the calendar date picker.
+- Article pages, About, Bridge AI, the topic pages (Learning, Skills Passport, Opportunities), legal pages, cookie preferences (shadcn Switch) and the public Skills Passport (solid navy header instead of a gradient) rebuilt on shadcn and the type scale.
+- No public page or shared component uses the old styles any more; only the dashboards still use the old Button through the adapter.
 
 ### 2026-11-08 — Redesign Step 5, batch 2: programmes and the apply flow
 - Programmes list: filter is a shadcn Toggle Group with counts; designed empty state.

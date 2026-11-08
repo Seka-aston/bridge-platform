@@ -5,6 +5,7 @@ import { HomeSection } from "@/components/HomeSection";
 import { PageHeader } from "@/components/PageHeader";
 import { SectionHeading } from "@/components/SectionHeading";
 import { StatList } from "@/components/StatItem";
+import { H3, Lead } from "@/components/ui/typography";
 import { about as c } from "@/content/pages";
 
 export const metadata: Metadata = { title: "About Bridge", description: c.header.supporting };
@@ -19,10 +20,9 @@ export default function AboutPage() {
         <h2 id="mission-title" className="sr-only">{c.mission.title}</h2>
         <div className="grid gap-10 lg:grid-cols-3">
           {blocks.map((b) => (
-            <div key={b.title}>
-              <span aria-hidden className="block h-1 w-8 rounded-full bg-green-500" />
-              <h3 className="mt-4 text-h3 text-navy-900">{b.title}</h3>
-              <p className="mt-2 text-body-lg text-gray-700">{b.description}</p>
+            <div key={b.title} className="border-l-2 border-brand-green pl-5">
+              <H3>{b.title}</H3>
+              <Lead className="mt-2">{b.description}</Lead>
             </div>
           ))}
         </div>

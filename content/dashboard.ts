@@ -113,13 +113,6 @@ export const roleText: Record<Role, { label: string; title: string; welcome: str
   },
 };
 
-export const signInText = {
-  eyebrow: "Prototype",
-  title: "Sign in as…",
-  supporting: "This prototype has no accounts or passwords. Choose a sample user to see their dashboard.",
-  continueAs: "Continue as {name}",
-};
-
 // ---------- Student dashboard (Aston's design) ----------
 export const studentText = {
   goalLine: {

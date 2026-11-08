@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Badge } from "@/components/Badge";
 import { BridgeAiPreview } from "@/components/BridgeAiPreview";
-import { Button } from "@/components/Button";
 import { FeatureGrid } from "@/components/FeatureGrid";
 import { FinalBand } from "@/components/FinalBand";
 import { HomeSection } from "@/components/HomeSection";
+import { LinkButton } from "@/components/LinkButton";
 import { PageHeader } from "@/components/PageHeader";
 import { SectionHeading } from "@/components/SectionHeading";
 import { bridgeAiPage as c } from "@/content/pages";
@@ -34,7 +34,7 @@ export default function BridgeAiPage() {
           <FeatureGrid items={c.volunteer.items} />
         </div>
         <div className="mt-10">
-          <Button href={c.volunteer.cta.href} size="lg">{c.volunteer.cta.label}</Button>
+          <LinkButton href={c.volunteer.cta.href}>{c.volunteer.cta.label}</LinkButton>
         </div>
       </HomeSection>
 

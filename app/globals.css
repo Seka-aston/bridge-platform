@@ -204,8 +204,9 @@
     background-color: var(--brand-amber);
     color: var(--brand-navy); /* 5.7:1 */
   }
-  &[data-variant="preview"] {
+  &:is([data-variant="preview"], [data-variant="sample"]) {
     border-color: rgb(255 255 255 / 0.5);
+    background-color: transparent;
     color: #ffffff;
   }
   &:is([data-variant="closed"], [data-variant="upcoming"]) {

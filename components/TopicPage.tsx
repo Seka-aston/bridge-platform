@@ -1,6 +1,6 @@
-import { Check } from "lucide-react";
 import type { ReactNode } from "react";
-import { Button } from "@/components/Button";
+import { CheckList } from "@/components/CheckList";
+import { LinkButton } from "@/components/LinkButton";
 import { FinalBand } from "@/components/FinalBand";
 import { HomeSection } from "@/components/HomeSection";
 import { PageHeader } from "@/components/PageHeader";
@@ -27,19 +27,12 @@ export function TopicPage({ eyebrow, title, description, capabilities, actions, 
         title={title}
         supporting={description}
         actions={actions?.map((a, i) => (
-          <Button key={a.href} href={a.href} size="lg" variant={i === 0 ? "primary" : "outline"}>
+          <LinkButton key={a.href} href={a.href} variant={i === 0 ? "default" : "outline"}>
             {a.label}
-          </Button>
+          </LinkButton>
         ))}
       >
-        <ul className="mt-10 grid gap-3 sm:grid-cols-2">
-          {capabilities.map((c) => (
-            <li key={c} className="flex gap-3 rounded-control bg-white p-4 text-gray-800">
-              <Check aria-hidden className="mt-0.5 size-5 shrink-0 text-green-700" />
-              {c}
-            </li>
-          ))}
-        </ul>
+        <CheckList items={capabilities} className="mt-10 sm:grid-cols-2" />
       </PageHeader>
       {children}
       <FinalBand />

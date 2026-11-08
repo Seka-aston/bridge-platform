@@ -1,19 +1,22 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, Info } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/Button";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 import { ErrorSummary, RadioGroup, SelectField, TextArea, TextField } from "@/components/forms/Fields";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { discoveryCall as t, formText } from "@/content/pages";
 import { fakeNetwork, isEmail, saveToSession } from "@/lib/prototypeStore";
 
 /*
-  Discovery-call request: the placeholder booking step until Bridge chooses a booking tool.
-  Prototype: nothing is sent; the request is kept in this tab.
+  Discovery-call request on react-hook-form + zod: the placeholder booking step until Bridge
+  chooses a booking tool. Prototype: nothing is sent; the request is kept in this tab.
 */
-
-type Values = { fullName: string; email: string; organisation: string; role: string; topic: string; date: string; time: string };
-const empty: Values = { fullName: "", email: "", organisation: "", role: "", topic: "", date: "", time: "" };
 
 function tomorrow() {
   const d = new Date();
@@ -21,24 +24,30 @@ function tomorrow() {
   return d.toISOString().slice(0, 10);
 }
 
-function validate(v: Values) {
-  const e: Record<string, string> = {};
-  if (!v.fullName.trim()) e.fullName = formText.required;
-  if (!v.email.trim()) e.email = formText.required;
-  else if (!isEmail(v.email)) e.email = formText.email;
-  if (!v.role) e.role = formText.required;
-  if (!v.topic.trim()) e.topic = formText.required;
-  if (!v.date) e.date = formText.required;
-  else if (v.date < tomorrow()) e.date = formText.date;
-  if (!v.time) e.time = formText.required;
-  return e;
-}
+const required = (extra?: (v: string) => string | undefined) =>
+  z.string().superRefine((v, ctx) => {
+    if (!v.trim()) ctx.addIssue({ code: "custom", message: formText.required });
+    else {
+      const problem = extra?.(v.trim());
+      if (problem) ctx.addIssue({ code: "custom", message: problem });
+    }
+  });
+
+const schema = z.object({
+  fullName: required(),
+  email: required((v) => (isEmail(v) ? undefined : formText.email)),
+  organisation: z.string(),
+  role: required(),
+  topic: required(),
+  date: required((v) => (v < tomorrow() ? formText.date : undefined)),
+  time: required(),
+});
+type Values = z.infer<typeof schema>;
+
+const empty: Values = { fullName: "", email: "", organisation: "", role: "", topic: "", date: "", time: "" };
 
 export function DiscoveryCallForm() {
-  const [values, setValues] = useState<Values>(empty);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [submitted, setSubmitted] = useState(false);
-  const [status, setStatus] = useState<"idle" | "submitting" | "done">("idle");
+  const [done, setDone] = useState(false);
   const summaryRef = useRef<HTMLDivElement>(null);
   const successRef = useRef<HTMLHeadingElement>(null);
   // The earliest bookable date depends on today, so it's worked out in the browser.
@@ -46,68 +55,70 @@ export function DiscoveryCallForm() {
   // eslint-disable-next-line react-hooks/set-state-in-effect -- needs the visitor's clock, after mount
   useEffect(() => setMinDate(tomorrow()), []);
 
-  const set = <K extends keyof Values>(key: K) => (val: Values[K]) => {
-    const next = { ...values, [key]: val };
-    setValues(next);
-    if (submitted) setErrors(validate(next));
-  };
+  const form = useForm<Values>({ resolver: zodResolver(schema), defaultValues: empty, shouldFocusError: false, reValidateMode: "onChange" });
+  const { control, formState } = form;
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setSubmitted(true);
-    const found = validate(values);
-    setErrors(found);
-    if (Object.keys(found).length > 0) {
-      requestAnimationFrame(() => summaryRef.current?.focus());
-      return;
-    }
-    setStatus("submitting");
+  // After a failed submit, move focus to the error summary once it has rendered.
+  const failedSubmits = formState.submitCount - (formState.isSubmitSuccessful ? 1 : 0);
+  useEffect(() => {
+    if (failedSubmits > 0) summaryRef.current?.focus();
+  }, [failedSubmits]);
+
+  async function onValid(values: Values) {
     await fakeNetwork();
     saveToSession("bridge-discovery-calls", values);
-    setStatus("done");
+    toast.success(t.success.title);
+    setDone(true);
     requestAnimationFrame(() => successRef.current?.focus());
   }
 
-  if (status === "done") {
+  if (done) {
     return (
-      <div className="rounded-card border border-green-700 bg-green-50 p-6 md:p-8" role="status">
-        <CheckCircle2 aria-hidden className="size-8 text-green-700" />
-        <h2 ref={successRef} tabIndex={-1} className="mt-4 text-h3 text-navy-900 focus:outline-none">
-          {t.success.title}
-        </h2>
-        <p className="mt-2 text-gray-800">{t.success.body}</p>
-      </div>
+      <Alert variant="success" className="p-6 md:p-8" role="status">
+        <CheckCircle2 className="size-6!" />
+        <AlertTitle className="text-lg">
+          <h2 ref={successRef} tabIndex={-1} className="font-semibold text-heading focus:outline-none">
+            {t.success.title}
+          </h2>
+        </AlertTitle>
+        <AlertDescription className="text-base">{t.success.body}</AlertDescription>
+      </Alert>
     );
   }
 
   // Error-summary labels: the text fields only (not the option lists).
-  const labels: Record<string, string> = Object.fromEntries(
-    Object.entries(t.fields).filter((entry): entry is [string, string] => typeof entry[1] === "string"),
-  );
+  const labels: Record<string, string> = Object.fromEntries(Object.entries(t.fields).filter((entry): entry is [string, string] => typeof entry[1] === "string"));
+  const errors = Object.fromEntries(Object.entries(formState.errors).map(([k, v]) => [k, v?.message ?? ""])) as Record<string, string>;
+  const submitting = formState.isSubmitting;
 
   return (
-    <form noValidate onSubmit={onSubmit} className="space-y-6">
-      <p className="flex items-start gap-2 rounded-control border border-dashed border-gray-500 bg-white px-4 py-3 text-gray-700">
-        <Info aria-hidden className="mt-0.5 size-5 shrink-0" />
-        {t.prototypeNote}
-      </p>
-      <ErrorSummary title={formText.errorSummaryTitle} errors={errors} labels={labels} summaryRef={summaryRef} />
+    <form noValidate onSubmit={(e) => form.handleSubmit(onValid)(e)} className="space-y-6">
+      <Alert role="note">
+        <Info />
+        <AlertDescription>{t.prototypeNote}</AlertDescription>
+      </Alert>
+      {formState.isSubmitted && <ErrorSummary title={formText.errorSummaryTitle} errors={errors} labels={labels} summaryRef={summaryRef} />}
       <div className="grid gap-6 md:grid-cols-2">
-        <TextField id="fullName" label={t.fields.fullName} required value={values.fullName} onChange={set("fullName")} error={errors.fullName} autoComplete="name" />
-        <TextField id="email" type="email" label={t.fields.email} required value={values.email} onChange={set("email")} error={errors.email} autoComplete="email" />
+        <Controller name="fullName" control={control} render={({ field }) => <TextField id="fullName" label={t.fields.fullName} required value={field.value} onChange={field.onChange} error={errors.fullName} autoComplete="name" />} />
+        <Controller name="email" control={control} render={({ field }) => <TextField id="email" type="email" label={t.fields.email} required value={field.value} onChange={field.onChange} error={errors.email} autoComplete="email" />} />
       </div>
-      <TextField id="organisation" label={t.fields.organisation} value={values.organisation} onChange={set("organisation")} autoComplete="organization" />
-      <RadioGroup id="role" label={t.fields.role} required value={values.role} onChange={set("role")} options={t.fields.roles} error={errors.role} />
-      <TextArea id="topic" label={t.fields.topic} required value={values.topic} onChange={set("topic")} error={errors.topic} />
+      <Controller name="organisation" control={control} render={({ field }) => <TextField id="organisation" label={t.fields.organisation} value={field.value} onChange={field.onChange} autoComplete="organization" />} />
+      <Controller name="role" control={control} render={({ field }) => <RadioGroup id="role" label={t.fields.role} required value={field.value} onChange={field.onChange} options={t.fields.roles} error={errors.role} />} />
+      <Controller name="topic" control={control} render={({ field }) => <TextArea id="topic" label={t.fields.topic} required value={field.value} onChange={field.onChange} error={errors.topic} />} />
       <div className="grid gap-6 md:grid-cols-2">
-        <TextField id="date" type="date" label={t.fields.date} required min={minDate} value={values.date} onChange={set("date")} error={errors.date} />
-        <SelectField id="time" label={t.fields.time} required value={values.time} onChange={set("time")} options={t.fields.times} placeholder={formText.choose} error={errors.time} />
+        <Controller name="date" control={control} render={({ field }) => <TextField id="date" type="date" label={t.fields.date} required min={minDate} value={field.value} onChange={field.onChange} error={errors.date} />} />
+        <Controller
+          name="time"
+          control={control}
+          render={({ field }) => <SelectField id="time" label={t.fields.time} required value={field.value} onChange={field.onChange} options={t.fields.times} placeholder={formText.choose} error={errors.time} />}
+        />
       </div>
-      <Button type="submit" size="lg" disabled={status === "submitting"}>
-        {status === "submitting" ? t.submitting : t.submit}
+      <Button type="submit" size="xl" disabled={submitting}>
+        {submitting && <Spinner data-icon="inline-start" />}
+        {submitting ? t.submitting : t.submit}
       </Button>
       <p aria-live="polite" className="sr-only">
-        {status === "submitting" ? t.submitting : ""}
+        {submitting ? t.submitting : ""}
       </p>
     </form>
   );
