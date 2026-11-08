@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ProgrammeBrowser } from "@/components/ProgrammeBrowser";
 import { ProgrammeCard, ProgrammeGrid } from "@/components/ProgrammeCardView";
 import { ProgrammeDetailView } from "@/components/ProgrammeDetailView";
+import { H2 } from "@/components/ui/typography";
 import type { Programme } from "@/data/programmes";
 import { arrangeProgrammes, programmeStatus } from "@/lib/programmes";
 import { PROGRAMME_EDITS_STORE, readJSON } from "@/lib/prototypeStore";
@@ -77,7 +78,7 @@ export function SessionProgrammeDetail({ id, today, notFoundText }: { id: string
   if (p === null)
     return (
       <div className="mx-auto max-w-content px-gutter py-section-mobile md:py-section">
-        <h1 className="text-h2-mobile text-navy-900 md:text-h2">{notFoundText}</h1>
+        <H2 as="h1">{notFoundText}</H2>
       </div>
     );
   return <ProgrammeDetailView programme={p} status={programmeStatus(p, today)} />;

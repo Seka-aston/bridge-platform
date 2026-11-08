@@ -1,42 +1,90 @@
 "use client";
 
-import { AlertCircle } from "lucide-react";
-import type { ReactNode } from "react";
+import { format, parseISO } from "date-fns";
+import { AlertCircle, CalendarDays } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Field, FieldContent, FieldError, FieldLabel, FieldLegend, FieldSet } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { RadioGroup as UiRadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 /*
-  Accessible form fields: visible labels, required marking, error text linked to the
-  field (aria-describedby) and announced with aria-invalid. Errors show an icon as well
-  as text, never colour alone. There's no red in the brand palette, so errors use
-  navy text with a bold label and icon.
+  Form fields on shadcn/ui (redesign Step 5). Same props as before, so every form on the site
+  uses them unchanged: visible labels, "(required)" marking, error text linked to the field
+  (aria-describedby) and announced with aria-invalid. Errors use the destructive red with an
+  icon and text, never colour alone. Date fields open a calendar (shadcn Calendar + Popover)
+  and still store the date as YYYY-MM-DD.
 */
-
-const inputBase =
-  "mt-2 block w-full rounded-control border bg-white px-3 py-2.5 text-gray-800 shadow-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900";
-
-function borderFor(error?: string) {
-  return error ? "border-navy-900 border-2" : "border-gray-500";
-}
 
 function Label({ htmlFor, children, required }: { htmlFor: string; children: ReactNode; required?: boolean }) {
   return (
-    <label htmlFor={htmlFor} className="block font-semibold text-navy-900">
-      {children}
-      {required && <span className="text-gray-700"> (required)</span>}
-    </label>
+    <FieldLabel htmlFor={htmlFor}>
+      <span>
+        {children}
+        {required && <span className="font-normal text-muted-foreground"> (required)</span>}
+      </span>
+    </FieldLabel>
   );
 }
 
 export function ErrorText({ id, error }: { id: string; error?: string }) {
   if (!error) return null;
   return (
-    <p id={id} className="mt-2 flex items-start gap-2 font-semibold text-navy-900">
-      <AlertCircle aria-hidden className="mt-0.5 size-5 shrink-0" />
+    <FieldError id={id} className="flex items-start gap-1.5">
+      <AlertCircle aria-hidden className="mt-0.5 size-4 shrink-0" />
       {error}
-    </p>
+    </FieldError>
   );
 }
 
 type Common = { id: string; label: string; error?: string; required?: boolean };
+
+const describe = (id: string, error?: string) => ({
+  "aria-invalid": error ? true : undefined,
+  "aria-describedby": error ? `${id}-error` : undefined,
+});
+
+// Calendar picker for date fields. `min` (YYYY-MM-DD) disables earlier days.
+function DateInput({ id, value, onChange, min, error }: { id: string; value: string; onChange: (v: string) => void; min?: string; error?: string }) {
+  const [open, setOpen] = useState(false);
+  const selected = value ? parseISO(value) : undefined;
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          id={id}
+          variant="outline"
+          size="lg"
+          {...describe(id, error)}
+          className="w-full justify-start border-input text-base font-normal data-[empty=true]:text-muted-foreground"
+          data-empty={!value}
+        >
+          <CalendarDays data-icon="inline-start" />
+          {selected ? format(selected, "d MMMM yyyy") : "Choose a date"}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <Calendar
+          mode="single"
+          selected={selected}
+          defaultMonth={selected ?? (min ? parseISO(min) : undefined)}
+          disabled={min ? { before: parseISO(min) } : undefined}
+          onSelect={(d) => {
+            onChange(d ? format(d, "yyyy-MM-dd") : "");
+            setOpen(false);
+          }}
+          autoFocus
+        />
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 export function TextField({
   id,
@@ -56,45 +104,38 @@ export function TextField({
   min?: string;
 }) {
   return (
-    <div>
+    <Field data-invalid={error ? true : undefined}>
       <Label htmlFor={id} required={required}>
         {label}
       </Label>
-      <input
-        id={id}
-        name={id}
-        type={type}
-        value={value}
-        min={min}
-        autoComplete={autoComplete}
-        onChange={(e) => onChange(e.target.value)}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={error ? `${id}-error` : undefined}
-        className={`${inputBase} ${borderFor(error)}`}
-      />
+      {type === "date" ? (
+        <DateInput id={id} value={value} onChange={onChange} min={min} error={error} />
+      ) : (
+        <Input
+          id={id}
+          name={id}
+          type={type}
+          value={value}
+          autoComplete={autoComplete}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-11 text-base"
+          {...describe(id, error)}
+        />
+      )}
       <ErrorText id={`${id}-error`} error={error} />
-    </div>
+    </Field>
   );
 }
 
 export function TextArea({ id, label, error, required, value, onChange }: Common & { value: string; onChange: (v: string) => void }) {
   return (
-    <div>
+    <Field data-invalid={error ? true : undefined}>
       <Label htmlFor={id} required={required}>
         {label}
       </Label>
-      <textarea
-        id={id}
-        name={id}
-        rows={5}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={error ? `${id}-error` : undefined}
-        className={`${inputBase} ${borderFor(error)}`}
-      />
+      <Textarea id={id} name={id} rows={5} value={value} onChange={(e) => onChange(e.target.value)} className="min-h-32 text-base" {...describe(id, error)} />
       <ErrorText id={`${id}-error`} error={error} />
-    </div>
+    </Field>
   );
 }
 
@@ -109,31 +150,28 @@ export function SelectField({
   placeholder,
 }: Common & { value: string; onChange: (v: string) => void; options: string[]; placeholder: string }) {
   return (
-    <div>
+    <Field data-invalid={error ? true : undefined}>
       <Label htmlFor={id} required={required}>
         {label}
       </Label>
-      <select
-        id={id}
-        name={id}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={error ? `${id}-error` : undefined}
-        className={`${inputBase} ${borderFor(error)}`}
-      >
-        <option value="">{placeholder}</option>
-        {options.map((o) => (
-          <option key={o} value={o}>
-            {o}
-          </option>
-        ))}
-      </select>
+      <Select name={id} value={value} onValueChange={onChange}>
+        <SelectTrigger id={id} className="h-11! w-full text-base" {...describe(id, error)}>
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((o) => (
+            <SelectItem key={o} value={o}>
+              {o}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <ErrorText id={`${id}-error`} error={error} />
-    </div>
+    </Field>
   );
 }
 
+// Options shown as selectable cards; the chosen one is highlighted.
 export function RadioGroup({
   id,
   label,
@@ -144,55 +182,43 @@ export function RadioGroup({
   options,
 }: Common & { value: string; onChange: (v: string) => void; options: string[] }) {
   return (
-    <fieldset aria-describedby={error ? `${id}-error` : undefined}>
-      <legend className="font-semibold text-navy-900">
+    <FieldSet data-invalid={error ? true : undefined} aria-describedby={error ? `${id}-error` : undefined}>
+      <FieldLegend variant="label">
         {label}
-        {required && <span className="text-gray-700"> (required)</span>}
-      </legend>
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        {options.map((o, i) => (
-          <label
-            key={o}
-            className={`flex cursor-pointer items-center gap-3 rounded-control border px-4 py-3 has-[:checked]:border-green-700 has-[:checked]:bg-green-50 ${
-              error ? "border-navy-900" : "border-gray-200"
-            }`}
-          >
-            <input
-              id={i === 0 ? id : undefined}
-              type="radio"
-              name={id}
-              value={o}
-              checked={value === o}
-              onChange={() => onChange(o)}
-              className="size-4 accent-green-700"
-            />
-            <span className="text-gray-800">{o}</span>
-          </label>
-        ))}
-      </div>
+        {required && <span className="font-normal text-muted-foreground"> (required)</span>}
+      </FieldLegend>
+      <UiRadioGroup name={id} value={value} onValueChange={onChange} className="grid gap-3 sm:grid-cols-2">
+        {options.map((o, i) => {
+          const itemId = i === 0 ? id : `${id}-${i}`;
+          return (
+            <FieldLabel key={o} htmlFor={itemId}>
+              <Field orientation="horizontal">
+                {/* Named by its text explicitly: Radix radios are buttons, which a <label> alone doesn't name for every assistive tool. */}
+                <RadioGroupItem value={o} id={itemId} aria-labelledby={`${itemId}-text`} aria-invalid={error ? true : undefined} />
+                <span id={`${itemId}-text`} className="font-normal">
+                  {o}
+                </span>
+              </Field>
+            </FieldLabel>
+          );
+        })}
+      </UiRadioGroup>
       <ErrorText id={`${id}-error`} error={error} />
-    </fieldset>
+    </FieldSet>
   );
 }
 
 export function CheckboxField({ id, label, error, checked, onChange }: Common & { checked: boolean; onChange: (v: boolean) => void }) {
   return (
-    <div>
-      <label htmlFor={id} className="flex cursor-pointer items-start gap-3">
-        <input
-          id={id}
-          name={id}
-          type="checkbox"
-          checked={checked}
-          onChange={(e) => onChange(e.target.checked)}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={error ? `${id}-error` : undefined}
-          className="mt-1 size-4 shrink-0 accent-green-700"
-        />
-        <span className="text-gray-800">{label}</span>
-      </label>
-      <ErrorText id={`${id}-error`} error={error} />
-    </div>
+    <Field orientation="horizontal" data-invalid={error ? true : undefined}>
+      <Checkbox id={id} name={id} checked={checked} onCheckedChange={(v) => onChange(v === true)} className="mt-0.5" {...describe(id, error)} />
+      <FieldContent>
+        <FieldLabel htmlFor={id} className="font-normal">
+          {label}
+        </FieldLabel>
+        <ErrorText id={`${id}-error`} error={error} />
+      </FieldContent>
+    </Field>
   );
 }
 
@@ -211,19 +237,20 @@ export function ErrorSummary({
   const keys = Object.keys(errors);
   if (keys.length === 0) return null;
   return (
-    <div ref={summaryRef} tabIndex={-1} role="alert" className="rounded-card border-2 border-navy-900 bg-white p-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900">
-      <p className="flex items-center gap-2 font-bold text-navy-900">
-        <AlertCircle aria-hidden className="size-5" /> {title}
-      </p>
-      <ul className="mt-3 list-disc space-y-1 pl-6">
-        {keys.map((k) => (
-          <li key={k}>
-            <a href={`#${k}`} className="font-semibold text-green-700 underline underline-offset-4 hover:text-green-800">
-              {labels[k] ?? k}: {errors[k]}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <Alert ref={summaryRef} tabIndex={-1} role="alert" variant="destructive" className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+      <AlertCircle />
+      <AlertTitle>{title}</AlertTitle>
+      <AlertDescription>
+        <ul className="mt-1 list-disc space-y-1 pl-5">
+          {keys.map((k) => (
+            <li key={k}>
+              <a href={`#${k}`} className="font-medium underline underline-offset-4 hover:no-underline">
+                {labels[k] ?? k}: {errors[k]}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </AlertDescription>
+    </Alert>
   );
 }

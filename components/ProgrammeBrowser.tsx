@@ -1,11 +1,14 @@
 "use client";
 
+import { SearchX } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from "@/components/ui/empty";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { ProgrammeStatus } from "@/lib/programmes";
 
 /*
-  Programme list filter (Checkpoint 5). Cards are built on the server (where each status
-  is calculated for today) and passed in ready-made; this component only shows or hides them.
+  Programme list filter. Cards are built on the server (where each status is calculated for
+  today) and passed in ready-made; this component only shows or hides them.
   "Current" = open, upcoming and closed; archived programmes are a separate choice.
 */
 
@@ -33,31 +36,40 @@ export function ProgrammeBrowser({ items, labels }: { items: Item[]; labels: Lab
 
   return (
     <div>
-      <div role="group" aria-label={labels.label} className="flex flex-wrap items-center gap-2">
-        <span className="mr-2 font-semibold text-navy-900">{labels.label}</span>
-        {order.map((f) => {
-          const n = items.filter((i) => matches(f, i.status)).length;
-          const active = f === filter;
-          return (
-            <button
-              key={f}
-              type="button"
-              aria-pressed={active}
-              onClick={() => setFilter(f)}
-              className={`rounded-full border px-4 py-1.5 font-semibold transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900 ${
-                active ? "border-green-700 bg-green-700 text-white" : "border-gray-200 bg-white text-gray-700 hover:border-green-700 hover:text-green-700"
-              }`}
-            >
-              {labels.options[f]} <span className={active ? "text-white" : "text-gray-500"}>({n})</span>
-            </button>
-          );
-        })}
+      <div className="flex flex-wrap items-center gap-3">
+        <span id="programme-filter-label" className="text-sm font-semibold text-heading">
+          {labels.label}
+        </span>
+        <ToggleGroup
+          type="single"
+          variant="outline"
+          value={filter}
+          onValueChange={(v) => v && setFilter(v as Filter)}
+          aria-labelledby="programme-filter-label"
+          className="flex-wrap"
+        >
+          {order.map((f) => {
+            const n = items.filter((i) => matches(f, i.status)).length;
+            return (
+              <ToggleGroupItem key={f} value={f} className="px-3">
+                {labels.options[f]} <span className="text-muted-foreground tabular-nums">{n}</span>
+              </ToggleGroupItem>
+            );
+          })}
+        </ToggleGroup>
       </div>
-      <p aria-live="polite" className="mt-4 text-gray-700">
+      <p aria-live="polite" className="mt-4 text-sm text-muted-foreground">
         {countText}
       </p>
       {shown.length === 0 ? (
-        <p className="mt-6 rounded-card border border-dashed border-gray-500 p-6 text-gray-700">{labels.empty}</p>
+        <Empty className="mt-6 border">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <SearchX />
+            </EmptyMedia>
+            <EmptyDescription>{labels.empty}</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
         <ul className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {shown.map((i) => (

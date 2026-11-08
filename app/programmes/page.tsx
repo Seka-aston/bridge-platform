@@ -24,7 +24,7 @@ export default function ProgrammesPage() {
       <PageHeader title={c.header.title} supporting={c.header.supporting} />
       <section aria-label={c.header.title} className="mx-auto w-full max-w-content px-gutter py-section-mobile md:py-section">
         {prototypeMode && (
-          <p className="mb-4 flex items-center gap-2 text-gray-700">
+          <p className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
             <Badge kind="draft" /> {c.filters.draftNote}
           </p>
         )}

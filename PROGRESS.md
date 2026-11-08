@@ -211,7 +211,7 @@ Branch `shadcn-redesign`. One step at a time, each reviewed by Aston before the 
 - [x] Step 4: Homepage (approved 8 Nov 2026)
 - [ ] Step 5: Public pages
   - [x] Batch 1: For Talents, For Schools, For Companies, For Ecosystem, Ventures Lab (approved 8 Nov 2026)
-  - [ ] Batch 2: Programmes list, programme detail and apply flow
+  - [x] Batch 2: Programmes list, programme detail and apply flow (approved 8 Nov 2026)
   - [ ] Batch 3: Resources, articles, About, Impact, booking, Bridge AI, Learning, Skills Passport, Opportunities, sign-in, legal pages
 - [ ] Step 6: Platform shell
 - [ ] Step 7: Dashboards (Student, Company, School, Admin)
@@ -230,6 +230,13 @@ Decisions (Aston, 8 Nov 2026):
 ## Changelog
 
 (Claude Code adds a short entry after each working session.)
+
+### 2026-11-08 — Redesign Step 5, batch 2: programmes and the apply flow
+- Programmes list: filter is a shadcn Toggle Group with counts; designed empty state.
+- Programme detail: grey page header (the mint one hid the "Open" label), details in a Card, "not open" message as an Alert.
+- Apply form rebuilt on react-hook-form + zod: same copy and rules, error summary (focused after a failed submit) plus errors under each field, spinner while sending, success panel and toast. School and admin notices unchanged.
+- `components/forms/Fields.tsx` rebuilt on shadcn Field, Input, Textarea, Select, Checkbox, Radio Group and Alert with the same props, so every form (including dashboard forms) has the new look. Errors use the destructive red; date fields now open a calendar picker.
+- Checked: apply journey end to end, dashboard Settings and message forms, cookie preferences.
 
 ### 2026-11-08 — Redesign Step 5, batch 1: audience pages and Ventures Lab
 - For Talents, For Schools, For Companies, For Ecosystem and Ventures Lab use shadcn buttons directly; no old style names left.
