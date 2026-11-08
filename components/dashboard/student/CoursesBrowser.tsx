@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CourseCard, coursePercent } from "@/components/dashboard/student/CourseCard";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { studentText } from "@/content/dashboard";
 import type { Course } from "@/data/student";
 
@@ -11,26 +12,18 @@ type Filter = "active" | "completed" | "all";
 export function CoursesBrowser({ items }: { items: Course[] }) {
   const t = studentText.courses;
   const [filter, setFilter] = useState<Filter>("active");
-  const match = (c: Course) => (filter === "all" ? true : filter === "completed" ? coursePercent(c) === 100 : coursePercent(c) < 100);
+  const match = (f: Filter) => (c: Course) => (f === "all" ? true : f === "completed" ? coursePercent(c) === 100 : coursePercent(c) < 100);
   return (
-    <div>
-      <div role="group" aria-label={t.title} className="flex flex-wrap gap-2">
+    <div className="space-y-6">
+      <ToggleGroup type="single" variant="outline" value={filter} onValueChange={(v) => v && setFilter(v as Filter)} aria-label={t.title} className="flex-wrap">
         {(["active", "completed", "all"] as Filter[]).map((f) => (
-          <button
-            key={f}
-            type="button"
-            aria-pressed={filter === f}
-            onClick={() => setFilter(f)}
-            className={`rounded-full px-4 py-2 font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900 ${
-              filter === f ? "bg-green-700 text-white" : "bg-white text-navy-900 hover:bg-green-50"
-            }`}
-          >
-            {t.filter[f]}
-          </button>
+          <ToggleGroupItem key={f} value={f} className="px-3">
+            {t.filter[f]} <span className="text-muted-foreground tabular-nums">{items.filter(match(f)).length}</span>
+          </ToggleGroupItem>
         ))}
-      </div>
-      <ul className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        {items.filter(match).map((c) => (
+      </ToggleGroup>
+      <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {items.filter(match(filter)).map((c) => (
           <li key={c.id}>
             <CourseCard course={c} href={`/dashboard/student/courses/${c.id}`} />
           </li>

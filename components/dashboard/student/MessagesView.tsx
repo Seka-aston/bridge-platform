@@ -1,22 +1,28 @@
 "use client";
 
-import { ArrowLeft, Send } from "lucide-react";
+import { ArrowLeft, MessagesSquare, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/Button";
 import { ErrorText } from "@/components/forms/Fields";
-import { ago, ring } from "@/components/dashboard/kit";
-import { messagesText as t } from "@/content/dashboard";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import { Input } from "@/components/ui/input";
+import { messagesText as t, sharedText } from "@/content/dashboard";
 import { threads, type Message } from "@/data/messages";
 import { readJSON } from "@/lib/prototypeStore";
+import { cn } from "@/lib/utils";
 
 /*
-  Student messages (Checkpoint 13): conversation list and thread, two panes on large screens,
-  one at a time on small ones. Sent messages, and messages a company sends from its dashboard,
-  are kept in this browser tab ("bridge-messages").
+  Student messages (redesign Step 7): one card with the conversation list and the open thread,
+  side by side on large screens and one at a time on small ones. Sent messages, and messages a
+  company sends from its dashboard, are kept in this browser tab ("bridge-messages").
 */
 
 export const MESSAGE_STORE = "bridge-messages";
 type Extra = { from: "me" | "them"; text: string; at: string };
+
+const ago = (n: number) => sharedText.agoDays[String(n)] ?? sharedText.agoDays.n.replace("{n}", String(n));
 
 function initials(name: string) {
   return name.split(" ").map((w) => w[0]).join("").slice(0, 2);
@@ -58,9 +64,9 @@ export function MessagesView() {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[22rem_1fr]">
-      <section aria-label={t.listLabel} className={`rounded-panel bg-white p-3 ${active ? "hidden lg:block" : ""}`}>
-        <ul>
+    <Card className="grid gap-0 p-0 lg:min-h-[34rem] lg:grid-cols-[20rem_minmax(0,1fr)]">
+      <section aria-label={t.listLabel} className={cn("p-2 lg:border-r", active && "hidden lg:block")}>
+        <ul className="space-y-0.5">
           {threads.map((th) => {
             const msgs = all(th.id);
             const last = msgs[msgs.length - 1];
@@ -71,17 +77,20 @@ export function MessagesView() {
                   type="button"
                   onClick={() => setActive(th.id)}
                   aria-current={selected ? "true" : undefined}
-                  className={`flex w-full items-start gap-3 rounded-tile p-3 text-left ${ring} ${selected ? "bg-green-50" : "hover:bg-gray-50"}`}
+                  className={cn(
+                    "flex w-full items-start gap-3 rounded-lg p-3 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                    selected ? "bg-accent" : "hover:bg-muted",
+                  )}
                 >
-                  <span aria-hidden className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-navy-900 font-bold text-white">
-                    {initials(th.name)}
-                  </span>
+                  <Avatar>
+                    <AvatarFallback className="bg-brand-navy text-xs font-semibold text-white">{initials(th.name)}</AvatarFallback>
+                  </Avatar>
                   <span className="min-w-0 flex-1">
                     <span className="flex items-baseline justify-between gap-2">
-                      <span className="font-semibold text-navy-900">{th.name}</span>
-                      <span className="shrink-0 text-sm text-gray-500">{ago(last.daysAgo)}</span>
+                      <span className="font-medium text-heading">{th.name}</span>
+                      <span className="shrink-0 text-xs text-muted-foreground">{ago(last.daysAgo)}</span>
                     </span>
-                    <span className="block truncate text-sm text-gray-700">{last.text}</span>
+                    <span className="block truncate text-muted-foreground">{last.text}</span>
                   </span>
                 </button>
               </li>
@@ -90,32 +99,43 @@ export function MessagesView() {
         </ul>
       </section>
 
-      <section aria-label={current?.name ?? t.title} className={`min-w-0 flex-col rounded-panel bg-white ${active ? "flex" : "hidden lg:flex"}`}>
+      <section aria-label={current?.name ?? t.title} className={cn("min-w-0 flex-col", active ? "flex" : "hidden lg:flex")}>
         {current ? (
           <>
-            <div className="flex items-center gap-3 border-b border-gray-200 p-4">
-              <button type="button" onClick={() => setActive(null)} aria-label={t.back} className={`inline-flex size-10 items-center justify-center rounded-full bg-gray-50 lg:hidden ${ring}`}>
-                <ArrowLeft aria-hidden className="size-5" />
-              </button>
+            <div className="flex items-center gap-3 border-b px-4 py-3">
+              <Button variant="ghost" size="icon-sm" onClick={() => setActive(null)} aria-label={t.back} className="lg:hidden">
+                <ArrowLeft />
+              </Button>
+              <Avatar>
+                <AvatarFallback className="bg-brand-navy text-xs font-semibold text-white">{initials(current.name)}</AvatarFallback>
+              </Avatar>
               <div>
-                <h2 className="font-bold text-navy-900">{current.name}</h2>
-                <p className="text-sm text-gray-700">{current.role}</p>
+                <h2 className="font-semibold text-heading">{current.name}</h2>
+                <p className="text-xs text-muted-foreground">{current.role}</p>
               </div>
             </div>
-            <ol className="flex max-h-[28rem] min-h-72 flex-col gap-3 overflow-y-auto p-4" aria-live="polite">
+            <ol className="flex max-h-[28rem] min-h-72 flex-1 flex-col gap-3 overflow-y-auto bg-muted/40 p-4 text-sm" aria-live="polite">
               {all(current.id).map((m, i) => (
-                <li key={i} className={`max-w-[85%] rounded-tile px-4 py-3 ${m.from === "me" ? "self-end bg-green-700 text-white" : "self-start bg-gray-50 text-gray-800"}`}>
+                <li
+                  key={i}
+                  className={cn(
+                    "max-w-[85%] rounded-2xl px-4 py-2.5",
+                    m.from === "me" ? "self-end rounded-br-sm bg-primary text-primary-foreground" : "self-start rounded-bl-sm bg-card ring-1 ring-border",
+                  )}
+                >
                   <span className="sr-only">{m.from === "me" ? t.you : current.name}: </span>
                   {m.text}
-                  <span className={`mt-1 block text-sm ${m.from === "me" ? "text-white" : "text-gray-500"}`}>{ago(m.daysAgo)}</span>
+                  <span className={cn("mt-1 block text-xs", m.from === "me" ? "text-primary-foreground" : "text-muted-foreground")}>{ago(m.daysAgo)}</span>
                 </li>
               ))}
               <li ref={endRef} aria-hidden className="h-0" />
             </ol>
-            <form noValidate onSubmit={send} className="border-t border-gray-200 p-4">
-              <div className="flex gap-3">
-                <label className="sr-only" htmlFor="message">{t.placeholder}</label>
-                <input
+            <form noValidate onSubmit={send} className="border-t p-4">
+              <div className="flex gap-2">
+                <label className="sr-only" htmlFor="message">
+                  {t.placeholder}
+                </label>
+                <Input
                   id="message"
                   value={draft}
                   onChange={(e) => {
@@ -125,20 +145,30 @@ export function MessagesView() {
                   placeholder={t.placeholder}
                   aria-invalid={error ? true : undefined}
                   aria-describedby={error ? "message-error" : undefined}
-                  className={`min-w-0 flex-1 rounded-full border border-gray-500 px-4 py-2.5 text-gray-800 ${ring}`}
+                  className="h-9 flex-1"
                 />
-                <Button type="submit" shape="pill">
-                  <Send aria-hidden className="size-4" /> {t.send}
+                <Button type="submit">
+                  <Send data-icon="inline-start" aria-hidden /> {t.send}
                 </Button>
               </div>
-              <ErrorText id="message-error" error={error} />
-              <p className="mt-2 text-sm text-gray-500">{t.sentNote}</p>
+              <div className="mt-2">
+                <ErrorText id="message-error" error={error} />
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">{t.sentNote}</p>
             </form>
           </>
         ) : (
-          <p className="m-auto p-10 text-center text-gray-700">{t.description}</p>
+          <Empty className="m-auto">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <MessagesSquare />
+              </EmptyMedia>
+              <EmptyTitle>{t.title}</EmptyTitle>
+              <EmptyDescription>{t.description}</EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         )}
       </section>
-    </div>
+    </Card>
   );
 }

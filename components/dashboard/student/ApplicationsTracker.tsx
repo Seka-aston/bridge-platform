@@ -3,16 +3,18 @@
 import { Check, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/dashboard/parts";
-import { studentText } from "@/content/dashboard";
-import { readJSON, readSession } from "@/lib/prototypeStore";
-import { companyText } from "@/content/dashboard";
-import type { Stage } from "@/data/company";
 import { OPP_STORE } from "@/components/dashboard/student/OpportunitiesTable";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { companyText, studentText } from "@/content/dashboard";
+import type { Stage } from "@/data/company";
+import { readJSON, readSession } from "@/lib/prototypeStore";
+import { cn } from "@/lib/utils";
 
 /*
-  Application tracking (Checkpoint 7). Combines programme applications made on the public
-  website and opportunity applications made in the dashboard, all from this browser tab.
-  In the prototype every application sits at the first step, "Submitted".
+  Application tracking. Combines programme applications made on the public website and
+  opportunity applications made in the dashboard, all from this browser tab. The company
+  dashboard can move the student's internship application along (Checkpoint 11).
 */
 
 const t = studentText.opportunitiesPage;
@@ -30,7 +32,6 @@ export function ApplicationsTracker() {
       kind: "programme" as const,
       savedAt: a.savedAt,
     }));
-    // The company dashboard's stage for the student's application to its internship (Checkpoint 11).
     const companyStage = readJSON<Record<string, Stage>>("bridge-stage-overrides", {})["session-diane"];
     const opps = readSession<{ id: string; position: string; company: string; savedAt: string }>(OPP_STORE).map((a) => ({
       stage: a.id === "o1" ? companyStage : undefined,
@@ -43,41 +44,44 @@ export function ApplicationsTracker() {
     setItems([...programmes, ...opps].sort((a, b) => b.savedAt.localeCompare(a.savedAt)));
   }, []);
 
-  if (items === null) return <div className="min-h-32" />;
+  if (items === null) return <Skeleton className="h-28 w-full" />;
   if (items.length === 0) {
     return <EmptyState icon={Send} title={t.applicationsEmpty.title} body={t.applicationsEmpty.body} action={{ label: t.applicationsEmpty.action, href: "/programmes" }} />;
   }
   return (
-    <ul className="space-y-4">
-      {items.map((a) => (
-        <li key={a.key} className="rounded-tile border border-gray-200 p-5">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <p className="font-bold text-navy-900">{a.title}</p>
-            <p className="text-sm text-gray-700">
-              {t.kind[a.kind]} ·{" "}
-              {t.appliedOn.replace(
-                "{date}",
-                new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(a.savedAt)),
-              )}
-            </p>
-          </div>
-          <ol className="mt-4 grid grid-cols-3 gap-2" aria-label={t.currentStep.replace("{step}", t.steps[stepOf(a.stage)])}>
-            {t.steps.map((step, i) => {
-              const reached = i <= stepOf(a.stage);
-              return (
-                <li key={step} className="flex flex-col gap-2">
-                  <span className={`h-1.5 rounded-full ${reached ? "bg-green-700" : "bg-gray-200"}`} aria-hidden />
-                  <span className={`flex items-center gap-1.5 text-sm ${reached ? "font-semibold text-navy-900" : "text-gray-700"}`}>
-                    {reached && <Check aria-hidden className="size-4 text-green-700" />}
-                    {step}
-                    {i === stepOf(a.stage) && a.stage && a.stage !== "new" && ` · ${companyText.applicantsPage.stages[a.stage]}`}
-                  </span>
-                </li>
-              );
-            })}
-          </ol>
-        </li>
-      ))}
+    <ul className="divide-y rounded-lg border">
+      {items.map((a) => {
+        const step = stepOf(a.stage);
+        return (
+          <li key={a.key} className="p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="font-medium text-heading">{a.title}</p>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Badge variant="outline">{t.kind[a.kind]}</Badge>
+                {t.appliedOn.replace(
+                  "{date}",
+                  new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(a.savedAt)),
+                )}
+              </div>
+            </div>
+            <ol className="mt-4 grid grid-cols-3 gap-2" aria-label={t.currentStep.replace("{step}", t.steps[step])}>
+              {t.steps.map((label, i) => {
+                const reached = i <= step;
+                return (
+                  <li key={label} className="flex flex-col gap-2">
+                    <span className={cn("h-1.5 rounded-full", reached ? "bg-primary" : "bg-border")} aria-hidden />
+                    <span className={cn("flex items-center gap-1.5 text-xs", reached ? "font-medium text-heading" : "text-muted-foreground")}>
+                      {reached && <Check aria-hidden className="size-3.5 text-primary" />}
+                      {label}
+                      {i === step && a.stage && a.stage !== "new" && ` · ${companyText.applicantsPage.stages[a.stage]}`}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </li>
+        );
+      })}
     </ul>
   );
 }

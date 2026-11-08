@@ -1,50 +1,51 @@
 "use client";
 
+import Link from "next/link";
 import { BadgeCheck, Clock, Copy, ExternalLink, Plus } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/Button";
-import { ErrorText } from "@/components/forms/Fields";
-import { studentText } from "@/content/dashboard";
-import type { Skill } from "@/data/student";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { TextArea, TextField } from "@/components/forms/Fields";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { SectionTitle } from "@/components/ui/typography";
+import { noticeText, studentText } from "@/content/dashboard";
 import { school } from "@/data/school";
+import type { Skill } from "@/data/student";
 import { addNotice, readSession, saveToSession, VERIFY_STORE } from "@/lib/prototypeStore";
-import { noticeText } from "@/content/dashboard";
 
 /*
-  Skills list with "Add New Skill" (opens automatically when arriving from the overview's
-  button via #add) and "Copy shareable link". Added skills show as pending verification and
-  are kept in this browser tab only.
+  Skills list (redesign Step 7) with "Add New Skill" (opens automatically when arriving from the
+  overview's button via #add) and "Copy shareable link". Added skills show as pending
+  verification and are kept in this browser tab only.
 */
 
 const t = studentText.passportPage;
 const STORE = "bridge-added-skills";
 
 export function PassportActions({ publicHref, onAdd }: { publicHref: string; onAdd: () => void }) {
-  const [copied, setCopied] = useState(false);
   return (
     <>
-      <Button shape="pill" onClick={onAdd}>
-        <Plus aria-hidden className="size-5" /> {studentText.addSkill}
+      <Button onClick={onAdd}>
+        <Plus data-icon="inline-start" aria-hidden /> {studentText.addSkill}
       </Button>
       <Button
         variant="outline"
-        shape="pill"
         onClick={async () => {
           try {
             await navigator.clipboard.writeText(new URL(publicHref, window.location.origin).toString());
           } catch {}
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2500);
+          toast.success(t.copied);
         }}
       >
-        <Copy aria-hidden className="size-5" /> {copied ? t.copied : t.share}
+        <Copy data-icon="inline-start" aria-hidden /> {t.share}
       </Button>
-      <Button href={publicHref} variant="text">
-        <ExternalLink aria-hidden className="size-4" /> {t.viewPublic}
+      <Button asChild variant="ghost">
+        <Link href={publicHref}>
+          <ExternalLink data-icon="inline-start" aria-hidden /> {t.viewPublic}
+        </Link>
       </Button>
-      <span aria-live="polite" className="sr-only">
-        {copied ? t.copied : ""}
-      </span>
     </>
   );
 }
@@ -55,16 +56,16 @@ export function SkillsSection({ skills, publicHref }: { skills: Skill[]; publicH
   const [name, setName] = useState("");
   const [evidence, setEvidence] = useState("");
   const [error, setError] = useState("");
-  const [justAdded, setJustAdded] = useState(false);
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- browser-only storage, read after mount
+    /* eslint-disable react-hooks/set-state-in-effect -- browser-only storage and address, read after mount */
     setAdded(readSession<Skill>(STORE));
     try {
       setDecisions(JSON.parse(sessionStorage.getItem(VERIFY_STORE) ?? "{}"));
     } catch {}
-    if (window.location.hash === "#add") dialogRef.current?.showModal();
+    if (window.location.hash === "#add") setOpen(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   // Skills the school verified during the demo show as verified here.
@@ -86,98 +87,75 @@ export function SkillsSection({ skills, publicHref }: { skills: Skill[]; publicH
     setAdded((a) => [...a, skill]);
     setName("");
     setEvidence("");
-    setJustAdded(true);
-    dialogRef.current?.close();
+    setOpen(false);
+    toast.success(t.added);
   }
 
   const row = (s: Skill) => (
-    <li key={s.name + (s.verified ? "v" : "p")} className="flex items-start justify-between gap-4 border-b border-gray-200 py-3 last:border-0">
-      <div>
-        <p className="font-semibold text-navy-900">{s.name}</p>
-        {s.verifiedBy && <p className="text-sm text-gray-700">{t.verifiedBy.replace("{by}", s.verifiedBy)}</p>}
-        {s.evidence && <p className="text-sm text-gray-700">{t.evidence.replace("{e}", s.evidence)}</p>}
+    <li key={s.name + (s.verified ? "v" : "p")} className="flex items-start justify-between gap-4 py-3 text-sm">
+      <div className="min-w-0">
+        <p className="font-medium text-heading">{s.name}</p>
+        {s.verifiedBy && <p className="text-xs text-muted-foreground">{t.verifiedBy.replace("{by}", s.verifiedBy)}</p>}
+        {s.evidence && <p className="text-xs text-muted-foreground">{t.evidence.replace("{e}", s.evidence)}</p>}
       </div>
       {s.verified ? (
-        <span className="inline-flex shrink-0 items-center gap-1.5 font-semibold text-green-700">
-          <BadgeCheck aria-hidden className="size-4" /> {t.verified}
-        </span>
+        <Badge variant="verified">
+          <BadgeCheck data-icon="inline-start" aria-hidden /> {t.verified}
+        </Badge>
       ) : (
-        <span className="inline-flex shrink-0 items-center gap-1.5 text-gray-700">
-          <Clock aria-hidden className="size-4" /> {t.pending}
-        </span>
+        <Badge variant="outline" className="text-muted-foreground">
+          <Clock data-icon="inline-start" aria-hidden /> {t.pending}
+        </Badge>
       )}
     </li>
   );
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-3">
-        <PassportActions publicHref={publicHref} onAdd={() => dialogRef.current?.showModal()} />
+      <div className="flex flex-wrap items-center gap-2">
+        <PassportActions publicHref={publicHref} onAdd={() => setOpen(true)} />
       </div>
-      {justAdded && (
-        <p role="status" className="mt-4 rounded-tile bg-green-50 p-4 text-gray-800">
-          {t.added}
-        </p>
-      )}
-      <section aria-labelledby="skills-title" className="mt-6 rounded-panel bg-white p-5 md:p-8">
-        <h2 id="skills-title" className="text-h3 text-navy-900 md:text-panel">
-          {t.skillsTitle} ({verified.length} {t.verified.toLowerCase()}, {pending.length} {t.pending.toLowerCase()})
-        </h2>
-        <div className="mt-4 grid gap-x-10 lg:grid-cols-2">
-          <ul>{verified.slice(0, Math.ceil(verified.length / 2)).map(row)}</ul>
-          <ul>{[...verified.slice(Math.ceil(verified.length / 2)), ...pending].map(row)}</ul>
-        </div>
-      </section>
+      <Card as="section" aria-labelledby="skills-title" className="mt-6">
+        <CardHeader>
+          <SectionTitle id="skills-title">{t.skillsTitle}</SectionTitle>
+          <CardDescription>
+            {verified.length} {t.verified.toLowerCase()} · {pending.length} {t.pending.toLowerCase()}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-x-10 lg:grid-cols-2">
+          <ul className="divide-y">{verified.slice(0, Math.ceil(verified.length / 2)).map(row)}</ul>
+          <ul className="divide-y border-t lg:border-t-0">{[...verified.slice(Math.ceil(verified.length / 2)), ...pending].map(row)}</ul>
+        </CardContent>
+      </Card>
 
-      <dialog
-        ref={dialogRef}
-        aria-labelledby="add-skill-title"
-        onClick={(e) => e.target === dialogRef.current && dialogRef.current?.close()}
-        className="m-auto w-[calc(100%-2rem)] max-w-md rounded-panel bg-white p-0 backdrop:bg-navy-900/60"
-      >
-        <form noValidate onSubmit={add} className="space-y-4 p-6">
-          <h2 id="add-skill-title" className="text-h3 text-navy-900">
-            {t.addTitle}
-          </h2>
-          <div>
-            <label htmlFor="skill-name" className="block font-semibold text-navy-900">
-              {t.addName}
-            </label>
-            <input
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <form noValidate onSubmit={add} className="grid gap-6">
+            <DialogHeader>
+              <DialogTitle>{t.addTitle}</DialogTitle>
+              <DialogDescription>{t.addHelp}</DialogDescription>
+            </DialogHeader>
+            <TextField
               id="skill-name"
+              label={t.addName}
+              required
               value={name}
-              onChange={(e) => {
-                setName(e.target.value);
+              onChange={(v) => {
+                setName(v);
                 setError("");
               }}
-              aria-invalid={error ? true : undefined}
-              aria-describedby={error ? "skill-name-error" : undefined}
-              className="mt-2 block w-full rounded-control border border-gray-500 px-3 py-2 text-gray-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900"
+              error={error}
             />
-            <ErrorText id="skill-name-error" error={error} />
-          </div>
-          <div>
-            <label htmlFor="skill-evidence" className="block font-semibold text-navy-900">
-              {t.addEvidence}
-            </label>
-            <textarea
-              id="skill-evidence"
-              rows={3}
-              value={evidence}
-              onChange={(e) => setEvidence(e.target.value)}
-              className="mt-2 block w-full rounded-control border border-gray-500 px-3 py-2 text-gray-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900"
-            />
-          </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="outline" shape="pill" onClick={() => dialogRef.current?.close()}>
-              {t.addCancel}
-            </Button>
-            <Button type="submit" shape="pill">
-              {t.addSubmit}
-            </Button>
-          </div>
-        </form>
-      </dialog>
+            <TextArea id="skill-evidence" label={t.addEvidence} value={evidence} onChange={setEvidence} />
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                {t.addCancel}
+              </Button>
+              <Button type="submit">{t.addSubmit}</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

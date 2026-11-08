@@ -212,9 +212,13 @@ Branch `shadcn-redesign`. One step at a time, each reviewed by Aston before the 
 - [x] Step 5: Public pages (approved 8 Nov 2026)
   - [x] Batch 1: For Talents, For Schools, For Companies, For Ecosystem, Ventures Lab (approved 8 Nov 2026)
   - [x] Batch 2: Programmes list, programme detail and apply flow (approved 8 Nov 2026)
-  - [ ] Batch 3: Resources, articles, About, Impact, booking, Bridge AI, Learning, Skills Passport, Opportunities, public passport, legal pages, and the new log in, create account and password reset screens (approved 8 Nov 2026)
-- [ ] Step 6: Platform shell (approved by Aston, 8 November 2026)
+  - [x] Batch 3: Resources, articles, About, Impact, booking, Bridge AI, Learning, Skills Passport, Opportunities, public passport, legal pages, and the new log in, create account and password reset screens (approved 8 Nov 2026)
+- [x] Step 6: Platform shell (approved by Aston, 8 November 2026)
 - [ ] Step 7: Dashboards (Student, Company, School, Admin)
+  - [x] Student (approved 8 Nov 2026)
+  - [ ] Company
+  - [ ] School
+  - [ ] Admin
 - [ ] Step 8: Clean-up and QA
 
 Decisions (Aston, 8 Nov 2026):
@@ -452,3 +456,13 @@ Decisions (Aston, 8 Nov 2026):
 - Lint and production build both pass.
 - Still from the starter, to replace in Checkpoint 1: Geist font (to be replaced by Manrope in Checkpoint 0), automatic dark mode, and the Next.js sample homepage and images in `public/`.
 - No git repository set up yet.
+
+### 2026-11-08 — Redesign Step 7: Student dashboard
+- Step 6 approved, committed and pushed.
+- Every Student screen rebuilt on shadcn/ui: overview, courses, course pages and lesson drawer, assignments, opportunities and applications, Skills Passport, messages, settings.
+- Coloured course tiles replaced by course cards with an icon, module label and progress; the passport card is now navy with a green accent; the apply and add-skill pop-ups are shadcn dialogs; the period picker, tabs and filters are shadcn controls; confirmations also show as toasts.
+- Assignments use the shared sortable, searchable table.
+- Settings (all four roles) now use shadcn switches, radio buttons and checkboxes.
+- Fixed: the shadcn progress bar never passed its value on, so screen readers could not hear the percentage (affected every progress bar).
+- Tests: Student journeys pass (period picker, tabs, apply and focus return, course filter, assignment search, filter and submit, add skill, copy link, settings, phone messages); cross-dashboard journeys pass; zero accessibility issues inside dialogs and drawers at 1440 and 375px; full sweep of 60 pages at four widths: 0 issues, no sideways scrolling.
+

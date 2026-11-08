@@ -2,10 +2,13 @@
 
 import { CheckCircle2, Info } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/Button";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Field, FieldContent, FieldDescription, FieldLabel, FieldLegend, FieldSet } from "@/components/ui/field";
+import { Switch } from "@/components/ui/switch";
 import { ResetDemo } from "@/components/ResetDemo";
 import { Panel } from "@/components/dashboard/parts";
-import { ErrorSummary, TextArea, TextField } from "@/components/forms/Fields";
+import { CheckboxField, ErrorSummary, RadioGroup, TextArea, TextField } from "@/components/forms/Fields";
 import { settingsText as t } from "@/content/dashboard";
 import { formText } from "@/content/pages";
 import { school } from "@/data/school";
@@ -15,31 +18,22 @@ import { defaultPrivacy, PRIVACY_STORE, readStudentPrivacy, type StudentPrivacy 
 import { isEmail, readJSON } from "@/lib/prototypeStore";
 
 /*
-  Settings for all four roles (Checkpoint 13): profile, email notifications and one
+  Settings for all four roles (Checkpoint 13; shadcn controls since redesign Step 7): profile, email notifications and one
   role-specific panel. For the student, Skills Passport privacy really changes what companies
   and the public link show. Everything is kept in this browser tab.
 */
 
 type Base = { name: string; email: string; phone: string; notify: boolean[] };
 
-function Switch({ id, label, help, checked, onChange }: { id: string; label: string; help?: string; checked: boolean; onChange: (v: boolean) => void }) {
+function SwitchRow({ id, label, help, checked, onChange }: { id: string; label: string; help?: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
-    <div className="flex items-start justify-between gap-6 border-b border-gray-200 py-4 last:border-0">
-      <div>
-        <label htmlFor={id} className="font-semibold text-navy-900">{label}</label>
-        {help && <p id={`${id}-help`} className="mt-1 text-sm text-gray-700">{help}</p>}
-      </div>
-      <input
-        id={id}
-        type="checkbox"
-        role="switch"
-        checked={checked}
-        aria-describedby={help ? `${id}-help` : undefined}
-        onChange={(e) => onChange(e.target.checked)}
-        // Styled as a toggle switch; the off state (gray-500) meets the 3:1 contrast for controls.
-        className="relative mt-1 h-6 w-11 shrink-0 cursor-pointer appearance-none rounded-full bg-gray-500 transition-colors duration-150 before:absolute before:left-0.5 before:top-0.5 before:size-5 before:rounded-full before:bg-white before:transition-transform before:duration-150 checked:bg-green-700 checked:before:translate-x-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900"
-      />
-    </div>
+    <Field orientation="horizontal" className="justify-between gap-6 border-b py-4 first:pt-0 last:border-0 last:pb-0">
+      <FieldContent>
+        <FieldLabel htmlFor={id}>{label}</FieldLabel>
+        {help && <FieldDescription id={`${id}-help`}>{help}</FieldDescription>}
+      </FieldContent>
+      <Switch id={id} checked={checked} aria-describedby={help ? `${id}-help` : undefined} onCheckedChange={onChange} />
+    </Field>
   );
 }
 
@@ -89,6 +83,7 @@ export function SettingsView({ role }: { role: Role }) {
       if (role === "student") sessionStorage.setItem(PRIVACY_STORE, JSON.stringify(privacy));
     } catch {}
     setSaved(true);
+    toast.success(t.saved);
   }
 
   const toggleList = (name: string, value: string) => {
@@ -110,7 +105,7 @@ export function SettingsView({ role }: { role: Role }) {
 
         <Panel title={t.notificationsTitle} id="set-notify">
           {notifyLabels.map((label, i) => (
-            <Switch
+            <SwitchRow
               key={label}
               id={`notify-${i}`}
               label={label}
@@ -122,8 +117,8 @@ export function SettingsView({ role }: { role: Role }) {
 
         {role === "student" && (
           <Panel title={t.privacy.title} subtitle={t.privacy.description} id="set-privacy">
-            <Switch id="priv-link" label={t.privacy.publicLink} help={t.privacy.publicLinkHelp} checked={privacy.publicLink} onChange={(v) => setPrivacy({ ...privacy, publicLink: v })} />
-            <Switch
+            <SwitchRow id="priv-link" label={t.privacy.publicLink} help={t.privacy.publicLinkHelp} checked={privacy.publicLink} onChange={(v) => setPrivacy({ ...privacy, publicLink: v })} />
+            <SwitchRow
               id="priv-availability"
               label={t.privacy.shareAvailability}
               help={t.privacy.shareAvailabilityHelp}
@@ -140,18 +135,10 @@ export function SettingsView({ role }: { role: Role }) {
 
         {role === "school" && (
           <Panel title={t.school.title} subtitle={school.name} id="set-school">
-            <Switch id="req-evidence" label={t.school.requireEvidence} checked={!!extra.requireEvidence} onChange={(v) => setExtra({ ...extra, requireEvidence: v })} />
-            <fieldset className="pt-4">
-              <legend className="font-semibold text-navy-900">{t.school.whoVerifies}</legend>
-              <div className="mt-3 space-y-2">
-                {t.school.whoOptions.map((o) => (
-                  <label key={o} className="flex items-center gap-3 text-gray-800">
-                    <input type="radio" name="who" checked={extra.whoVerifies === o} onChange={() => setExtra({ ...extra, whoVerifies: o })} className="size-4 accent-green-700" />
-                    {o}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
+            <SwitchRow id="req-evidence" label={t.school.requireEvidence} checked={!!extra.requireEvidence} onChange={(v) => setExtra({ ...extra, requireEvidence: v })} />
+            <div className="pt-4">
+              <RadioGroup id="who" label={t.school.whoVerifies} value={String(extra.whoVerifies)} onChange={(v) => setExtra({ ...extra, whoVerifies: v })} options={t.school.whoOptions} />
+            </div>
           </Panel>
         )}
 
@@ -160,28 +147,27 @@ export function SettingsView({ role }: { role: Role }) {
             <div className="space-y-5">
               <TextField id="co-web" label={t.company.website} value={String(extra.website)} onChange={(v) => setExtra({ ...extra, website: v })} />
               <TextArea id="co-about" label={t.company.about} value={String(extra.about)} onChange={(v) => setExtra({ ...extra, about: v })} />
-              <fieldset>
-                <legend className="font-semibold text-navy-900">{t.company.disciplines}</legend>
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                  {school.disciplines.map((d) => (
-                    <label key={d} className="flex items-center gap-3 text-gray-800">
-                      <input type="checkbox" checked={((extra.disciplines as string[]) ?? []).includes(d)} onChange={() => toggleList("disciplines", d)} className="size-4 accent-green-700" />
-                      {d}
-                    </label>
+              <FieldSet>
+                <FieldLegend variant="label">{t.company.disciplines}</FieldLegend>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {school.disciplines.map((d, i) => (
+                    <CheckboxField key={d} id={`co-disc-${i}`} label={d} checked={((extra.disciplines as string[]) ?? []).includes(d)} onChange={() => toggleList("disciplines", d)} />
                   ))}
                 </div>
-              </fieldset>
+              </FieldSet>
             </div>
           </Panel>
         )}
 
         {role === "admin" && (
           <Panel title={t.admin.title} id="set-admin">
-            <p className="font-semibold text-navy-900">{t.admin.prototypeMode}</p>
-            <p className="mt-1 text-gray-800">{t.admin.prototypeOn}</p>
-            <p className="mt-2 flex items-start gap-2 text-sm text-gray-700">
-              <Info aria-hidden className="mt-0.5 size-4 shrink-0" /> {t.admin.prototypeHow}
-            </p>
+            <div className="space-y-1 text-sm">
+              <p className="font-medium text-heading">{t.admin.prototypeMode}</p>
+              <p>{t.admin.prototypeOn}</p>
+              <p className="flex items-start gap-2 text-muted-foreground">
+                <Info aria-hidden className="mt-0.5 size-4 shrink-0" /> {t.admin.prototypeHow}
+              </p>
+            </div>
             <div className="mt-6">
               <ResetDemo />
             </div>
@@ -190,11 +176,13 @@ export function SettingsView({ role }: { role: Role }) {
       </div>
 
       <div className="flex flex-wrap items-center gap-4">
-        <Button type="submit" shape="pill" size="lg">{t.save}</Button>
-        <p role="status" className="flex items-center gap-2 font-semibold text-green-700">
+        <Button type="submit" size="lg">
+          {t.save}
+        </Button>
+        <p role="status" className="flex items-center gap-2 text-sm font-medium text-primary">
           {saved && (
             <>
-              <CheckCircle2 aria-hidden className="size-5" /> {t.saved}
+              <CheckCircle2 aria-hidden className="size-4" /> {t.saved}
             </>
           )}
         </p>

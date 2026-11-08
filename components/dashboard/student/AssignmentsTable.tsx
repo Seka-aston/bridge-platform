@@ -1,23 +1,30 @@
 "use client";
 
 import { CheckCircle2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Button } from "@/components/Button";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { DataGrid, SortHeader, type ColumnDef } from "@/components/dashboard/DataGrid";
 import { DetailDrawer } from "@/components/dashboard/DetailDrawer";
-import { DataTable } from "@/components/dashboard/parts";
-import { ErrorText } from "@/components/forms/Fields";
+import { TextArea } from "@/components/forms/Fields";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { studentText } from "@/content/dashboard";
 import type { Assignment, Course } from "@/data/student";
 import { fakeNetwork, readSession, saveToSession } from "@/lib/prototypeStore";
 
 /*
-  Assignments list with a status filter and a drawer for each assignment (brief, grade,
-  submit). Submissions are saved in this browser tab only (prototype).
+  Assignments (redesign Step 7) on the shared DataGrid: status filter, search, sortable due
+  date, and a drawer for each assignment (brief, grade, submit). Submissions are saved in this
+  browser tab only (prototype).
 */
 
 const t = studentText.assignments;
 const STORE = "bridge-assignment-submissions";
 type Filter = "all" | Assignment["status"];
+type Row = Assignment & { course: string };
 
 function dueText(n: number) {
   if (n === 0) return t.dueIn.today;
@@ -26,11 +33,7 @@ function dueText(n: number) {
   return t.dueIn.future.replace("{n}", String(n));
 }
 
-const statusLook: Record<Assignment["status"], string> = {
-  "to-do": "border border-navy-900 text-navy-900",
-  submitted: "bg-green-50 text-green-700",
-  graded: "bg-gray-200 text-gray-800",
-};
+const statusVariant = { "to-do": "upcoming", submitted: "open", graded: "closed" } as const;
 
 export function AssignmentsTable({ items, courses }: { items: Assignment[]; courses: Course[] }) {
   const [filter, setFilter] = useState<Filter>("all");
@@ -43,10 +46,58 @@ export function AssignmentsTable({ items, courses }: { items: Assignment[]; cour
   // eslint-disable-next-line react-hooks/set-state-in-effect -- browser-only storage, read after mount
   useEffect(() => setSubmittedIds(readSession<{ id: string }>(STORE).map((s) => s.id)), []);
 
-  const withStatus = items.map((a) => ({ ...a, status: submittedIds.includes(a.id) && a.status === "to-do" ? ("submitted" as const) : a.status }));
-  const shown = withStatus.filter((a) => filter === "all" || a.status === filter);
-  const open = withStatus.find((a) => a.id === openId);
   const courseName = (id: string) => courses.find((c) => c.id === id)?.title ?? "";
+  const rows: Row[] = items.map((a) => ({
+    ...a,
+    course: courseName(a.courseId),
+    status: submittedIds.includes(a.id) && a.status === "to-do" ? ("submitted" as const) : a.status,
+  }));
+  const shown = rows.filter((a) => filter === "all" || a.status === filter);
+  const open = rows.find((a) => a.id === openId);
+
+  const columns = useMemo<ColumnDef<Row, unknown>[]>(
+    () => [
+      {
+        accessorKey: "title",
+        header: t.columns.title,
+        cell: ({ row }) => <span className="font-medium text-heading">{row.original.title}</span>,
+      },
+      { accessorKey: "course", header: t.columns.course },
+      {
+        accessorKey: "dueInDays",
+        header: ({ column }) => <SortHeader label={t.columns.due} sorted={column.getIsSorted()} onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")} />,
+        cell: ({ row }) => <span className="tabular-nums">{dueText(row.original.dueInDays)}</span>,
+        enableGlobalFilter: false,
+      },
+      {
+        accessorKey: "status",
+        header: t.columns.status,
+        cell: ({ row }) => <Badge variant={statusVariant[row.original.status]}>{t.status[row.original.status]}</Badge>,
+        enableGlobalFilter: false,
+      },
+      {
+        id: "action",
+        header: () => <span className="sr-only">{t.view}</span>,
+        cell: ({ row }) => (
+          <div className="text-right">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setOpenId(row.original.id);
+                setNote("");
+                setError("");
+              }}
+            >
+              {t.view}
+              <span className="sr-only">: {row.original.title}</span>
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    [],
+  );
 
   async function submit() {
     if (!note.trim()) {
@@ -58,111 +109,73 @@ export function AssignmentsTable({ items, courses }: { items: Assignment[]; cour
     saveToSession(STORE, { id: openId, note });
     setSubmittedIds((s) => [...s, openId!]);
     setSending(false);
+    toast.success(t.submitted);
   }
 
   return (
-    <div>
-      <div role="group" aria-label={t.columns.status} className="flex flex-wrap gap-2">
-        {(Object.keys(t.filter) as Filter[]).map((f) => (
-          <button
-            key={f}
-            type="button"
-            aria-pressed={filter === f}
-            onClick={() => setFilter(f)}
-            className={`rounded-full px-4 py-2 font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900 ${
-              filter === f ? "bg-green-700 text-white" : "bg-gray-50 text-navy-900 hover:bg-green-50"
-            }`}
-          >
-            {t.filter[f]} ({f === "all" ? withStatus.length : withStatus.filter((a) => a.status === f).length})
-          </button>
-        ))}
-      </div>
-      <div className="mt-6">
-        <DataTable
-          caption={t.title}
-          columns={[
-            { key: "title", header: t.columns.title },
-            { key: "course", header: t.columns.course },
-            { key: "due", header: t.columns.due },
-            { key: "status", header: t.columns.status },
-            { key: "action", header: "", className: "text-right" },
-          ]}
-          rows={shown.map((a) => ({
-            key: a.id,
-            cells: {
-              title: a.title,
-              course: courseName(a.courseId),
-              due: dueText(a.dueInDays),
-              status: <span className={`inline-flex rounded-full px-3 py-0.5 text-sm font-semibold ${statusLook[a.status]}`}>{t.status[a.status]}</span>,
-              action: (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOpenId(a.id);
-                    setNote("");
-                    setError("");
-                  }}
-                  className="rounded-sm font-semibold text-green-700 underline-offset-4 hover:text-green-800 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900"
-                >
-                  {t.view}
-                  <span className="sr-only">: {a.title}</span>
-                </button>
-              ),
-            },
-          }))}
-        />
-      </div>
+    <>
+      <DataGrid
+        data={shown}
+        columns={columns}
+        caption={t.title}
+        searchLabel={t.searchLabel}
+        searchPlaceholder={t.searchLabel}
+        toolbar={
+          <ToggleGroup type="single" variant="outline" value={filter} onValueChange={(v) => v && setFilter(v as Filter)} aria-label={t.columns.status} className="flex-wrap">
+            {(Object.keys(t.filter) as Filter[]).map((f) => (
+              <ToggleGroupItem key={f} value={f} className="px-3">
+                {t.filter[f]} <span className="text-muted-foreground tabular-nums">{f === "all" ? rows.length : rows.filter((a) => a.status === f).length}</span>
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        }
+      />
 
       <DetailDrawer open={!!open} onClose={() => setOpenId(null)} title={open?.title ?? ""}>
         {open && (
-          <div className="space-y-6">
-            <p className="text-gray-700">
-              {courseName(open.courseId)} · {dueText(open.dueInDays)}
-            </p>
+          <div className="space-y-6 text-sm">
+            <div className="flex flex-wrap items-center gap-2 text-muted-foreground">
+              <Badge variant={statusVariant[open.status]}>{t.status[open.status]}</Badge>
+              {open.course} · {dueText(open.dueInDays)}
+            </div>
             <div>
-              <h3 className="font-bold text-navy-900">{t.brief}</h3>
-              <p className="mt-1 text-gray-800">{open.brief}</p>
+              <h3 className="font-semibold text-heading">{t.brief}</h3>
+              <p className="mt-1">{open.brief}</p>
             </div>
             {open.grade && (
               <div>
-                <h3 className="font-bold text-navy-900">{t.grade}</h3>
-                <p className="mt-1 text-gray-800">{open.grade}</p>
+                <h3 className="font-semibold text-heading">{t.grade}</h3>
+                <p className="mt-1">{open.grade}</p>
               </div>
             )}
             {open.status === "to-do" && (
-              <div>
-                <h3 className="font-bold text-navy-900">{t.submitTitle}</h3>
-                <label htmlFor="submission" className="mt-3 block font-semibold text-navy-900">
-                  {t.submitLabel}
-                </label>
-                <textarea
+              <div className="space-y-4 border-t pt-6">
+                <h3 className="font-semibold text-heading">{t.submitTitle}</h3>
+                <TextArea
                   id="submission"
-                  rows={4}
+                  label={t.submitLabel}
                   value={note}
-                  onChange={(e) => {
-                    setNote(e.target.value);
+                  onChange={(v) => {
+                    setNote(v);
                     setError("");
                   }}
-                  aria-invalid={error ? true : undefined}
-                  aria-describedby={error ? "submission-error" : undefined}
-                  className="mt-2 block w-full rounded-control border border-gray-500 px-3 py-2 text-gray-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900"
+                  error={error}
                 />
-                <ErrorText id="submission-error" error={error} />
-                <div className="mt-4">
-                  <Button shape="pill" onClick={submit} disabled={sending}>
-                    {sending ? t.submitting : t.submit}
-                  </Button>
-                </div>
+                <Button onClick={submit} disabled={sending}>
+                  {sending && <Spinner data-icon="inline-start" />}
+                  {sending ? t.submitting : t.submit}
+                </Button>
               </div>
             )}
             {open.status === "submitted" && (
-              <p role="status" className="flex items-start gap-2 rounded-tile bg-green-50 p-4 text-gray-800">
-                <CheckCircle2 aria-hidden className="mt-0.5 size-5 shrink-0 text-green-700" /> {t.submitted}
-              </p>
+              <Alert variant="success" role="status">
+                <CheckCircle2 aria-hidden />
+                <AlertDescription>{t.submitted}</AlertDescription>
+              </Alert>
             )}
           </div>
         )}
       </DetailDrawer>
-    </div>
+    </>
   );
 }

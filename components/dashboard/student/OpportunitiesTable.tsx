@@ -2,18 +2,23 @@
 
 import { Check, CheckCircle2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/Button";
-import { studentText } from "@/content/dashboard";
-import type { Opportunity } from "@/data/opportunities";
-import { addNotice, fakeNetwork, readSession, saveToSession } from "@/lib/prototypeStore";
-import { noticeText } from "@/content/dashboard";
+import { toast } from "sonner";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Spinner } from "@/components/ui/spinner";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { company } from "@/data/company";
+import type { Opportunity } from "@/data/opportunities";
+import { noticeText, studentText } from "@/content/dashboard";
+import { addNotice, fakeNetwork, readSession, saveToSession } from "@/lib/prototypeStore";
 
 /*
-  "Opportunities for you" from Aston's design, adapted to the content rules: sample employers
-  only, and no match percentages. Skills the student already has are ticked, and the Match
-  column says it in words. Apply opens a confirmation; the application is saved in this
-  browser tab and shows on the Opportunities page.
+  "Opportunities for you" (redesign Step 7), adapted to the content rules: sample employers only,
+  and no match percentages. Skills the student already has are ticked, and the match is said in
+  words. Apply opens a confirmation; the application is saved in this browser tab and shows on
+  the Opportunities page.
 */
 
 const t = studentText.opportunities;
@@ -27,17 +32,18 @@ function initials(name: string) {
 export function OpportunitiesTable({ items, mySkills }: { items: Opportunity[]; mySkills: string[] }) {
   const [applied, setApplied] = useState<string[]>([]);
   const [current, setCurrent] = useState<Opportunity | null>(null);
+  const [open, setOpen] = useState(false);
   const [sending, setSending] = useState(false);
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const returnTo = useRef<HTMLElement | null>(null);
+  const tableRef = useRef<HTMLDivElement>(null);
 
   // eslint-disable-next-line react-hooks/set-state-in-effect -- browser-only storage, read after mount
   useEffect(() => setApplied(readSession<{ id: string }>(OPP_STORE).map((a) => a.id)), []);
 
-  function open(o: Opportunity) {
+  function start(o: Opportunity) {
     returnTo.current = document.activeElement as HTMLElement;
     setCurrent(o);
-    dialogRef.current?.showModal();
+    setOpen(true);
   }
 
   async function confirm() {
@@ -48,112 +54,122 @@ export function OpportunitiesTable({ items, mySkills }: { items: Opportunity[]; 
     if (current.company === company.name) addNotice("company", noticeText.opportunityApplied.replace("{position}", current.position));
     setApplied((a) => [...a, current.id]);
     setSending(false);
-    dialogRef.current?.close();
+    setOpen(false);
+    toast.success(d.done);
   }
 
   return (
     <>
-      <div role="region" aria-label={t.title} tabIndex={0} className="relative overflow-x-auto rounded-tile focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900">
-        <table className="w-full min-w-[40rem] border-separate border-spacing-y-1 text-left">
-          <caption className="sr-only">{t.title}</caption>
-          <thead>
-            <tr>
-              {[t.columns.company, t.columns.position, t.columns.skills].map((h) => (
-                <th key={h} scope="col" className="px-3 pb-2 font-semibold text-gray-700">
-                  {h}
-                </th>
-              ))}
-              <th scope="col" className="pb-2">
+      <div ref={tableRef} tabIndex={-1} className="overflow-hidden rounded-lg border outline-none">
+        <Table className="min-w-[40rem]" scrollLabel={t.title}>
+          <TableCaption className="sr-only">{t.title}</TableCaption>
+          <TableHeader className="bg-muted">
+            <TableRow>
+              <TableHead scope="col">{t.columns.company}</TableHead>
+              <TableHead scope="col">{t.columns.position}</TableHead>
+              <TableHead scope="col">{t.columns.skills}</TableHead>
+              <TableHead scope="col">
                 <span className="sr-only">{t.apply}</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {items.map((o) => {
               const have = o.skills.filter((s) => mySkills.includes(s));
               const match = have.length === o.skills.length ? t.matchAll : have.length > 0 ? t.matchSome : t.matchNone;
               const isApplied = applied.includes(o.id);
               return (
-                <tr key={o.id} className="group">
-                  <th scope="row" className="rounded-l-tile px-3 py-3 font-normal group-hover:bg-gray-50">
+                <TableRow key={o.id}>
+                  <TableHead scope="row" className="h-auto py-3 font-normal">
                     <div className="flex items-center gap-3">
-                      <span aria-hidden className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-navy-900 font-bold text-white">
-                        {initials(o.company)}
-                      </span>
+                      <Avatar>
+                        <AvatarFallback className="bg-brand-navy text-xs font-semibold text-white">{initials(o.company)}</AvatarFallback>
+                      </Avatar>
                       <span>
-                        <span className="block whitespace-nowrap font-semibold text-navy-900">{o.company}</span>
-                        <span className="block whitespace-nowrap text-sm text-gray-700">
+                        <span className="block font-medium text-heading">{o.company}</span>
+                        <span className="block text-xs text-muted-foreground">
                           {o.location}
                           {o.mode !== o.location ? ` · ${o.mode}` : ""}
                         </span>
                       </span>
                     </div>
-                  </th>
-                  <td className="min-w-40 px-3 py-3 text-gray-800 group-hover:bg-gray-50">{o.position}</td>
-                  <td className="px-3 py-3 group-hover:bg-gray-50">
-                    <ul className="flex flex-wrap gap-2">
-                      {o.skills.map((s) => (
-                        <li key={s} className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-gray-50 px-3 py-1 text-sm font-semibold text-navy-900 group-hover:bg-white">
-                          {mySkills.includes(s) && (
-                            <>
-                              <Check aria-hidden className="size-3.5 text-green-700" />
-                              <span className="sr-only">{t.youHave}: </span>
-                            </>
-                          )}
-                          {s}
-                        </li>
-                      ))}
+                  </TableHead>
+                  <TableCell className="min-w-40 py-3 whitespace-normal">{o.position}</TableCell>
+                  <TableCell className="py-3 whitespace-normal">
+                    <ul className="flex flex-wrap gap-1.5">
+                      {o.skills.map((s) => {
+                        const mine = mySkills.includes(s);
+                        return (
+                          <li key={s}>
+                            <Badge variant={mine ? "secondary" : "outline"}>
+                              {mine && (
+                                <>
+                                  <Check data-icon="inline-start" aria-hidden />
+                                  <span className="sr-only">{t.youHave}: </span>
+                                </>
+                              )}
+                              {s}
+                            </Badge>
+                          </li>
+                        );
+                      })}
                     </ul>
                     {/* Match in words, never a percentage (content rule 4) */}
-                    <p className="mt-2 inline-flex items-center gap-2 whitespace-nowrap text-sm font-semibold text-navy-900">
-                      <span aria-hidden className={`size-2.5 rounded-full ${have.length ? "bg-green-500" : "bg-gray-500"}`} />
+                    <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <span aria-hidden className={`size-2 rounded-full ${have.length ? "bg-brand-green" : "bg-input"}`} />
                       {match}
                     </p>
-                  </td>
-                  <td className="rounded-r-tile px-3 py-3 text-right group-hover:bg-gray-50">
+                  </TableCell>
+                  <TableCell className="py-3 text-right">
                     {isApplied ? (
-                      <span className="inline-flex items-center gap-1.5 font-semibold text-green-700">
+                      <span className="inline-flex items-center gap-1.5 text-sm font-medium text-primary">
                         <CheckCircle2 aria-hidden className="size-4" /> {t.applied}
                       </span>
                     ) : (
-                      <Button variant="navy" shape="pill" onClick={() => open(o)}>
+                      <Button variant="navy" size="sm" onClick={() => start(o)}>
                         {t.apply}
-                        <span className="sr-only">: {o.position}, {o.company}</span>
+                        <span className="sr-only">
+                          : {o.position}, {o.company}
+                        </span>
                       </Button>
                     )}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               );
             })}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
-      <dialog
-        ref={dialogRef}
-        aria-labelledby="apply-dialog-title"
-        onClose={() => returnTo.current?.focus()}
-        onClick={(e) => e.target === dialogRef.current && !sending && dialogRef.current?.close()}
-        className="m-auto w-[calc(100%-2rem)] max-w-md rounded-panel bg-white p-0 backdrop:bg-navy-900/60"
-      >
-        {current && (
-          <div className="p-6">
-            <h2 id="apply-dialog-title" className="text-h3 text-navy-900">
-              {d.title.replace("{position}", current.position)}
-            </h2>
-            <p className="mt-2 text-gray-700">{current.description}</p>
-            <p className="mt-4 text-gray-800">{d.body.replace("{company}", current.company)}</p>
-            <div className="mt-6 flex flex-wrap justify-end gap-3">
-              <Button variant="outline" shape="pill" onClick={() => dialogRef.current?.close()} disabled={sending}>
-                {d.cancel}
-              </Button>
-              <Button variant="navy" shape="pill" onClick={confirm} disabled={sending}>
-                {sending ? d.sending : d.confirm}
-              </Button>
-            </div>
-          </div>
-        )}
-      </dialog>
+      <Dialog open={open} onOpenChange={(v) => !sending && setOpen(v)}>
+        <DialogContent
+          onCloseAutoFocus={(e) => {
+            // The Apply button is replaced by "Applied" once sent, so fall back to the table.
+            e.preventDefault();
+            if (returnTo.current?.isConnected) returnTo.current.focus();
+            else tableRef.current?.focus();
+          }}
+        >
+          {current && (
+            <>
+              <DialogHeader>
+                <DialogTitle>{d.title.replace("{position}", current.position)}</DialogTitle>
+                <DialogDescription>{current.description}</DialogDescription>
+              </DialogHeader>
+              <p className="text-sm">{d.body.replace("{company}", current.company)}</p>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setOpen(false)} disabled={sending}>
+                  {d.cancel}
+                </Button>
+                <Button variant="navy" onClick={confirm} disabled={sending}>
+                  {sending && <Spinner data-icon="inline-start" />}
+                  {sending ? d.sending : d.confirm}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
