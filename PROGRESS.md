@@ -216,7 +216,7 @@ Branch `shadcn-redesign`. One step at a time, each reviewed by Aston before the 
 - [x] Step 6: Platform shell (approved by Aston, 8 November 2026)
 - [ ] Step 7: Dashboards (Student, Company, School, Admin)
   - [x] Student (approved 8 Nov 2026)
-  - [ ] Company
+  - [x] Company (approved 8 Nov 2026)
   - [ ] School
   - [ ] Admin
 - [ ] Step 8: Clean-up and QA
@@ -465,4 +465,11 @@ Decisions (Aston, 8 Nov 2026):
 - Settings (all four roles) now use shadcn switches, radio buttons and checkboxes.
 - Fixed: the shadcn progress bar never passed its value on, so screen readers could not hear the percentage (affected every progress bar).
 - Tests: Student journeys pass (period picker, tabs, apply and focus return, course filter, assignment search, filter and submit, add skill, copy link, settings, phone messages); cross-dashboard journeys pass; zero accessibility issues inside dialogs and drawers at 1440 and 375px; full sweep of 60 pages at four widths: 0 issues, no sideways scrolling.
+
+### 2026-11-08 — Redesign Step 7: Company dashboard
+- Student dashboard approved, committed and pushed.
+- Company screens rebuilt on shadcn/ui, laid out like the Student overview: talent cards with initials and a verification label; navy hiring-snapshot card; recent applicants list; tabbed "what's next today?".
+- Talent discovery: search box, shadcn dropdowns and a checkbox instead of browser-default controls.
+- Opportunities and Applicants use the shared sortable, searchable table; Applicants' role and stage filters sit in the table toolbar. The posting form is a shadcn dialog; stage changes use a shadcn dropdown; confirmations also show as toasts. The dashed tip box is now an info alert.
+- Tests: Company journeys pass (tabs, talent search and filters, shortlist, focus return, new posting with validation, close posting, applicant filters and stage change); cross-dashboard journeys pass; no accessibility issues in dialogs and drawers; no sideways scrolling at 768 and 375px; full sweep of 60 pages at four widths: 0 issues.
 

@@ -1,51 +1,65 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, BriefcaseBusiness, CalendarClock, CheckCircle2, FilePlus2, Info, SearchX, Star, Users } from "lucide-react";
-import { useRef, useState } from "react";
-import { Button } from "@/components/Button";
+import { ArrowUpRight, CalendarClock, CheckCircle2, FilePlus2, Info, Search, SearchX, Star, Users } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
+import { DataGrid, SortHeader, type ColumnDef } from "@/components/dashboard/DataGrid";
 import { DetailDrawer } from "@/components/dashboard/DetailDrawer";
-import { DataTable, EmptyState, Panel } from "@/components/dashboard/parts";
+import { EmptyState, Panel } from "@/components/dashboard/parts";
 import { isActiveStage, useCompanyData, type CompanyApplicant } from "@/components/dashboard/company/CompanyData";
-import { ProfileDrawerBody, TalentTile } from "@/components/dashboard/company/TalentParts";
-import { ErrorSummary, SelectField, TextArea, TextField } from "@/components/forms/Fields";
-import { companyText as t, dashboardText } from "@/content/dashboard";
+import { initials, ProfileDrawerBody, TalentTile } from "@/components/dashboard/company/TalentParts";
+import { MESSAGE_STORE } from "@/components/dashboard/student/MessagesView";
+import { CheckboxField, ErrorSummary, SelectField, TextArea, TextField } from "@/components/forms/Fields";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { companyText as t, dashboardText, messagesText } from "@/content/dashboard";
 import { formText } from "@/content/pages";
 import { company, interviews, stages, type Posting, type PostingStatus, type Stage } from "@/data/company";
 import { talentProfiles, type TalentProfile } from "@/data/talent";
 import { defaultPrivacy, readStudentPrivacy, withPrivacy, type StudentPrivacy } from "@/lib/privacy";
 import { addNotice } from "@/lib/prototypeStore";
-import { MESSAGE_STORE } from "@/components/dashboard/student/MessagesView";
-import { messagesText } from "@/content/dashboard";
-import { useEffect } from "react";
 
 /*
-  Company dashboard views (Checkpoint 8), in the student dashboard's visual language.
-  All changes are kept in this browser tab (see CompanyData).
+  Company dashboard views (redesign Step 7, on shadcn/ui). All changes are kept in this browser
+  tab (see CompanyData).
 */
 
-const ring = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-900";
 const talentById = (id: string) => talentProfiles.find((p) => p.id === id)!;
 const ago = (n: number) => t.postingsPage.postedAgo[String(n)] ?? t.postingsPage.postedAgo.n.replace("{n}", String(n));
+const ANY = "any";
 
-const stageLook: Record<Stage, string> = {
-  new: "bg-navy-900 text-white",
-  reviewing: "border border-navy-900 text-navy-900",
-  interview: "bg-green-50 text-green-700",
-  offer: "bg-green-700 text-white",
-  "not-progressing": "bg-gray-200 text-gray-800",
-};
-const statusLook: Record<PostingStatus, string> = {
-  open: "bg-green-700 text-white",
-  draft: "border border-dashed border-gray-500 text-gray-700",
-  closed: "bg-gray-200 text-gray-800",
-};
+// Stage and posting-status labels: always text, colour only supports it.
+const stageVariant = { new: "featured", reviewing: "upcoming", interview: "secondary", offer: "default", "not-progressing": "closed" } as const;
+const statusVariant = { open: "open", draft: "archived", closed: "closed" } as const;
 
 export function StagePill({ stage }: { stage: Stage }) {
-  return <span className={`inline-flex whitespace-nowrap rounded-full px-3 py-0.5 text-sm font-semibold ${stageLook[stage]}`}>{t.applicantsPage.stages[stage]}</span>;
+  return <Badge variant={stageVariant[stage]}>{t.applicantsPage.stages[stage]}</Badge>;
 }
 function StatusPill({ status }: { status: PostingStatus }) {
-  return <span className={`inline-flex rounded-full px-3 py-0.5 text-sm font-semibold ${statusLook[status]}`}>{t.postingsPage.status[status]}</span>;
+  return (
+    <Badge variant={statusVariant[status]} className={status === "draft" ? "border-dashed" : undefined}>
+      {t.postingsPage.status[status]}
+    </Badge>
+  );
+}
+
+function TalentAvatar({ name }: { name: string }) {
+  return (
+    <Avatar>
+      <AvatarFallback className="bg-brand-navy text-xs font-semibold text-white">{initials(name)}</AvatarFallback>
+    </Avatar>
+  );
 }
 
 // Profile drawer shared by the talent views
@@ -58,6 +72,45 @@ function useProfileDrawer() {
     </DetailDrawer>
   );
   return { open: setOpenId, drawer };
+}
+
+// Compact filter for a table toolbar: the trigger is named by aria-label, and its value ("All roles") shows what it filters.
+function ToolbarSelect({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+  return (
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger aria-label={label} className="w-full bg-background sm:w-48">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map((o) => (
+          <SelectItem key={o.value} value={o.value}>
+            {o.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
+// A labelled shadcn Select for filters. Radix Select can't use "" as a value, so "any" stands for "no filter".
+function FilterSelect({ id, label, value, onChange, options }: { id: string; label: string; value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+  return (
+    <Field className="gap-1.5">
+      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger id={id} className="w-full bg-background">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((o) => (
+            <SelectItem key={o.value} value={o.value}>
+              {o.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </Field>
+  );
 }
 
 // ---------- Overview pieces ----------
@@ -90,15 +143,15 @@ export function RecommendedTalent({ href }: { href: string }) {
       subtitle={t.recommended.subtitle}
       id="recommended-title"
       action={
-        <Button href={href} variant="text">
-          {t.recommended.viewAll}
+        <Button asChild variant="outline" size="sm">
+          <Link href={href}>{t.recommended.viewAll}</Link>
         </Button>
       }
     >
-      <ul className="grid gap-4 sm:grid-cols-2 min-[87.5rem]:grid-cols-4">
-        {picks.map((p, i) => (
+      <ul className="grid gap-4 sm:grid-cols-2">
+        {picks.map((p) => (
           <li key={p.id}>
-            <TalentTile profile={p} index={i} onOpen={() => open(p.id)} />
+            <TalentTile profile={p} onOpen={() => open(p.id)} />
           </li>
         ))}
       </ul>
@@ -111,10 +164,10 @@ export function HiringSnapshot({ href }: { href: string }) {
   const { postings, applicants, shortlist } = useCompanyData();
   const s = t.snapshot;
   const openRoles = postings.filter((p) => p.status === "open").length;
-  const mini = [
-    { icon: Users, value: applicants.filter((a) => isActiveStage(a.stage)).length, label: s.stats.applicants },
-    { icon: CalendarClock, value: applicants.filter((a) => a.stage === "interview").length, label: s.stats.interviews },
-    { icon: Star, value: shortlist.length, label: s.stats.shortlisted },
+  const stats = [
+    { value: applicants.filter((a) => isActiveStage(a.stage)).length, label: s.stats.applicants },
+    { value: applicants.filter((a) => a.stage === "interview").length, label: s.stats.interviews },
+    { value: shortlist.length, label: s.stats.shortlisted },
   ];
   return (
     <Panel
@@ -122,32 +175,32 @@ export function HiringSnapshot({ href }: { href: string }) {
       subtitle={s.subtitle}
       id="snapshot-title"
       action={
-        <Link
-          href={href}
-          aria-label={s.open}
-          className={`inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-gray-50 text-navy-900 hover:bg-green-50 ${ring}`}
-        >
-          <ArrowUpRight aria-hidden className="size-5" />
-        </Link>
+        <Button asChild variant="ghost" size="icon-sm">
+          <Link href={href} aria-label={s.open}>
+            <ArrowUpRight />
+          </Link>
+        </Button>
       }
     >
-      <div className="rounded-panel bg-linear-to-br from-navy-900 to-green-deep p-6 text-white">
-        <p className="text-eyebrow uppercase">{s.cardLabel}</p>
-        <p className="mt-5">{s.rolesOpen}</p>
-        <p className="mt-1 flex items-baseline gap-2">
-          <span className="text-display-mobile">{openRoles}</span>
-          <span className="text-h3">{s.rolesUnit}</span>
-        </p>
-        <p className="mt-6 font-semibold">{company.name}</p>
-      </div>
-      <div className="mt-4 grid grid-cols-3 gap-3">
-        {mini.map(({ icon: Icon, value, label }) => (
-          <div key={label} className="rounded-tile bg-gray-50 p-4">
-            <Icon aria-hidden className="size-5 text-green-700" />
-            <p className="mt-2 text-h3 text-navy-900">{value}</p>
-            <p className="text-sm text-gray-700">{label}</p>
-          </div>
-        ))}
+      <div className="space-y-4">
+        <div className="surface-navy relative overflow-hidden rounded-xl p-5">
+          <span aria-hidden className="pointer-events-none absolute -right-14 -bottom-20 size-44 rounded-full border-[18px] border-brand-green/25" />
+          <p className="relative text-xs font-semibold tracking-[0.08em] uppercase">{s.cardLabel}</p>
+          <p className="relative mt-6 text-sm text-muted-foreground">{s.rolesOpen}</p>
+          <p className="relative mt-1 flex items-baseline gap-2">
+            <span className="font-heading text-4xl leading-none font-bold tabular-nums">{openRoles}</span>
+            <span className="text-sm font-medium">{s.rolesUnit}</span>
+          </p>
+          <p className="relative mt-6 border-t border-border pt-3 text-sm font-semibold">{company.name}</p>
+        </div>
+        <dl className="grid grid-cols-3 divide-x rounded-lg border">
+          {stats.map((x) => (
+            <div key={x.label} className="flex flex-col gap-1 p-3">
+              <dt className="text-xs leading-tight text-muted-foreground">{x.label}</dt>
+              <dd className="order-first text-xl leading-none font-semibold text-heading tabular-nums">{x.value}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
     </Panel>
   );
@@ -158,26 +211,35 @@ export function RecentApplicants({ href }: { href: string }) {
   const r = t.recentApplicants;
   const rows = applicants.filter((a) => isActiveStage(a.stage)).sort((a, b) => a.appliedDaysAgo - b.appliedDaysAgo).slice(0, 4);
   return (
-    <Panel title={r.title} subtitle={r.subtitle} id="recent-title" action={<Button href={href} variant="text">{r.open}</Button>}>
-      <ul className="space-y-1">
+    <Panel
+      title={r.title}
+      subtitle={r.subtitle}
+      id="recent-title"
+      action={
+        <Button asChild variant="outline" size="sm">
+          <Link href={href}>{r.open}</Link>
+        </Button>
+      }
+    >
+      <ul className="divide-y rounded-lg border">
         {rows.map((a) => {
           const p = talentById(a.talentId);
           const posting = postings.find((x) => x.id === a.postingId);
           return (
-            <li key={a.id} className="flex flex-wrap items-center gap-4 rounded-tile px-3 py-3 hover:bg-gray-50">
-              <span aria-hidden className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-navy-900 font-bold text-white">
-                {p.name.split(" ").map((w) => w[0]).join("")}
-              </span>
+            <li key={a.id} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
+              <TalentAvatar name={p.name} />
               <div className="min-w-40 flex-1">
-                <p className="font-semibold text-navy-900">{p.name}</p>
-                <p className="text-sm text-gray-700">
+                <p className="font-medium text-heading">{p.name}</p>
+                <p className="text-xs text-muted-foreground">
                   {posting?.title} · {a.fromSession ? t.applicantsPage.thisSession : ago(a.appliedDaysAgo)}
                 </p>
               </div>
               <StagePill stage={a.stage} />
-              <Button href={href} variant="navy" shape="pill">
-                {r.review}
-                <span className="sr-only">: {p.name}</span>
+              <Button asChild variant="navy" size="sm">
+                <Link href={href}>
+                  {r.review}
+                  <span className="sr-only">: {p.name}</span>
+                </Link>
               </Button>
             </li>
           );
@@ -189,86 +251,68 @@ export function RecentApplicants({ href }: { href: string }) {
 
 export function CompanyToday({ firstName, applicantsHref, opportunitiesHref }: { firstName: string; applicantsHref: string; opportunitiesHref: string }) {
   const { applicants, postings } = useCompanyData();
-  const [tab, setTab] = useState<"review" | "interview" | "post">("review");
   const d = t.today;
+  const title = d.title.replace("{name}", firstName);
   const toReview = applicants.filter((a) => a.stage === "new" || a.stage === "reviewing").length;
   const drafts = postings.filter((p) => p.status === "draft").length;
-  const keys = ["review", "interview", "post"] as const;
-  const icons = { review: Users, interview: CalendarClock, post: FilePlus2 };
+  const action = (href: string, label: string) => (
+    <Button asChild variant="outline" className="w-full">
+      <Link href={href}>{label}</Link>
+    </Button>
+  );
   return (
-    <section aria-labelledby="ctoday-title" className="min-w-0 rounded-panel bg-white p-5 md:p-8">
-      <h2 id="ctoday-title" className="text-h3 text-navy-900 md:text-panel">
-        {d.title.replace("{name}", firstName)}
-      </h2>
-      <div role="tablist" aria-label={d.title.replace("{name}", firstName)} className="mt-6 grid grid-cols-3 gap-1 rounded-full bg-gray-50 p-1.5">
-        {keys.map((k) => {
-          const Icon = icons[k];
-          return (
-            <button
-              key={k}
-              id={`ctab-${k}`}
-              role="tab"
-              aria-selected={tab === k}
-              aria-controls={`cpanel-${k}`}
-              tabIndex={tab === k ? 0 : -1}
-              onClick={() => setTab(k)}
-              onKeyDown={(e) => {
-                if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-                const i = keys.indexOf(tab);
-                const next = keys[(i + (e.key === "ArrowRight" ? 1 : keys.length - 1)) % keys.length];
-                setTab(next);
-                document.getElementById(`ctab-${next}`)?.focus();
-              }}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-full px-2 py-2.5 text-sm font-semibold sm:text-body ${ring} ${
-                tab === k ? "bg-green-700 text-white" : "text-navy-900 hover:bg-white"
-              }`}
-            >
-              <Icon aria-hidden className="size-4" /> {d.tabs[k]}
-            </button>
-          );
-        })}
-      </div>
-      <div role="tabpanel" id={`cpanel-${tab}`} aria-labelledby={`ctab-${tab}`} className="mt-6">
-        {tab === "review" && (
-          <>
-            <h3 className="text-h3 text-navy-900">{d.reviewTitle}</h3>
-            <p className="mt-1 text-gray-700">{toReview === 0 ? d.reviewNone : toReview === 1 ? d.reviewBodyOne : d.reviewBody.replace("{n}", String(toReview))}</p>
-            <div className="mt-5">
-              <Button href={applicantsHref} variant="outline" shape="pill">{d.reviewAction}</Button>
-            </div>
-          </>
-        )}
-        {tab === "interview" && (
-          <>
-            <h3 className="text-h3 text-navy-900">{d.interviewTitle}</h3>
-            <ul className="mt-3 space-y-3">
-              {interviews.map((iv) => (
-                <li key={iv.talentId + iv.postingId} className="rounded-tile bg-green-50 p-4">
-                  <p className="font-bold text-navy-900">
-                    {talentById(iv.talentId).name} · {postings.find((p) => p.id === iv.postingId)?.title}
-                  </p>
-                  <p className="text-gray-700">
-                    {iv.when} · {iv.where}
-                  </p>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-5">
-              <Button href={applicantsHref} variant="outline" shape="pill">{d.interviewAction}</Button>
-            </div>
-          </>
-        )}
-        {tab === "post" && (
-          <>
-            <h3 className="text-h3 text-navy-900">{d.postTitle}</h3>
-            <p className="mt-1 text-gray-700">{drafts === 0 ? d.postNone : drafts === 1 ? d.postBodyOne : d.postBody.replace("{n}", String(drafts))}</p>
-            <div className="mt-5">
-              <Button href={opportunitiesHref} variant="outline" shape="pill">{d.postAction}</Button>
-            </div>
-          </>
-        )}
-      </div>
-    </section>
+    <Panel title={title} id="ctoday-title">
+      <Tabs defaultValue="review">
+        <TabsList aria-label={title} className="w-full">
+          <TabsTrigger value="review" id="ctab-review">
+            <Users aria-hidden /> {d.tabs.review}
+          </TabsTrigger>
+          <TabsTrigger value="interview" id="ctab-interview">
+            <CalendarClock aria-hidden /> {d.tabs.interview}
+          </TabsTrigger>
+          <TabsTrigger value="post" id="ctab-post">
+            <FilePlus2 aria-hidden /> {d.tabs.post}
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="review" className="mt-4 space-y-4">
+          <div>
+            <h3 className="font-semibold text-heading">{d.reviewTitle}</h3>
+            <p className="mt-1 text-sm text-muted-foreground">{toReview === 0 ? d.reviewNone : toReview === 1 ? d.reviewBodyOne : d.reviewBody.replace("{n}", String(toReview))}</p>
+          </div>
+          {action(applicantsHref, d.reviewAction)}
+        </TabsContent>
+        <TabsContent value="interview" className="mt-4 space-y-4">
+          <h3 className="font-semibold text-heading">{d.interviewTitle}</h3>
+          <ul className="space-y-2">
+            {interviews.map((iv) => (
+              <li key={iv.talentId + iv.postingId}>
+                <Item variant="muted" size="sm">
+                  <ItemMedia variant="icon">
+                    <CalendarClock aria-hidden className="text-primary" />
+                  </ItemMedia>
+                  <ItemContent>
+                    <ItemTitle className="text-heading">
+                      {talentById(iv.talentId).name} · {postings.find((p) => p.id === iv.postingId)?.title}
+                    </ItemTitle>
+                    <ItemDescription>
+                      {iv.when} · {iv.where}
+                    </ItemDescription>
+                  </ItemContent>
+                </Item>
+              </li>
+            ))}
+          </ul>
+          {action(applicantsHref, d.interviewAction)}
+        </TabsContent>
+        <TabsContent value="post" className="mt-4 space-y-4">
+          <div>
+            <h3 className="font-semibold text-heading">{d.postTitle}</h3>
+            <p className="mt-1 text-sm text-muted-foreground">{drafts === 0 ? d.postNone : drafts === 1 ? d.postBodyOne : d.postBody.replace("{n}", String(drafts))}</p>
+          </div>
+          {action(opportunitiesHref, d.postAction)}
+        </TabsContent>
+      </Tabs>
+    </Panel>
   );
 }
 
@@ -278,8 +322,8 @@ export function TalentDiscovery() {
   const c = t.talent;
   const { open, drawer } = useProfileDrawer();
   const [q, setQ] = useState("");
-  const [discipline, setDiscipline] = useState("");
-  const [availability, setAvailability] = useState("");
+  const [discipline, setDiscipline] = useState(ANY);
+  const [availability, setAvailability] = useState(ANY);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   // The sample student's current privacy choice decides whether her availability counts as shared.
   const [privacy, setPrivacy] = useState<StudentPrivacy | null>(null);
@@ -292,52 +336,58 @@ export function TalentDiscovery() {
   const query = q.trim().toLowerCase();
   const shown = profiles.filter(
     (p) =>
-      (!discipline || p.discipline === discipline) &&
+      (discipline === ANY || p.discipline === discipline) &&
       (!verifiedOnly || p.verification === "verified") &&
-      (availability !== c.availabilityOptions.shared || p.availability?.consented) &&
+      (availability === ANY || p.availability?.consented) &&
       (!query || p.name.toLowerCase().includes(query) || p.skills.some((s) => s.toLowerCase().includes(query))),
   );
-  const field = `mt-2 block w-full rounded-full border border-gray-500 bg-white px-4 py-2.5 text-gray-800 ${ring}`;
   return (
     <div className="space-y-6">
-      <section aria-label={c.title} className="rounded-panel bg-white p-5 md:p-6">
-        <div className="grid gap-4 md:grid-cols-[2fr_1fr_1fr]">
-          <label className="block font-semibold text-navy-900">
-            {c.search}
-            <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={c.searchPlaceholder} className={field} />
-          </label>
-          <label className="block font-semibold text-navy-900">
-            {c.discipline}
-            <select value={discipline} onChange={(e) => setDiscipline(e.target.value)} className={field}>
-              <option value="">{c.availabilityOptions.any}</option>
-              {disciplines.map((d) => (
-                <option key={d}>{d}</option>
-              ))}
-            </select>
-          </label>
-          <label className="block font-semibold text-navy-900">
-            {c.availability}
-            <select value={availability} onChange={(e) => setAvailability(e.target.value)} className={field}>
-              <option value="">{c.availabilityOptions.any}</option>
-              <option>{c.availabilityOptions.shared}</option>
-            </select>
-          </label>
-        </div>
-        <label className="mt-4 inline-flex cursor-pointer items-center gap-3 font-semibold text-navy-900">
-          <input type="checkbox" checked={verifiedOnly} onChange={(e) => setVerifiedOnly(e.target.checked)} className="size-4 accent-green-700" />
-          {c.verifiedOnly}
-        </label>
-        <p aria-live="polite" className="mt-3 text-gray-700">
-          {dashboardText.showing.replace("{n}", String(shown.length)).replace("{total}", String(talentProfiles.length))}
-        </p>
-      </section>
+      <Card as="section" aria-label={c.title} size="sm">
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-[2fr_1fr_1fr]">
+            <Field className="gap-1.5">
+              <FieldLabel htmlFor="talent-search">{c.search}</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon>
+                  <Search />
+                </InputGroupAddon>
+                <InputGroupInput id="talent-search" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={c.searchPlaceholder} />
+              </InputGroup>
+            </Field>
+            <FilterSelect
+              id="talent-discipline"
+              label={c.discipline}
+              value={discipline}
+              onChange={setDiscipline}
+              options={[{ value: ANY, label: c.availabilityOptions.any }, ...disciplines.map((d) => ({ value: d, label: d }))]}
+            />
+            <FilterSelect
+              id="talent-availability"
+              label={c.availability}
+              value={availability}
+              onChange={setAvailability}
+              options={[
+                { value: ANY, label: c.availabilityOptions.any },
+                { value: "shared", label: c.availabilityOptions.shared },
+              ]}
+            />
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <CheckboxField id="talent-verified" label={c.verifiedOnly} checked={verifiedOnly} onChange={setVerifiedOnly} />
+            <p aria-live="polite" className="text-xs text-muted-foreground tabular-nums">
+              {dashboardText.showing.replace("{n}", String(shown.length)).replace("{total}", String(talentProfiles.length))}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
       {shown.length === 0 ? (
         <EmptyState icon={SearchX} title={dashboardText.noResults.title} body={dashboardText.noResults.body} />
       ) : (
-        <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 min-[87.5rem]:grid-cols-4">
-          {shown.map((p, i) => (
+        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 min-[87.5rem]:grid-cols-4">
+          {shown.map((p) => (
             <li key={p.id}>
-              <TalentTile profile={p} index={i} onOpen={() => open(p.id)} />
+              <TalentTile profile={p} onOpen={() => open(p.id)} />
             </li>
           ))}
         </ul>
@@ -353,15 +403,15 @@ export function ShortlistView({ talentHref }: { talentHref: string }) {
   const { shortlist, ready } = useCompanyData();
   const { open, drawer } = useProfileDrawer();
   const e = t.shortlistPage.empty;
-  if (!ready) return <div className="min-h-40" />;
+  if (!ready) return <Skeleton className="h-40 w-full" />;
   const saved = shortlist.map(talentById).filter(Boolean) as TalentProfile[];
   if (saved.length === 0) return <EmptyState icon={Star} title={e.title} body={e.body} action={{ label: e.action, href: talentHref }} />;
   return (
     <>
-      <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 min-[87.5rem]:grid-cols-4">
-        {saved.map((p, i) => (
+      <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 min-[87.5rem]:grid-cols-4">
+        {saved.map((p) => (
           <li key={p.id}>
-            <TalentTile profile={p} index={i} onOpen={() => open(p.id)} />
+            <TalentTile profile={p} onOpen={() => open(p.id)} />
           </li>
         ))}
       </ul>
@@ -374,18 +424,70 @@ export function ShortlistView({ talentHref }: { talentHref: string }) {
 
 type FormValues = { title: string; location: string; mode: string; skills: string; description: string };
 const emptyForm: FormValues = { title: "", location: "", mode: "", skills: "", description: "" };
+type PostingRow = Posting & { applicants: number };
 
 export function PostingsView() {
   const { postings, applicants, setPostingStatus, addPosting } = useCompanyData();
   const p = t.postingsPage;
+  const f = p.form;
   const [openId, setOpenId] = useState<string | null>(null);
   const [changed, setChanged] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
   const [values, setValues] = useState<FormValues>(emptyForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
   const current = postings.find((x) => x.id === openId);
-  const count = (id: string) => applicants.filter((a) => a.postingId === id && isActiveStage(a.stage)).length;
+  const rows: PostingRow[] = postings.map((x) => ({ ...x, applicants: applicants.filter((a) => a.postingId === x.id && isActiveStage(a.stage)).length }));
+
+  const columns = useMemo<ColumnDef<PostingRow, unknown>[]>(
+    () => [
+      {
+        accessorKey: "title",
+        header: p.columns.title,
+        cell: ({ row }) => (
+          <span>
+            <span className="block font-medium text-heading">{row.original.title}</span>
+            <span className="block text-xs text-muted-foreground">
+              {row.original.location} · {row.original.mode}
+            </span>
+          </span>
+        ),
+      },
+      { accessorKey: "status", header: p.columns.status, cell: ({ row }) => <StatusPill status={row.original.status} />, enableGlobalFilter: false },
+      {
+        accessorKey: "applicants",
+        header: ({ column }) => <SortHeader label={p.columns.applicants} sorted={column.getIsSorted()} onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")} />,
+        cell: ({ row }) => <span className="tabular-nums">{row.original.applicants}</span>,
+        enableGlobalFilter: false,
+      },
+      {
+        accessorKey: "postedDaysAgo",
+        header: p.columns.posted,
+        cell: ({ row }) => (row.original.status === "draft" ? "–" : ago(row.original.postedDaysAgo)),
+        enableGlobalFilter: false,
+      },
+      {
+        id: "action",
+        header: () => <span className="sr-only">{p.manage}</span>,
+        cell: ({ row }) => (
+          <div className="text-right">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setOpenId(row.original.id);
+                setChanged(false);
+              }}
+            >
+              {p.manage}
+              <span className="sr-only">: {row.original.title}</span>
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    [p],
+  );
 
   function validate(v: FormValues) {
     const e: Record<string, string> = {};
@@ -403,7 +505,7 @@ export function PostingsView() {
       requestAnimationFrame(() => summaryRef.current?.focus());
       return;
     }
-    const posting: Posting = {
+    addPosting({
       id: `new-${Date.now()}`,
       title: values.title.trim(),
       location: values.location.trim(),
@@ -412,251 +514,230 @@ export function PostingsView() {
       description: values.description.trim(),
       status,
       postedDaysAgo: 0,
-    };
-    addPosting(posting);
+    });
+    toast.success((status === "draft" ? f.drafted : f.posted).replace("{title}", values.title.trim()));
     setValues(emptyForm);
-    dialogRef.current?.close();
+    setFormOpen(false);
   }
   const set = (k: keyof FormValues) => (v: string) => setValues((x) => ({ ...x, [k]: v }));
-  const f = p.form;
+  const changeStatus = (id: string, s: PostingStatus) => {
+    setPostingStatus(id, s);
+    setChanged(true);
+    toast.success(p.statusChanged);
+  };
 
   return (
     <>
-      <div className="flex justify-end">
-        <Button shape="pill" onClick={() => dialogRef.current?.showModal()}>
-          <FilePlus2 aria-hidden className="size-5" /> {t.postCta}
-        </Button>
-      </div>
-      <section aria-label={p.title} className="mt-6 rounded-panel bg-white p-5 md:p-8">
-        <DataTable
-          caption={p.title}
-          columns={[
-            { key: "title", header: p.columns.title },
-            { key: "status", header: p.columns.status },
-            { key: "applicants", header: p.columns.applicants },
-            { key: "posted", header: p.columns.posted },
-            { key: "action", header: "", className: "text-right" },
-          ]}
-          rows={postings.map((x) => ({
-            key: x.id,
-            cells: {
-              title: (
-                <span>
-                  {x.title}
-                  <span className="block text-sm font-normal text-gray-700">
-                    {x.location} · {x.mode}
-                  </span>
-                </span>
-              ),
-              status: <StatusPill status={x.status} />,
-              applicants: count(x.id),
-              posted: x.status === "draft" ? "–" : ago(x.postedDaysAgo),
-              action: (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOpenId(x.id);
-                    setChanged(false);
-                  }}
-                  className={`rounded-sm font-semibold text-green-700 underline-offset-4 hover:text-green-800 hover:underline ${ring}`}
-                >
-                  {p.manage}
-                  <span className="sr-only">: {x.title}</span>
-                </button>
-              ),
-            },
-          }))}
-        />
-      </section>
+      <DataGrid
+        data={rows}
+        columns={columns}
+        caption={p.title}
+        searchLabel={p.searchLabel}
+        searchPlaceholder={p.searchLabel}
+        toolbar={
+          <Button className="sm:ml-auto" onClick={() => setFormOpen(true)}>
+            <FilePlus2 data-icon="inline-start" aria-hidden /> {t.postCta}
+          </Button>
+        }
+      />
 
       <DetailDrawer open={!!current} onClose={() => setOpenId(null)} title={current?.title ?? ""}>
         {current && (
-          <div className="space-y-5">
-            <StatusPill status={current.status} />
-            <p className="text-gray-800">{current.description}</p>
-            <ul className="flex flex-wrap gap-2">
+          <div className="space-y-5 text-sm">
+            <div className="flex flex-wrap items-center gap-2 text-muted-foreground">
+              <StatusPill status={current.status} />
+              {current.location} · {current.mode}
+            </div>
+            <p>{current.description}</p>
+            <ul className="flex flex-wrap gap-1.5">
               {current.skills.map((s) => (
-                <li key={s} className="rounded-full bg-gray-50 px-3 py-1 text-sm font-semibold text-navy-900">
-                  {s}
+                <li key={s}>
+                  <Badge variant="outline">{s}</Badge>
                 </li>
               ))}
             </ul>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2 border-t pt-5">
               {current.status === "open" && (
-                <Button variant="outline" shape="pill" onClick={() => { setPostingStatus(current.id, "closed"); setChanged(true); }}>
+                <Button variant="outline" onClick={() => changeStatus(current.id, "closed")}>
                   {p.close}
                 </Button>
               )}
-              {current.status === "closed" && (
-                <Button shape="pill" onClick={() => { setPostingStatus(current.id, "open"); setChanged(true); }}>
-                  {p.reopen}
-                </Button>
-              )}
-              {current.status === "draft" && (
-                <Button shape="pill" onClick={() => { setPostingStatus(current.id, "open"); setChanged(true); }}>
-                  {p.publish}
-                </Button>
-              )}
+              {current.status === "closed" && <Button onClick={() => changeStatus(current.id, "open")}>{p.reopen}</Button>}
+              {current.status === "draft" && <Button onClick={() => changeStatus(current.id, "open")}>{p.publish}</Button>}
             </div>
             {changed && (
-              <p role="status" className="flex items-start gap-2 rounded-tile bg-green-50 p-4 text-gray-800">
-                <CheckCircle2 aria-hidden className="mt-0.5 size-5 shrink-0 text-green-700" /> {p.statusChanged}
-              </p>
+              <Alert variant="success" role="status">
+                <CheckCircle2 aria-hidden />
+                <AlertDescription>{p.statusChanged}</AlertDescription>
+              </Alert>
             )}
           </div>
         )}
       </DetailDrawer>
 
-      <dialog
-        ref={dialogRef}
-        aria-labelledby="post-title-h"
-        onClick={(e) => e.target === dialogRef.current && dialogRef.current?.close()}
-        className="m-auto max-h-[90dvh] w-[calc(100%-2rem)] max-w-xl overflow-y-auto rounded-panel bg-white p-0 backdrop:bg-navy-900/60"
-      >
-        <form noValidate onSubmit={(e) => { e.preventDefault(); submit("open"); }} className="space-y-5 p-6">
-          <h2 id="post-title-h" className="text-h3 text-navy-900">{f.title}</h2>
-          <p className="flex items-start gap-2 text-sm text-gray-700">
-            <Info aria-hidden className="mt-0.5 size-4 shrink-0" /> {f.prototype}
-          </p>
-          <ErrorSummary
-            title={formText.errorSummaryTitle}
-            errors={errors}
-            labels={{ "post-title": f.role, "post-location": f.location, "post-mode": f.mode, "post-skills": f.skills, "post-description": f.description }}
-            summaryRef={summaryRef}
-          />
-          <TextField id="post-title" label={f.role} required value={values.title} onChange={set("title")} error={errors["post-title"]} />
-          <div className="grid gap-5 sm:grid-cols-2">
-            <TextField id="post-location" label={f.location} required value={values.location} onChange={set("location")} error={errors["post-location"]} />
-            <SelectField id="post-mode" label={f.mode} required value={values.mode} onChange={set("mode")} options={f.modes} placeholder={formText.choose} error={errors["post-mode"]} />
-          </div>
-          <TextField id="post-skills" label={f.skills} required value={values.skills} onChange={set("skills")} error={errors["post-skills"]} />
-          <TextArea id="post-description" label={f.description} required value={values.description} onChange={set("description")} error={errors["post-description"]} />
-          <div className="flex flex-wrap justify-end gap-3 pt-2">
-            <Button variant="text" onClick={() => dialogRef.current?.close()}>{f.cancel}</Button>
-            <Button variant="outline" shape="pill" onClick={() => submit("draft")}>{f.asDraft}</Button>
-            <Button type="submit" shape="pill">{f.publish}</Button>
-          </div>
-        </form>
-      </dialog>
+      <Dialog open={formOpen} onOpenChange={setFormOpen}>
+        <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-xl">
+          <form
+            noValidate
+            onSubmit={(e) => {
+              e.preventDefault();
+              submit("open");
+            }}
+            className="grid gap-5"
+          >
+            <DialogHeader>
+              <DialogTitle>{f.title}</DialogTitle>
+              <DialogDescription className="flex items-start gap-2">
+                <Info aria-hidden className="mt-0.5 size-4 shrink-0" /> {f.prototype}
+              </DialogDescription>
+            </DialogHeader>
+            <ErrorSummary
+              title={formText.errorSummaryTitle}
+              errors={errors}
+              labels={{ "post-title": f.role, "post-location": f.location, "post-mode": f.mode, "post-skills": f.skills, "post-description": f.description }}
+              summaryRef={summaryRef}
+            />
+            <TextField id="post-title" label={f.role} required value={values.title} onChange={set("title")} error={errors["post-title"]} />
+            <div className="grid gap-5 sm:grid-cols-2">
+              <TextField id="post-location" label={f.location} required value={values.location} onChange={set("location")} error={errors["post-location"]} />
+              <SelectField id="post-mode" label={f.mode} required value={values.mode} onChange={set("mode")} options={f.modes} placeholder={formText.choose} error={errors["post-mode"]} />
+            </div>
+            <TextField id="post-skills" label={f.skills} required value={values.skills} onChange={set("skills")} error={errors["post-skills"]} />
+            <TextArea id="post-description" label={f.description} required value={values.description} onChange={set("description")} error={errors["post-description"]} />
+            <DialogFooter>
+              <Button type="button" variant="ghost" onClick={() => setFormOpen(false)}>
+                {f.cancel}
+              </Button>
+              <Button type="button" variant="outline" onClick={() => submit("draft")}>
+                {f.asDraft}
+              </Button>
+              <Button type="submit">{f.publish}</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
 
 // ---------- Applicants ----------
 
+type ApplicantRow = CompanyApplicant & { name: string; discipline: string; role: string };
+
 export function ApplicantsView() {
   const { applicants, postings, setStage, ready } = useCompanyData();
   const a = t.applicantsPage;
-  const [role, setRole] = useState("");
-  const [stageFilter, setStageFilter] = useState<Stage | "">("");
+  const [role, setRole] = useState(ANY);
+  const [stageFilter, setStageFilter] = useState(ANY);
   const [openId, setOpenId] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
-  const shown = applicants.filter((x) => (!role || x.postingId === role) && (!stageFilter || x.stage === stageFilter));
+  const rows: ApplicantRow[] = applicants
+    .filter((x) => (role === ANY || x.postingId === role) && (stageFilter === ANY || x.stage === stageFilter))
+    .map((x) => {
+      const p = talentById(x.talentId);
+      return { ...x, name: p.name, discipline: p.discipline, role: postings.find((y) => y.id === x.postingId)?.title ?? "" };
+    });
   const current = applicants.find((x) => x.id === openId) as CompanyApplicant | undefined;
   const sessionApp = applicants.some((x) => x.fromSession);
-  const field = `mt-2 block w-full rounded-full border border-gray-500 bg-white px-4 py-2.5 text-gray-800 ${ring}`;
+
+  const columns = useMemo<ColumnDef<ApplicantRow, unknown>[]>(
+    () => [
+      {
+        accessorKey: "name",
+        header: a.columns.name,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-3">
+            <TalentAvatar name={row.original.name} />
+            <span>
+              <span className="block font-medium text-heading">{row.original.name}</span>
+              <span className="block text-xs text-muted-foreground">{row.original.discipline}</span>
+            </span>
+          </div>
+        ),
+      },
+      { accessorKey: "role", header: a.columns.role },
+      { accessorKey: "stage", header: a.columns.stage, cell: ({ row }) => <StagePill stage={row.original.stage} />, enableGlobalFilter: false },
+      {
+        accessorKey: "appliedDaysAgo",
+        header: ({ column }) => <SortHeader label={a.columns.applied} sorted={column.getIsSorted()} onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")} />,
+        cell: ({ row }) => (row.original.fromSession ? a.thisSession : ago(row.original.appliedDaysAgo)),
+        enableGlobalFilter: false,
+      },
+      {
+        id: "action",
+        header: () => <span className="sr-only">{t.recentApplicants.review}</span>,
+        cell: ({ row }) => (
+          <div className="text-right">
+            <Button
+              variant="navy"
+              size="sm"
+              onClick={() => {
+                setOpenId(row.original.id);
+                setSaved(false);
+              }}
+            >
+              {t.recentApplicants.review}
+              <span className="sr-only">: {row.original.name}</span>
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    [a],
+  );
 
   return (
     <div className="space-y-6">
       {ready && !sessionApp && (
-        <p className="flex items-start gap-2 rounded-tile border border-dashed border-gray-500 bg-white p-4 text-gray-700">
-          <Info aria-hidden className="mt-0.5 size-5 shrink-0" /> {a.hint}
-        </p>
+        <Alert>
+          <Info aria-hidden />
+          <AlertDescription>{a.hint}</AlertDescription>
+        </Alert>
       )}
-      <section aria-label={a.title} className="rounded-panel bg-white p-5 md:p-8">
-        <div className="grid gap-4 md:grid-cols-[1fr_1fr_2fr]">
-          <label className="block font-semibold text-navy-900">
-            {a.role}
-            <select value={role} onChange={(e) => setRole(e.target.value)} className={field}>
-              <option value="">{a.allRoles}</option>
-              {postings.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.title}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block font-semibold text-navy-900">
-            {a.columns.stage}
-            <select value={stageFilter} onChange={(e) => setStageFilter(e.target.value as Stage | "")} className={field}>
-              <option value="">{a.allStages}</option>
-              {stages.map((s) => (
-                <option key={s} value={s}>
-                  {a.stages[s]}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <div className="mt-6">
-          {shown.length === 0 ? (
-            <EmptyState icon={BriefcaseBusiness} title={a.empty.title} body={a.empty.body} />
-          ) : (
-            <DataTable
-              caption={a.title}
-              columns={[
-                { key: "name", header: a.columns.name },
-                { key: "role", header: a.columns.role },
-                { key: "stage", header: a.columns.stage },
-                { key: "applied", header: a.columns.applied },
-                { key: "action", header: "", className: "text-right" },
-              ]}
-              rows={shown.map((x) => {
-                const p = talentById(x.talentId);
-                return {
-                  key: x.id,
-                  cells: {
-                    name: (
-                      <span>
-                        {p.name}
-                        <span className="block text-sm font-normal text-gray-700">{p.discipline}</span>
-                      </span>
-                    ),
-                    role: postings.find((y) => y.id === x.postingId)?.title,
-                    stage: <StagePill stage={x.stage} />,
-                    applied: x.fromSession ? a.thisSession : ago(x.appliedDaysAgo),
-                    action: (
-                      <Button variant="navy" shape="pill" onClick={() => { setOpenId(x.id); setSaved(false); }}>
-                        {t.recentApplicants.review}
-                        <span className="sr-only">: {p.name}</span>
-                      </Button>
-                    ),
-                  },
-                };
-              })}
+      <DataGrid
+        data={rows}
+        columns={columns}
+        caption={a.title}
+        searchLabel={a.searchLabel}
+        searchPlaceholder={a.searchLabel}
+        emptyTitle={a.empty.title}
+        emptyBody={a.empty.body}
+        toolbar={
+          <>
+            <ToolbarSelect label={a.role} value={role} onChange={setRole} options={[{ value: ANY, label: a.allRoles }, ...postings.map((p) => ({ value: p.id, label: p.title }))]} />
+            <ToolbarSelect
+              label={a.columns.stage}
+              value={stageFilter}
+              onChange={setStageFilter}
+              options={[{ value: ANY, label: a.allStages }, ...stages.map((s) => ({ value: s, label: a.stages[s] }))]}
             />
-          )}
-        </div>
-        <p className="mt-4 text-sm text-gray-700">{a.note}</p>
-      </section>
+          </>
+        }
+      />
+      <p className="text-xs text-muted-foreground">{a.note}</p>
 
       <DetailDrawer open={!!current} onClose={() => setOpenId(null)} title={current ? talentById(current.talentId).name : ""}>
         {current && (
-          <div className="space-y-5">
-            <p className="text-gray-700">
+          <div className="space-y-5 text-sm">
+            <p className="text-muted-foreground">
               {postings.find((y) => y.id === current.postingId)?.title} · {current.fromSession ? a.thisSession : ago(current.appliedDaysAgo)}
             </p>
-            <label className="block font-semibold text-navy-900">
-              {a.moveTo}
-              <select
-                value={current.stage}
-                onChange={(e) => {
-                  setStage(current.id, e.target.value as Stage);
-                  setSaved(true);
-                }}
-                className={field}
-              >
-                {stages.map((s) => (
-                  <option key={s} value={s}>
-                    {a.stages[s]}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <FilterSelect
+              id="move-stage"
+              label={a.moveTo}
+              value={current.stage}
+              onChange={(v) => {
+                setStage(current.id, v as Stage);
+                setSaved(true);
+                toast.success(a.stageSaved);
+              }}
+              options={stages.map((s) => ({ value: s, label: a.stages[s] }))}
+            />
             {saved && (
-              <p role="status" className="flex items-start gap-2 rounded-tile bg-green-50 p-4 text-gray-800">
-                <CheckCircle2 aria-hidden className="mt-0.5 size-5 shrink-0 text-green-700" /> {a.stageSaved}
-              </p>
+              <Alert variant="success" role="status">
+                <CheckCircle2 aria-hidden />
+                <AlertDescription>{a.stageSaved}</AlertDescription>
+              </Alert>
             )}
             {current.talentId === "sample-1" && <MessageApplicant name={talentById(current.talentId).name} />}
             <ProfileDrawerBody profile={talentById(current.talentId)} />
@@ -692,29 +773,26 @@ function MessageApplicant({ name }: { name: string }) {
         setText("");
         setSent(true);
       }}
-      className="rounded-tile border border-gray-200 p-4"
+      className="space-y-3 rounded-lg border p-4"
     >
-      <label htmlFor="msg-applicant" className="font-semibold text-navy-900">
-        {m.companyAction.replace("{name}", name)}
-      </label>
-      <textarea
+      <TextArea
         id="msg-applicant"
-        rows={3}
+        label={m.companyAction.replace("{name}", name)}
         value={text}
-        onChange={(e) => {
-          setText(e.target.value);
+        onChange={(v) => {
+          setText(v);
           setError("");
           setSent(false);
         }}
-        placeholder={m.companyPlaceholder}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={error ? "msg-applicant-error" : undefined}
-        className={`mt-2 block w-full rounded-control border border-gray-500 px-3 py-2 text-gray-800 ${ring}`}
+        error={error}
       />
-      {error && <p id="msg-applicant-error" className="mt-2 font-semibold text-navy-900">{error}</p>}
-      <div className="mt-3 flex flex-wrap items-center gap-3">
-        <Button type="submit" variant="navy" shape="pill">{m.send}</Button>
-        <p role="status" className="text-sm font-semibold text-green-700">{sent ? m.companySent.replace("{name}", name) : ""}</p>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button type="submit" variant="navy">
+          {m.send}
+        </Button>
+        <p role="status" className="text-sm font-medium text-primary">
+          {sent ? m.companySent.replace("{name}", name) : ""}
+        </p>
       </div>
     </form>
   );

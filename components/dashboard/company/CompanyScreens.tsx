@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { Search } from "lucide-react";
-import { Button } from "@/components/Button";
+import { Button } from "@/components/ui/button";
 import { SettingsView } from "@/components/dashboard/SettingsView";
 import { settingsText } from "@/content/dashboard";
 import { DashPageHeader } from "@/components/dashboard/parts";
@@ -11,9 +12,9 @@ import { companyText as t, roleText } from "@/content/dashboard";
 import { sampleUsers } from "@/data/users";
 
 /*
-  Company dashboard (Checkpoint 8), in the student dashboard's visual language: big welcome line
-  with pill actions, coloured talent tiles (like course cards), a gradient summary card (like the
-  Skills Passport card), applicants list with navy Review buttons, and a tabbed "today" panel.
+  Company dashboard (redesign Step 7, on shadcn/ui), laid out like the Student overview:
+  recommended talent and recent applicants on the left; the hiring snapshot and a tabbed
+  "today" panel on the right.
 */
 
 const base = "/dashboard/company";
@@ -30,7 +31,7 @@ export function CompanyOverview() {
           title={
             <>
               {welcomeBefore}
-              <span className="text-green-700">
+              <span className="text-primary">
                 {firstName}
                 {welcomeAfter}
               </span>
@@ -39,20 +40,26 @@ export function CompanyOverview() {
           description={<WelcomeLine />}
           actions={
             <>
-              <Button href={`${base}/talent`} variant="outline" shape="pill" size="lg">
-                <Search aria-hidden className="size-5" /> {t.findTalent}
+              <Button asChild variant="outline">
+                <Link href={`${base}/talent`}>
+                  <Search data-icon="inline-start" aria-hidden /> {t.findTalent}
+                </Link>
               </Button>
-              <Button href={`${base}/opportunities`} shape="pill" size="lg">
-                {t.postCta}
+              <Button asChild>
+                <Link href={`${base}/opportunities`}>{t.postCta}</Link>
               </Button>
             </>
           }
         />
-        <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[1fr_24rem]">
-          <RecommendedTalent href={`${base}/talent`} />
-          <HiringSnapshot href={`${base}/opportunities`} />
-          <RecentApplicants href={`${base}/applicants`} />
-          <CompanyToday firstName={firstName} applicantsHref={`${base}/applicants`} opportunitiesHref={`${base}/opportunities`} />
+        <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
+          <div className="min-w-0 space-y-6">
+            <RecommendedTalent href={`${base}/talent`} />
+            <RecentApplicants href={`${base}/applicants`} />
+          </div>
+          <div className="min-w-0 space-y-6">
+            <HiringSnapshot href={`${base}/opportunities`} />
+            <CompanyToday firstName={firstName} applicantsHref={`${base}/applicants`} opportunitiesHref={`${base}/opportunities`} />
+          </div>
         </div>
       </div>
     </CompanyDataProvider>
