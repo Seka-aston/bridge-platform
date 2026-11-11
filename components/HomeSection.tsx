@@ -5,13 +5,14 @@ import { cn } from "@/lib/utils";
   Wrapper for each page section: background, vertical padding (96px desktop, 64px mobile),
   centred 1200px content width, and an accessible name taken from the section's heading
   (pass the heading's id as labelledBy).
-  tone "green" is the alternate tinted section (the section-tint token); "navy" flips colours.
+  tone "green" is the alternate tinted section (the section-tint token); "navy" flips colours;
+  "brand" is the flat Bridge green (surface-brand), used to highlight the Bridge AI section.
 */
 
 type HomeSectionProps = {
   id: string;
   labelledBy: string;
-  tone?: "white" | "green" | "navy";
+  tone?: "white" | "green" | "navy" | "brand";
   children: ReactNode;
 };
 
@@ -19,6 +20,7 @@ const tones = {
   white: "bg-background",
   green: "bg-section-tint",
   navy: "surface-navy",
+  brand: "surface-brand",
 };
 
 export function HomeSection({ id, labelledBy, tone = "white", children }: HomeSectionProps) {

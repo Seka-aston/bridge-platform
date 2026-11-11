@@ -8,7 +8,8 @@ import type { Story } from "@/data/stories";
 import { cn } from "@/lib/utils";
 
 /*
-  Testimonial / story card (spec 4.2.10). Approved stories only. With no story supplied,
+  Testimonial / story card (spec 4.2.10). Approved stories only. Without a photo, the person's
+  initials sit in a navy circle (decorative: the name is right beside it). With no story supplied,
   prototype mode shows a clearly bracketed placeholder on a quiet tinted card; outside
   prototype mode nothing is shown.
 */
@@ -30,7 +31,15 @@ export function StoryCard({ story }: { story?: Story }) {
         </blockquote>
         {story?.outcome && <p className="mt-4 font-semibold text-primary">{story.outcome}</p>}
         <figcaption className="mt-auto flex items-center gap-3 pt-6">
-          {story?.image && <Image src={story.image.src} alt={story.image.alt} width={48} height={48} className="size-12 rounded-full object-cover" />}
+          {story?.image ? (
+            <Image src={story.image.src} alt={story.image.alt} width={48} height={48} className="size-12 rounded-full object-cover" />
+          ) : (
+            story?.initials && (
+              <span aria-hidden className="inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-navy text-sm font-semibold text-white">
+                {story.initials}
+              </span>
+            )
+          )}
           <div>
             <p className="font-semibold text-heading">{placeholder ? t.placeholderName : story.name}</p>
             <p className="text-sm text-muted-foreground">{placeholder ? t.placeholderRole : story.role}</p>

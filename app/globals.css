@@ -149,8 +149,26 @@
   --accent-foreground: #ffffff;
 }
 
+/* Flat Bridge green section (the button green, #277A4D), e.g. the homepage Bridge AI section
+   (Aston, 11 Nov 2026). White text 5.3:1, pale-green text 4.6:1. Amber small text fails here
+   (2.75:1), so eyebrows stay white. */
+@utility surface-brand {
+  background-color: var(--primary);
+  color: #ffffff;
+  --foreground: #ffffff;
+  --muted-foreground: #e3f3ea;
+  --border: rgb(255 255 255 / 0.28);
+  --ring: #ffffff;
+  --heading: #ffffff;
+  --eyebrow-foreground: #ffffff;
+  --link: #ffffff;
+  --link-hover: #e3f3ea;
+  --accent: rgb(255 255 255 / 0.12);
+  --accent-foreground: #ffffff;
+}
+
 /* White cards and menus placed on a navy section (e.g. the hero visual) switch back to light-surface tokens. */
-:is(.surface-navy, .tokens-navy, .surface-green, .tokens-green) :is([data-slot="card"], [data-slot="navigation-menu-viewport"]) {
+:is(.surface-navy, .tokens-navy, .surface-green, .tokens-green, .surface-brand) :is([data-slot="card"], [data-slot="navigation-menu-viewport"]) {
   --foreground: #1f2937;
   --muted-foreground: #626a75;
   --border: #e5e7eb;
@@ -166,7 +184,7 @@
 
 /* Layout (kept from the original system; shared by old and new components) */
 /* Badges on navy (outside white cards): colours that only work on light surfaces are swapped. */
-:is(.surface-navy, .tokens-navy, .surface-green, .tokens-green) [data-slot="badge"]:not([data-slot="card"] *) {
+:is(.surface-navy, .tokens-navy, .surface-green, .tokens-green, .surface-brand) [data-slot="badge"]:not([data-slot="card"] *) {
   &[data-variant="draft"] {
     background-color: var(--brand-amber);
     color: var(--brand-navy); /* 5.7:1 */

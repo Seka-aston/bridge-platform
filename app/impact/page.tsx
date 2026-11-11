@@ -30,7 +30,7 @@ export default function ImpactPage() {
       {(visible.length > 0 || prototypeMode) && (
         <HomeSection id="stories" labelledBy="stories-title" tone="green">
           <h2 id="stories-title" className="sr-only">{impact.headline}</h2>
-          <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-6 md:grid-cols-2">
             {visible.length > 0 ? (
               visible.map((s) => (
                 <li key={s.id}>

@@ -122,7 +122,8 @@ export default function Home() {
           title={talent.headline}
           supporting={talent.supporting}
         />
-        <ul className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {/* Two columns: four testimonials make a balanced 2 × 2 grid. */}
+          <ul className="mt-12 grid gap-6 md:grid-cols-2">
           {talentProfiles.slice(0, 3).map((p) => (
             <li key={p.id}>
               <TalentCard profile={p} />
@@ -140,7 +141,7 @@ export default function Home() {
       </HomeSection>
 
       {/* 8. Bridge AI (product preview, labelled as in development) */}
-      <HomeSection id="bridge-ai" labelledBy="bridge-ai-title" tone="green">
+      <HomeSection id="bridge-ai" labelledBy="bridge-ai-title" tone="brand">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div>
             <Badge kind="preview" />
@@ -170,7 +171,8 @@ export default function Home() {
               <TextLink href={impact.cta.href}>{impact.cta.label}</TextLink>
             }
           />
-          <ul className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {/* Two columns: four testimonials make a balanced 2 × 2 grid. */}
+          <ul className="mt-12 grid gap-6 md:grid-cols-2">
             {visibleStories.length > 0 ? (
               visibleStories.map((s) => (
                 <li key={s.id}>
@@ -214,7 +216,8 @@ export default function Home() {
               <TextLink href={insights.cta.href}>{insights.cta.label}</TextLink>
             }
           />
-          <ul className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {/* Two columns: four testimonials make a balanced 2 × 2 grid. */}
+          <ul className="mt-12 grid gap-6 md:grid-cols-2">
             {visibleArticles.map((a) => (
               <li key={a.id}>
                 <ArticleCard article={a} />

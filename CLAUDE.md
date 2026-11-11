@@ -64,6 +64,8 @@ All values live in `:root` and are exposed to Tailwind through `@theme inline`. 
 | `chart-1…5` | validated palette | Multi-series charts (single-series charts use `primary`) |
 | `sidebar-*` | light grey | Dashboard sidebar |
 
+**Green section (11 Nov 2026):** `surface-brand` (HomeSection `tone="brand"`) paints the flat button green (`primary`, #277A4D) and flips the tokens to white like the hero; used for the homepage Bridge AI section. The logo green (#3AAA6D) is never a text background (white on it is 2.9:1), and amber small text fails on `surface-brand` (2.75:1), so eyebrows there stay white.
+
 **Navy surfaces:** `surface-navy` paints a navy background and flips the tokens (text, muted text, borders, links, focus ring → white); `tokens-navy` flips the tokens only. White cards and menus inside a navy section reset to the light tokens automatically.
 
 **Accessibility (decided):** WCAG 2.1 AA everywhere. The focus ring is a solid 2px outline with a 2px gap: navy on light backgrounds, white on navy. Animations respect "reduce motion".
@@ -124,8 +126,8 @@ These come directly from the spec and apply to every section.
 | 5 | **Audience pathways** | "One Ecosystem. Different Pathways to Growth." · 4 consistent panels: Talents, Schools, Companies, Ecosystem Partners. |
 | 6 | **Programmes and Ventures Lab** | "Opportunities to Learn, Build, and Grow." · programme cards driven by data · Ventures Lab featured when open · CTA Explore All Programmes. |
 | 7 | **Talent discovery** | Eyebrow "SKILLS THAT CONNECT TO WORK" · "Help Employers See What Talent Can Do." · illustrative profile cards · CTAs Hire Vetted Talent, Explore the Skills Passport. |
-| 8 | **Bridge AI** | Eyebrow "INTELLIGENCE FOR THE JOURNEY AHEAD" · "Your AI Companion from the Classroom to Your Career." · capabilities shown as a **product preview**, labelled as in development. |
-| 9 | **Impact and learner stories** | "Progress That Goes Beyond Graduation." · approved stories only · CTA Explore Bridge's Impact. |
+| 8 | **Bridge AI** | Eyebrow "INTELLIGENCE FOR THE JOURNEY AHEAD" · "Your AI Companion from the Classroom to Your Career." · capabilities shown as a **product preview**, labelled as in development. · Full green section (`surface-brand`) since 11 Nov 2026 to highlight it (Aston). |
+| 9 | **Impact and learner stories** | "Progress That Goes Beyond Graduation." · approved stories only · CTA Explore Bridge's Impact. · Four testimonials supplied by Aston (11 Nov 2026) in `data/stories.ts`, 2 × 2 grid with initials avatars. |
 | 10 | **How Bridge works** | "One Connected Journey, from Learning to Opportunity." · 4 steps: Learn, Build, Demonstrate, Connect, with consistent icons · CTA Start Your Journey. Must not imply every student automatically goes through every stage. |
 | 11 | **Insights and resources** | "Ideas for the Future of Technical Talent." · article cards · CTA Explore Resources. |
 | 12 | **Final conversion** | "Let's Connect Technical Talent to Opportunity." · Join a Programme, Book a Discovery Call, Partner with Bridge link. Strong brand section (navy, with green accents; the spec asks for green, Aston chose navy on 7 Nov 2026). |
@@ -168,7 +170,7 @@ Every component is reviewed on **`/components-preview`** before it is used. To a
 | Booking tool for "Book a Discovery Call" | Not specified |
 | Programme data source | Prototype: shared sample data in `/data`. Real source not specified. |
 | Login destination | Prototype (Aston, 8 Nov 2026): log in screen with email/password and simulated Google, Microsoft and LinkedIn buttons; the four sample users' emails open their dashboards with any password; simulated create-account and password-reset screens. Real login provider not specified. |
-| Approved stats, logos, testimonials, photos | Partner logos supplied by Aston (11 Nov 2026), taken from each organisation's own site; Bridge to confirm each partner agrees to its logo being shown. Stats, testimonials and photos awaiting Bridge |
+| Approved stats, logos, testimonials, photos | Partner logos supplied by Aston (11 Nov 2026), taken from each organisation's own site; Bridge to confirm each partner agrees to its logo being shown. Testimonials (4) and programme photos supplied by Aston (11 Nov 2026); Bridge to confirm the people quoted or pictured agree. Stats awaiting Bridge |
 | Official social accounts | Instagram supplied by Aston (11 Nov 2026): https://www.instagram.com/bridge.rw/, an icon button in the footer's Contact column. Others awaiting Bridge |
 | Analytics setup | Not specified |
 | Hosting and deployment | **Live at https://bridge.co.rw since 11 Nov 2026** (Aston's decision): Vercel project `bridge-platform-eovr` (team `lineaars-projects`, Hobby plan while non-commercial), auto-deployed from GitHub `main`. `www.bridge.co.rw` redirects permanently (308) to `bridge.co.rw`. DNS is Netlify DNS (the domain's nameservers are `dns1–4.p03.nsone.net`), not the AOS panel, whose records are inactive. Records in Netlify → DNS → bridge.co.rw: A `@` 216.198.79.1 and 64.29.17.1; CNAME `www` 7f3b9f325e54c5e7.vercel-dns-017.com. The old site stays on Netlify at `bridgerwanda.netlify.app` for rollback. Optional later: move nameservers to Vercel through AOS. |
