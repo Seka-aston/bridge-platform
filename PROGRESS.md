@@ -523,3 +523,10 @@ Decisions (Aston, 8 Nov 2026):
 - Accessibility: logo alt text is the organisation's name; screen readers hear the list once. Rows pause on hover and keyboard focus, a Pause / Play button stops both (required for moving content), and with reduced motion the rows become a still, wrapped grid.
 - QA: homepage at 375, 768, 1024 and 1440px: 0 accessibility issues, no sideways scrolling; Tab reaches the Pause button and Enter stops the rows.
 
+### 2026-11-11 — bridge.co.rw moved from Netlify to Vercel
+- Found that the domain's DNS is run by Netlify DNS (nameservers `dns1–4.p03.nsone.net`), so the records on the AOS seller's panel are not used; no change was needed at AOS.
+- Added `bridge.co.rw` and `www.bridge.co.rw` (permanent redirect to `bridge.co.rw`) to the Vercel project from the command line.
+- Aston removed the domain from the old Netlify site (`bridgerwanda`) and added Vercel's records in Netlify DNS: A `@` 216.198.79.1 and 64.29.17.1, CNAME `www` → 7f3b9f325e54c5e7.vercel-dns-017.com.
+- Checked: Vercel reports both addresses configured correctly; Let's Encrypt certificates issued for both (renewed automatically); http → https and www → bridge.co.rw redirects work; all 60 pages answer 200 on https://bridge.co.rw, including the partner logos and Instagram link.
+- Rollback: delete the three records and re-add the domain to the Netlify site `bridgerwanda` (still live at bridgerwanda.netlify.app).
+

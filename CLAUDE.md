@@ -171,7 +171,7 @@ Every component is reviewed on **`/components-preview`** before it is used. To a
 | Approved stats, logos, testimonials, photos | Partner logos supplied by Aston (11 Nov 2026), taken from each organisation's own site; Bridge to confirm each partner agrees to its logo being shown. Stats, testimonials and photos awaiting Bridge |
 | Official social accounts | Instagram supplied by Aston (11 Nov 2026): https://www.instagram.com/bridge.rw/, an icon button in the footer's Contact column. Others awaiting Bridge |
 | Analytics setup | Not specified |
-| Hosting and deployment | Prototype: Vercel (`bridge-platform-eovr`), auto-deployed from GitHub `main`. Final hosting not specified. |
+| Hosting and deployment | **Live at https://bridge.co.rw since 11 Nov 2026** (Aston's decision): Vercel project `bridge-platform-eovr` (team `lineaars-projects`, Hobby plan while non-commercial), auto-deployed from GitHub `main`. `www.bridge.co.rw` redirects permanently (308) to `bridge.co.rw`. DNS is Netlify DNS (the domain's nameservers are `dns1–4.p03.nsone.net`), not the AOS panel, whose records are inactive. Records in Netlify → DNS → bridge.co.rw: A `@` 216.198.79.1 and 64.29.17.1; CNAME `www` 7f3b9f325e54c5e7.vercel-dns-017.com. The old site stays on Netlify at `bridgerwanda.netlify.app` for rollback. Optional later: move nameservers to Vercel through AOS. |
 | Bridge sign-off on the green hero (Aston's Figma, 9 Nov 2026) and the navy final section | Aston to confirm with Bridge |
 | Hero map: learners across Africa (Dakar, Lagos, Cairo, Addis Ababa, Kinshasa, Johannesburg) show ambition, not current reach | Awaiting Bridge approval (no Draft label since 11 Nov 2026) |
 
