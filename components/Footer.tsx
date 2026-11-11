@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { Badge } from "@/components/Badge";
 import { InstagramIcon } from "@/components/InstagramIcon";
+import { LinkedInIcon } from "@/components/LinkedInIcon";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -112,7 +113,7 @@ export function Footer() {
                     <li key={s.href}>
                       <Button asChild variant="on-navy" size="icon-lg">
                         <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}>
-                          <InstagramIcon className="size-5" />
+                          {s.icon === "linkedin" ? <LinkedInIcon className="size-5" /> : <InstagramIcon className="size-5" />}
                         </a>
                       </Button>
                     </li>

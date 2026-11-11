@@ -548,3 +548,7 @@ Decisions (Aston, 8 Nov 2026):
 - QA: homepage at four widths: 0 accessibility issues, no sideways scrolling.
 
 - Aston approved as built: no perspective tags, spec heading kept.
+
+### 2026-11-11 — LinkedIn in the footer
+- LinkedIn icon button next to Instagram in the footer's Contact column, same style (44px, outlined white on navy, opens in a new tab; screen readers hear "Bridge on LinkedIn (opens in a new tab)"). Link: https://www.linkedin.com/company/bridgerwanda/ (Aston's link without the admin-only `?viewAsMember=true` view). Icon drawn in the lucide line style (`components/LinkedInIcon.tsx`).
+

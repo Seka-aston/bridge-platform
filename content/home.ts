@@ -298,8 +298,9 @@ export const footer = {
     email: "bridgerwanda77@gmail.com",
     approved: false,
   } as undefined | { email?: string; phone?: string; address?: string; approved: boolean },
-  // Official Instagram, supplied by Aston on 11 Nov 2026. `label` is read out by screen readers.
+  // Official accounts supplied by Aston on 11 Nov 2026. `label` is read out by screen readers.
   social: [
     { label: "Bridge on Instagram (opens in a new tab)", href: "https://www.instagram.com/bridge.rw/", icon: "instagram" },
-  ] as { label: string; href: string; icon: "instagram" }[],
+    { label: "Bridge on LinkedIn (opens in a new tab)", href: "https://www.linkedin.com/company/bridgerwanda/", icon: "linkedin" },
+  ] as { label: string; href: string; icon: "instagram" | "linkedin" }[],
 };
