@@ -16,7 +16,9 @@ export type Programme = {
   opensOn: string; // applications open (YYYY-MM-DD)
   closesOn: string; // applications close
   endsOn: string; // programme ends; after this it is archived
-  image?: { src: string; alt: string };
+  // `logo`: the image is a logo, shown whole on a brand-green panel (its size in pixels).
+  // `position`: which part of a photo stays in view when it is cropped to the card (CSS object-position).
+  image?: { src: string; alt: string; logo?: { width: number; height: number }; position?: string };
   featured?: boolean; // Bridge Ventures Lab, featured when relevant and available
   approved: boolean;
 };
@@ -40,6 +42,25 @@ export const programmes: Programme[] = [
     endsOn: "2027-02-28",
     featured: true,
     approved: false,
+    // Ventures Lab logo supplied by Aston (11 Nov 2026).
+    image: { src: "/programmes/ventures-lab-logo.png", alt: "Bridge Ventures Lab logo", logo: { width: 805, height: 349 } },
+  },
+  {
+    // Live bridge.co.rw "Career Guidance" programme (added 11 Nov 2026 as the homepage's third card).
+    // The live site says "Ongoing" and gives no location: location and dates are SAMPLES.
+    id: "career-guidance",
+    name: "Career Guidance",
+    summary: "Personalised mentorship and career planning to help you navigate your future.",
+    audience: "All Bridge programme participants",
+    eligibility: ["Open to all Bridge programme participants"],
+    format: "Mentorship and workshops · Ongoing",
+    location: "Kigali, Rwanda",
+    opensOn: "2026-09-01",
+    closesOn: "2027-06-30",
+    endsOn: "2027-12-31",
+    // Photo supplied by Aston (11 Nov 2026).
+    image: { src: "/programmes/career-guidance.jpg", alt: "A participant holding a Bridge and UniPod certificate of completion, standing with two others in front of a Bridge banner", position: "50% 0%" },
+    approved: false,
   },
   {
     id: "internship-training-jan-2027",
@@ -52,6 +73,8 @@ export const programmes: Programme[] = [
     opensOn: "2026-12-01",
     closesOn: "2027-01-10",
     endsOn: "2027-07-31",
+    // Photo supplied by Aston (11 Nov 2026).
+    image: { src: "/programmes/internship.jpg", alt: "TVET students working together on laptops in a design lab" },
     approved: false,
   },
   {
@@ -65,6 +88,8 @@ export const programmes: Programme[] = [
     opensOn: "2026-08-15",
     closesOn: "2026-10-15",
     endsOn: "2027-01-15",
+    // Photo supplied by Aston (11 Nov 2026).
+    image: { src: "/programmes/entrepreneurship.jpg", alt: "Two smiling Bridge scholars posing inside a Bridge x UniPod photo frame", position: "50% 40%" },
     approved: false,
   },
   {
@@ -78,6 +103,8 @@ export const programmes: Programme[] = [
     opensOn: "2026-02-01",
     closesOn: "2026-03-01",
     endsOn: "2026-09-30",
+    // Photo supplied by Aston (11 Nov 2026).
+    image: { src: "/programmes/internship.jpg", alt: "TVET students working together on laptops in a design lab" },
     approved: false,
   },
 ];

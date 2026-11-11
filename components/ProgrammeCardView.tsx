@@ -41,8 +41,13 @@ export function ProgrammeCard({ programme: p, status, featured = false }: Progra
   return (
     <Card className={cn("h-full gap-0 py-0 text-base", featured && "lg:flex-row")}>
       <div className={cn("relative", featured && "lg:w-5/12 lg:shrink-0")}>
-        {p.image ? (
-          <Image src={p.image.src} alt={p.image.alt} width={800} height={450} className={cn("aspect-video w-full object-cover", featured && "lg:h-full")} />
+        {p.image?.logo ? (
+          // A programme logo sits whole on a brand-green panel (the logo's own background), never cropped.
+          <div className={cn("flex aspect-video w-full items-center justify-center bg-brand-green p-8", featured && "lg:aspect-auto lg:h-full lg:p-12")}>
+            <Image src={p.image.src} alt={p.image.alt} width={p.image.logo.width} height={p.image.logo.height} className="h-auto w-full max-w-sm" />
+          </div>
+        ) : p.image ? (
+          <Image src={p.image.src} alt={p.image.alt} width={800} height={450} style={p.image.position ? { objectPosition: p.image.position } : undefined} className={cn("aspect-video w-full object-cover", featured && "lg:h-full")} />
         ) : (
           <ImagePlaceholder className={cn("aspect-video w-full", featured && "lg:aspect-auto lg:h-full")} />
         )}
