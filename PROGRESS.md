@@ -552,3 +552,8 @@ Decisions (Aston, 8 Nov 2026):
 ### 2026-11-11 — LinkedIn in the footer
 - LinkedIn icon button next to Instagram in the footer's Contact column, same style (44px, outlined white on navy, opens in a new tab; screen readers hear "Bridge on LinkedIn (opens in a new tab)"). Link: https://www.linkedin.com/company/bridgerwanda/ (Aston's link without the admin-only `?viewAsMember=true` view). Icon drawn in the lucide line style (`components/LinkedInIcon.tsx`).
 
+### 2026-11-11 — Designed covers for article cards
+- The two article cards in "Ideas for the Future of Technical Talent." showed the placeholder logo. Aston chose designed brand covers (over reusing programme photos, stock photos or waiting for photos).
+- New `components/ArticleCover.tsx`: a navy or green panel, the hero's dotted map of Africa fading in from the right, a large line icon for the topic in a frosted 12px-corner tile, and the white Bridge wordmark. Decorative (hidden from screen readers; the title is the card's link). Set per article in `data/articles.ts` (`cover: { icon, tone }`): internship tips = briefcase on navy, mentees guide = two people on green. Articles without a cover get a navy one with a book icon; a real photo always takes priority.
+- Also on the Resources page and the student dashboard's resources. Homepage: 0 accessibility issues at four widths, no sideways scrolling.
+

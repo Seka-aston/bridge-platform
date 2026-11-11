@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/Badge";
-import { ImagePlaceholder } from "@/components/ImagePlaceholder";
+import { ArticleCover } from "@/components/ArticleCover";
 import { Card } from "@/components/ui/card";
 import { Eyebrow, H3 } from "@/components/ui/typography";
 import { prototypeMode } from "@/content/site";
@@ -24,7 +24,7 @@ export function ArticleCard({ article: a, showImage = true }: { article: Article
         (a.image ? (
           <Image src={a.image.src} alt={a.image.alt} width={800} height={450} className="aspect-video w-full object-cover" />
         ) : (
-          <ImagePlaceholder className="aspect-video w-full" />
+          <ArticleCover cover={a.cover} />
         ))}
       <div className="flex flex-1 flex-col p-6">
         <div className="flex flex-wrap items-center gap-2">

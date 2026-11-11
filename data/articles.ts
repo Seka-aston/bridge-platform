@@ -7,6 +7,9 @@
 
 export type ArticleBlock = { heading?: string; paragraphs?: string[]; list?: string[] };
 
+// Designed cover shown when an article has no photo (components/ArticleCover.tsx).
+export type ArticleCover = { icon: "briefcase" | "mentoring" | "reading"; tone: "navy" | "green" };
+
 export type Article = {
   id: string;
   category: string;
@@ -15,6 +18,7 @@ export type Article = {
   publishedOn: string; // YYYY-MM-DD
   readingMinutes?: number;
   image?: { src: string; alt: string };
+  cover?: ArticleCover;
   href: string;
   body?: ArticleBlock[];
   approved: boolean;
@@ -25,6 +29,7 @@ export const articles: Article[] = [
     id: "successful-internship-tips",
     category: "Blog",
     title: "5 Tips for a Successful Internship",
+    cover: { icon: "briefcase", tone: "navy" },
     excerpt:
       "Learn how to make the most of your internship experience, from setting goals to networking effectively.",
     publishedOn: "2023-10-26",
@@ -84,6 +89,7 @@ export const articles: Article[] = [
     id: "mentee-guide",
     category: "Mentorship Guide",
     title: "Guide for Mentees: How to Build a Great Mentoring Relationship",
+    cover: { icon: "mentoring", tone: "green" },
     excerpt:
       "This guide provides practical advice for students on how to engage with their mentors for maximum benefit.",
     publishedOn: "2023-10-10",
