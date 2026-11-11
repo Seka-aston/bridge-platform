@@ -15,6 +15,8 @@ const buttonVariants = cva(
         outline:
           "border-border bg-background text-foreground shadow-xs hover:bg-accent aria-expanded:bg-accent",
         navy: "bg-brand-navy text-brand-navy-foreground hover:bg-brand-navy/90",
+        // White button with green text, for the green homepage hero and its see-through header.
+        inverse: "bg-white text-primary hover:bg-secondary",
         // For navy sections (hero, final band). Pair with the surface-navy utility.
         "on-navy":
           "border-brand-navy-foreground/50 bg-transparent text-brand-navy-foreground hover:bg-brand-navy-foreground/10",

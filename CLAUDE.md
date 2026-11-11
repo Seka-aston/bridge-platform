@@ -37,7 +37,7 @@ Current live site for reference: https://bridge.co.rw
 
 ## 4. Design system: shadcn/ui with the Bridge theme
 
-Since 8 November 2026 the whole platform runs on **shadcn/ui** with a Bridge theme (redesign Steps 1–8, see `PROGRESS.md`). Visual direction: **navy and white with green actions**, premium and production-ready. The spec's emerald hero with amber highlights is **not** used; its content is kept but rendered in navy and green.
+Since 8 November 2026 the whole platform runs on **shadcn/ui** with a Bridge theme (redesign Steps 1–8, see `PROGRESS.md`). Visual direction: **navy and white with green actions**, premium and production-ready. The one exception is the **homepage hero**, rebuilt from Aston's own Figma design (9 Nov 2026): a deep green gradient (`hero-start` → `hero-end`, `surface-green`) with amber highlights, glass details and a dotted map of Africa. The header is see-through over it until the visitor scrolls. Everything else stays navy and green.
 
 ### Tokens (`app/globals.css`)
 
@@ -52,7 +52,8 @@ All values live in `:root` and are exposed to Tailwind through `@theme inline`. 
 | `link`, `eyebrow-foreground` | `#277A4D` | Text links, eyebrow labels |
 | `brand-navy` | `#1C3D6A` | Navy sections, footer, avatars, Navy button |
 | `brand-green` | `#3AAA6D` | Logo, icons, illustrations, decorative arcs. **Never small text** (2.9:1) |
-| `brand-amber` | `#F8AC36` | Decorative accent only: Draft label tint, rank chip, shortlist star, notification dot. Navy text on it |
+| `brand-amber` | `#F8AC36` | Decorative accent: Draft label tint, rank chip, shortlist star, notification dot. Navy text on it. Also the large highlighted headline words on the green hero (3:1 for large text) |
+| `hero-start` / `hero-end` | `#016A3F` / `#015432` | Homepage hero gradient only. The Figma's `#027A48` start is deepened so amber and pale-green text pass over the glow |
 | `muted` / `muted-foreground` | `#F4F6F5` / `#626A75` | Quiet backgrounds / captions and metadata (5.5:1) |
 | `section-tint` | `#F4F6F5` | Alternate marketing sections (neutral grey, not mint) |
 | `accent` | `#EEF1F0` | Hover background for menus and list rows |
@@ -90,7 +91,7 @@ Headings are left-aligned by default; centred only for short single-statement se
 
 ### Variants (customise through these, never one-off overrides)
 
-- **Button** (`components/ui/button.tsx`): `default` (green), `secondary`, `outline`, `navy` (dashboard actions such as Apply, Review), `on-navy` (on navy sections), `ghost`, `link`, `destructive`. Sizes `xs`, `sm`, `default` (36px), `lg` (44px), `xl` (48px), `icon*`. Links that look like buttons use `<Button asChild><Link/></Button>`. Every state (hover, focus-visible, active, disabled, loading with `Spinner`) comes from the component.
+- **Button** (`components/ui/button.tsx`): `default` (green), `secondary`, `outline`, `navy` (dashboard actions such as Apply, Review), `on-navy` (on navy sections and the green hero), `inverse` (white with green text, on the green hero and its header), `ghost`, `link`, `destructive`. Sizes `xs`, `sm`, `default` (36px), `lg` (44px), `xl` (48px), `icon*`. Links that look like buttons use `<Button asChild><Link/></Button>`. Every state (hover, focus-visible, active, disabled, loading with `Spinner`) comes from the component.
 - **Badge** (`components/ui/badge.tsx`), always text, never colour alone: programme status `open`, `upcoming`, `closed`, `archived` (calculated from dates); `draft` (amber tint with a pencil, content awaiting Bridge approval); `preview` ("Coming soon", Bridge AI); `sample` ("Sample profile", "Sample figures"); `verified`; `featured`; plus `secondary` and `outline`. Dashboard stage labels map onto these: the further along, the stronger the green.
 - **Alert**: `default` (info), `success`, `destructive`. **Card** takes `as="section" | "article"`. **Table** takes `scrollLabel` so narrow screens scroll it in a labelled frame.
 
@@ -116,7 +117,7 @@ These come directly from the spec and apply to every section.
 | # | Section | Key content |
 |---|---|---|
 | 1 | **Header** | Logo · For Talents, For Schools, For Companies, Ventures Lab, For Ecosystem (dropdowns) · Login (visually secondary) · Book a Discovery Call (primary). Sticky, compact, mobile menu. |
-| 2 | **Hero** | Eyebrow "THE FUTURE OF TVET EMPLOYABILITY" · H1 "From Technical Skills to Real-World Opportunity." · supporting line · CTAs: Join a Programme (primary), Hire Vetted Talent (secondary), Book a Discovery Call (text link) · ecosystem visual: learner profiles, Skills Passport indicators, disciplines, partners and opportunity cards linked by a subtle network graphic. Not a generic AI animation, not an overcrowded map. |
+| 2 | **Hero** | Eyebrow "THE FUTURE OF TVET EMPLOYABILITY" · H1 "From Technical Skills to Real-World Opportunity." · supporting line · CTAs: Join a Programme (primary), Hire Vetted Talent (secondary), Book a Discovery Call (text link) · ecosystem visual: learner profiles, Skills Passport indicators, disciplines, partners and opportunity cards linked by a subtle network graphic. Not a generic AI animation, not an overcrowded map. **Built (9 Nov 2026) from Aston's Figma** (Bridge Designs, node 18:152): spec copy kept, last words of the H1 in amber, dotted Africa map with sample learners linked to Kigali (labelled illustration, Draft), Bridge AI preview bar that links to `/bridge-ai` (Coming soon, not an input). |
 | 3 | **Trust and credibility** | "Built Around Real Learners. Connected to Industry." · stats: 1,000+ students, 24+ partner schools, 15+ industry firms, 45+ facilitators (**all awaiting approval**) · optional verified logos. |
 | 4 | **The Bridge ecosystem** | Eyebrow "ONE CONNECTED JOURNEY" · "More Than Learning. A Pathway to Opportunity." · 3 service cards: Learn and Build, Prove Your Skills, Connect to Opportunity, each with capabilities list and CTA. |
 | 5 | **Audience pathways** | "One Ecosystem. Different Pathways to Growth." · 4 consistent panels: Talents, Schools, Companies, Ecosystem Partners. |
@@ -170,7 +171,8 @@ Every component is reviewed on **`/components-preview`** before it is used. To a
 | Official social accounts | Awaiting Bridge (the live footer's GitHub icon looks like a template leftover) |
 | Analytics setup | Not specified |
 | Hosting and deployment | Prototype: Vercel (`bridge-platform-eovr`), auto-deployed from GitHub `main`. Final hosting not specified. |
-| Bridge sign-off on navy-and-green instead of the spec's emerald hero and green final section | Aston to confirm with Bridge |
+| Bridge sign-off on the green hero (Aston's Figma, 9 Nov 2026) and the navy final section | Aston to confirm with Bridge |
+| Hero map: learners across Africa (Dakar, Lagos, Cairo, Addis Ababa, Kinshasa, Johannesburg) show ambition, not current reach | Shown with Draft until Bridge approves |
 
 ## 10. Definition of done (from spec 4.2.16)
 

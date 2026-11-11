@@ -39,17 +39,29 @@ export const hero = {
   additional: { label: "Book a Discovery Call", href: "/book-a-discovery-call" },
 };
 
-// Hero ecosystem visual (spec 4.2.3). Illustrative only: no real people, partners or logos.
-// The learner comes from the shared sample data (data/talent.ts). Disciplines are the live
-// site's internship tracks. Partner and opportunity nodes are generic and labelled as samples.
+// Hero ecosystem visual (spec 4.2.3), from Aston's Figma hero (9 Nov 2026): a dotted map of
+// Africa with sample learners linked to Bridge in Kigali. Illustrative only: the people are
+// sample profiles, and no match scores are shown (content rule 4).
+// TODO: awaiting Bridge approval. Learners across Africa show Bridge's ambition, not current reach.
 export const heroVisual = {
   label:
-    "Illustration: a sample learner's Skills Passport connected to technical disciplines, a partner school, an industry partner and an internship opportunity.",
-  passportTitle: "Skills Passport",
-  disciplines: ["Software Development", "Electrical Installation", "Wood Technology", "Welding"],
-  school: { title: "TVET partner school", detail: "Training and assessment" },
-  industry: { title: "Industry partner", detail: "Projects and mentorship" },
-  opportunity: { tag: "Sample opportunity", title: "Software development internship", detail: "Partner company · Kigali" },
+    "Illustration: a map of Africa with sample learner profiles in six cities, each connected to Bridge in Kigali, Rwanda.",
+  caption: "Illustration · sample profiles",
+  hub: { title: "Bridge Hub", detail: "Kigali, Rwanda" },
+  // Initials on the map, in the order of the connection lines.
+  learners: ["AD", "CO", "YH", "MT", "JP", "TM"],
+  cards: [
+    { name: "Chiamaka O.", city: "Lagos", discipline: "Solar PV Technician", chip: "Sample profile" },
+    { name: "Thabo M.", city: "Johannesburg", discipline: "Automotive Mechatronics", chip: "Verified" },
+  ],
+};
+
+// Bridge AI preview bar under the hero buttons. Not a chat input (content rule 3): it links to the
+// Bridge AI page and is marked "Coming soon".
+export const heroAi = {
+  prompt: "Ask Bridge anything: courses, internships, skills",
+  href: "/bridge-ai",
+  label: "Bridge AI preview: ask about courses, internships and skills. Coming soon.",
 };
 
 export const trust = {

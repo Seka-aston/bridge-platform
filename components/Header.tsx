@@ -25,15 +25,16 @@ import { cn } from "@/lib/utils";
   Menu items become dropdowns automatically when they have `children` in content/home.ts
   (Bridge has not supplied the dropdown contents yet). Keyboard: Tab, Enter, arrow keys, Escape.
 
-  Integrated header: on the homepage the header is navy, matching the hero, until the visitor
-  scrolls; then it turns white.
+  Integrated header: on the homepage the header is see-through over the green hero (white links,
+  white "inverse" button) until the visitor scrolls; then it turns white. The hero slides up
+  under it (Hero.tsx).
 */
 
 function isCurrent(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function DesktopItem({ item, current }: { item: NavItem; current: boolean }) {
+function DesktopItem({ item, current, onHero }: { item: NavItem; current: boolean; onHero: boolean }) {
   if (item.children?.length) {
     return (
       <NavigationMenuItem>
@@ -56,7 +57,7 @@ function DesktopItem({ item, current }: { item: NavItem; current: boolean }) {
   }
   return (
     <NavigationMenuItem>
-      <NavigationMenuLink asChild active={current} className={cn(navigationMenuTriggerStyle(), "bg-transparent px-3", current ? "text-foreground" : "text-foreground/80")}>
+      <NavigationMenuLink asChild active={current} className={cn(navigationMenuTriggerStyle(), "bg-transparent px-3", current || onHero ? "text-foreground" : "text-foreground/80")}>
         <Link href={item.href} aria-current={current ? "page" : undefined}>
           {item.label}
         </Link>
@@ -123,7 +124,7 @@ function MobileMenu({ nav, pathname }: { nav: NavItem[]; pathname: string }) {
 export function Header({ nav = headerContent.nav }: { nav?: NavItem[] }) {
   const pathname = usePathname() ?? "/";
 
-  // Navy while at the top of the homepage; white once the visitor scrolls.
+  // See-through over the hero at the top of the homepage; white once the visitor scrolls.
   const [atTop, setAtTop] = useState(true);
   useEffect(() => {
     const onScroll = () => setAtTop(window.scrollY < 8);
@@ -138,12 +139,12 @@ export function Header({ nav = headerContent.nav }: { nav?: NavItem[] }) {
     <header
       className={cn(
         "sticky top-0 z-50 border-b transition-colors duration-200",
-        dark ? "surface-navy border-transparent" : "border-border bg-background",
+        dark ? "tokens-green border-transparent bg-transparent" : "border-border bg-background",
       )}
     >
       <a
         href="#main"
-        className="sr-only rounded-md bg-background px-4 py-2 text-sm font-semibold text-heading focus:not-sr-only focus:absolute focus:top-3 focus:left-4 focus:z-50 focus:outline-2 focus:outline-ring"
+        className="sr-only rounded-md bg-white px-4 py-2 text-sm font-semibold text-brand-navy focus:not-sr-only focus:absolute focus:top-3 focus:left-4 focus:z-50 focus:outline-2 focus:outline-ring"
       >
         {headerContent.skipLink}
       </a>
@@ -156,18 +157,18 @@ export function Header({ nav = headerContent.nav }: { nav?: NavItem[] }) {
         <NavigationMenu aria-label={headerContent.navLabel} className="hidden lg:flex">
           <NavigationMenuList className="gap-0">
             {nav.map((item) => (
-              <DesktopItem key={item.href} item={item} current={isCurrent(pathname, item.href)} />
+              <DesktopItem key={item.href} item={item} current={isCurrent(pathname, item.href)} onHero={dark} />
             ))}
           </NavigationMenuList>
         </NavigationMenu>
 
         <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" className={cn("hidden lg:inline-flex", loginCurrent ? "text-foreground" : "text-foreground/80")}>
+          <Button asChild variant="ghost" className={cn("hidden lg:inline-flex", loginCurrent || dark ? "text-foreground" : "text-foreground/80")}>
             <Link href={headerContent.login.href} aria-current={loginCurrent ? "page" : undefined}>
               {headerContent.login.label}
             </Link>
           </Button>
-          <Button asChild className="hidden md:inline-flex">
+          <Button asChild variant={dark ? "inverse" : "default"} className="hidden md:inline-flex">
             <Link href={headerContent.primary.href}>{headerContent.primary.label}</Link>
           </Button>
 

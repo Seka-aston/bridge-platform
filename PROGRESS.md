@@ -499,3 +499,12 @@ Decisions (Aston, 8 Nov 2026):
 - "After" screenshots: 61 pages at 1440 and 375px in `/screenshots/after`, and a local side-by-side comparison page at `/screenshots/index.html` (local only, not committed).
 - CLAUDE.md sections 3, 4 and 7 now describe the shadcn design system: tokens, type scale, variants, patterns and where components live.
 
+### 2026-11-09 — Homepage hero rebuilt from Aston's Figma
+- Merged `shadcn-redesign` into `main`; the live Vercel link shows the redesign.
+- Hero rebuilt from Aston's Figma (Bridge Designs, node 18:152). Aston's choices: green gradient as designed, spec copy kept, header see-through over the hero, buttons keep 8px corners.
+- Map artwork exported from Figma into `/public/hero` (dots, six connection lines, Rwanda, pulse rings, glows). Card text scales with the map so the cards keep their places between the avatars at every width; on phones the cards step aside.
+- Content rules applied: "92% match" became "Sample profile"; the "Ask Bridge" bar is a link to the Bridge AI page marked Coming soon, not a chat input; the map carries "Illustration · sample profiles" and a Draft label.
+- Contrast: the Figma glow behind the headline lowered the supporting text to 3.1:1 and the amber words to 1.8:1. Fixed by deepening the gradient start slightly (`#027A48` → `#016A3F`), softening the glow and giving the glass cards a deep green tint. Now amber 3.1–3.3:1 (large text), body text 4.8:1 or more.
+- New button variant `inverse` (white, green text), shown on `/components-preview`.
+- QA: 61 pages at four widths, 0 broken links, no sideways scrolling; homepage 0 accessibility issues once the entrance animation finishes; keyboard order and focus ring checked.
+

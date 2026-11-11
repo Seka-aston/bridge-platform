@@ -46,6 +46,10 @@
   --brand-navy-foreground: #ffffff;
   --brand-green: #3aaa6d; /* Logo green: icons and illustrations only, never small text */
   --brand-amber: #f8ac36; /* Logo amber: decorative accent only, navy text on it */
+  /* Homepage hero gradient (Aston's Figma hero, 9 Nov 2026). The Figma's #027a48 start is
+     deepened slightly so amber headline words keep 3:1 and pale-green text 4.5:1 over the glow. */
+  --hero-start: #016a3f;
+  --hero-end: #015432;
 
   /* Neutrals */
   --muted: #f4f6f5; /* gray-50, quiet backgrounds */
@@ -114,8 +118,39 @@
   --accent-foreground: #ffffff;
 }
 
+/* Green hero surface (homepage only). Same idea as navy: the tokens flip to white.
+   Muted text is a pale green rather than grey so it keeps 4.5:1 at the gradient's light end. */
+@utility tokens-green {
+  color: #ffffff;
+  --foreground: #ffffff;
+  --muted-foreground: #e3f3ea; /* 4.7:1 on hero-start, more on the darker end */
+  --border: rgb(255 255 255 / 0.28);
+  --ring: #ffffff;
+  --heading: #ffffff;
+  --eyebrow-foreground: #ffffff;
+  --link: #ffffff;
+  --link-hover: #e3f3ea;
+  --accent: rgb(255 255 255 / 0.12);
+  --accent-foreground: #ffffff;
+}
+@utility surface-green {
+  background-color: var(--hero-end);
+  background-image: linear-gradient(139deg, var(--hero-start) 0%, var(--hero-end) 83%);
+  color: #ffffff;
+  --foreground: #ffffff;
+  --muted-foreground: #e3f3ea;
+  --border: rgb(255 255 255 / 0.28);
+  --ring: #ffffff;
+  --heading: #ffffff;
+  --eyebrow-foreground: #ffffff;
+  --link: #ffffff;
+  --link-hover: #e3f3ea;
+  --accent: rgb(255 255 255 / 0.12);
+  --accent-foreground: #ffffff;
+}
+
 /* White cards and menus placed on a navy section (e.g. the hero visual) switch back to light-surface tokens. */
-:is(.surface-navy, .tokens-navy) :is([data-slot="card"], [data-slot="navigation-menu-viewport"]) {
+:is(.surface-navy, .tokens-navy, .surface-green, .tokens-green) :is([data-slot="card"], [data-slot="navigation-menu-viewport"]) {
   --foreground: #1f2937;
   --muted-foreground: #626a75;
   --border: #e5e7eb;
@@ -131,7 +166,7 @@
 
 /* Layout (kept from the original system; shared by old and new components) */
 /* Badges on navy (outside white cards): colours that only work on light surfaces are swapped. */
-:is(.surface-navy, .tokens-navy) [data-slot="badge"]:not([data-slot="card"] *) {
+:is(.surface-navy, .tokens-navy, .surface-green, .tokens-green) [data-slot="badge"]:not([data-slot="card"] *) {
   &[data-variant="draft"] {
     background-color: var(--brand-amber);
     color: var(--brand-navy); /* 5.7:1 */
@@ -178,6 +213,8 @@
   --color-brand-navy-foreground: var(--brand-navy-foreground);
   --color-brand-green: var(--brand-green);
   --color-brand-amber: var(--brand-amber);
+  --color-hero-start: var(--hero-start);
+  --color-hero-end: var(--hero-end);
   --color-section-tint: var(--section-tint);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
@@ -229,14 +266,21 @@
   }
 }
 
-/* Hero network: a slow flow along the dashed connection lines. Restrained on purpose. */
-@keyframes bridge-flow {
-  to {
-    stroke-dashoffset: -24;
-  }
+/* Hero map cards: text scales with the map (a size container), like the Figma artwork, so the
+   cards keep their place between the avatars at every width. 12px at full size, never under 10px. */
+.hero-map-text {
+  font-size: clamp(0.625rem, 2.05cqw, 0.75rem);
+  line-height: 1.3;
 }
-.bridge-flow {
-  animation: bridge-flow 3s linear infinite;
+
+/* Hero map: a soft pulse around the Kigali hub. Removed for reduced motion (below). */
+@keyframes hero-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.12); opacity: 0.6; }
+}
+.hero-pulse {
+  animation: hero-pulse 3.2s ease-in-out infinite;
+  transform-origin: center;
 }
 
 /* Turn off animation and transitions for people who ask for reduced motion. */

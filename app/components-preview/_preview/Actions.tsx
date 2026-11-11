@@ -89,6 +89,17 @@ export function Actions() {
             Book a Discovery Call <ArrowRight data-icon="inline-end" />
           </Button>
         </Demo>
+        <Demo label="On the green homepage hero" className="surface-green flex flex-wrap items-center gap-3 rounded-xl p-6">
+          <Button size="lg" variant="inverse">
+            Join a Programme <ArrowRight data-icon="inline-end" />
+          </Button>
+          <Button size="lg" variant="on-navy">
+            Hire Vetted Talent <ArrowRight data-icon="inline-end" />
+          </Button>
+          <Button size="lg" variant="link">
+            Book a Discovery Call
+          </Button>
+        </Demo>
         <Demo label="Button group, toggle and toggle group" className="flex flex-wrap items-center gap-6">
           <ButtonGroup aria-label="Export">
             <Button variant="outline">Export CSV</Button>
