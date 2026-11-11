@@ -52,7 +52,7 @@ All values live in `:root` and are exposed to Tailwind through `@theme inline`. 
 | `link`, `eyebrow-foreground` | `#277A4D` | Text links, eyebrow labels |
 | `brand-navy` | `#1C3D6A` | Navy sections, footer, avatars, Navy button |
 | `brand-green` | `#3AAA6D` | Logo, icons, illustrations, decorative arcs. **Never small text** (2.9:1) |
-| `brand-amber` | `#F8AC36` | Decorative accent: Draft label tint, rank chip, shortlist star, notification dot. Navy text on it. Also the large highlighted headline words on the green hero (3:1 for large text) |
+| `brand-amber` | `#F8AC36` | Decorative accent: rank chip, shortlist star, notification dot. Navy text on it. Also the large highlighted headline words on the green hero (3:1 for large text) |
 | `hero-start` / `hero-end` | `#016A3F` / `#015432` | Homepage hero gradient only. The Figma's `#027A48` start is deepened so amber and pale-green text pass over the glow |
 | `muted` / `muted-foreground` | `#F4F6F5` / `#626A75` | Quiet backgrounds / captions and metadata (5.5:1) |
 | `section-tint` | `#F4F6F5` | Alternate marketing sections (neutral grey, not mint) |
@@ -105,7 +105,7 @@ Headings are left-aligned by default; centred only for short single-statement se
 These come directly from the spec and apply to every section.
 
 1. **Never fabricate** statistics, reviews, ratings, testimonials, partner logos, endorsements, placement outcomes, addresses, phone numbers or social profiles.
-2. Any figure or claim not yet approved by Bridge must be marked in the content file with `// TODO: awaiting Bridge approval` and shown with a visible **"Draft"** badge while `prototypeMode` is on (`content/site.ts`), including on the shared Vercel link. When `prototypeMode` is off (real launch), unapproved items are hidden entirely, never shown without the badge. (Aston, 7 November 2026.)
+2. Any figure or claim not yet approved by Bridge must be marked in the content file with `// TODO: awaiting Bridge approval`. While `prototypeMode` is on (`content/site.ts`) it is shown on the site; when `prototypeMode` is off (real launch), unapproved items are hidden entirely. (Aston, 7 November 2026.) **No "Draft" labels on the site** (Aston, 11 November 2026): `showDraftLabels` in `content/site.ts` is off; set it to `true` to bring every Draft badge back. The Admin "Content approvals" queue still lists the unapproved items.
 3. Features that are not yet live (e.g. Bridge AI) must be clearly labelled as **"Coming soon"** or **"Preview"**. **No live chat input** anywhere unless it is connected to a working service.
 4. Sample talent profiles must be clearly illustrative (e.g. "Sample profile"). Never imply that a match or placement is guaranteed. Do not show match percentages.
 5. Never display an expired deadline or suggest a closed programme is accepting applications.
@@ -119,6 +119,7 @@ These come directly from the spec and apply to every section.
 | 1 | **Header** | Logo · For Talents, For Schools, For Companies, Ventures Lab, For Ecosystem (dropdowns) · Login (visually secondary) · Book a Discovery Call (primary). Sticky, compact, mobile menu. |
 | 2 | **Hero** | Eyebrow "THE FUTURE OF TVET EMPLOYABILITY" · H1 "From Technical Skills to Real-World Opportunity." · supporting line · CTAs: Join a Programme (primary), Hire Vetted Talent (secondary), Book a Discovery Call (text link) · ecosystem visual: learner profiles, Skills Passport indicators, disciplines, partners and opportunity cards linked by a subtle network graphic. Not a generic AI animation, not an overcrowded map. **Built (9 Nov 2026) from Aston's Figma** (Bridge Designs, node 18:152): spec copy kept, last words of the H1 in amber, dotted Africa map with sample learners linked to Kigali (labelled illustration, Draft), Bridge AI preview bar that links to `/bridge-ai` (Coming soon, not an input). |
 | 3 | **Trust and credibility** | "Built Around Real Learners. Connected to Industry." · stats: 1,000+ students, 24+ partner schools, 15+ industry firms, 45+ facilitators (**all awaiting approval**) · optional verified logos. |
+| 3b | **Partner logos** (Aston, 11 Nov 2026) | "Trusted by Partners, ESOs, Initiatives at National and Global level." · two rows of grey logo tiles scrolling in opposite directions (after Andela's "Trusted by" band), Pause button, still grid for reduced motion. List and logos in `content/home.ts` (`partners`), files in `/public/partners`. 17 organisations; the TVET schools and Yali Labs are left out until usable logos exist. |
 | 4 | **The Bridge ecosystem** | Eyebrow "ONE CONNECTED JOURNEY" · "More Than Learning. A Pathway to Opportunity." · 3 service cards: Learn and Build, Prove Your Skills, Connect to Opportunity, each with capabilities list and CTA. |
 | 5 | **Audience pathways** | "One Ecosystem. Different Pathways to Growth." · 4 consistent panels: Talents, Schools, Companies, Ecosystem Partners. |
 | 6 | **Programmes and Ventures Lab** | "Opportunities to Learn, Build, and Grow." · programme cards driven by data · Ventures Lab featured when open · CTA Explore All Programmes. |
@@ -139,9 +140,9 @@ Every component is reviewed on **`/components-preview`** before it is used. To a
 | Area | Files |
 |---|---|
 | shadcn components, Bridge-themed | `components/ui/*` (button, badge, card, table, dialog, sheet, sidebar, tabs, select, field, …) and `components/ui/typography.tsx` |
-| Content labels | `components/Badge.tsx` (Draft, Coming soon, Sample profile), `ApprovableDraft.tsx`, `StatusPill.tsx` (programme status from dates) |
+| Content labels | `components/Badge.tsx` (Coming soon, Sample profile; Draft is switched off), `ApprovableDraft.tsx`, `StatusPill.tsx` (programme status from dates) |
 | Marketing layout | `Header`, `Footer`, `HomeSection`, `PageHeader`, `SectionHeading`, `CtaBand`, `LinkButton`, `TextLink`, `IconTile`, `CheckList` |
-| Marketing cards | `StatItem`, `ServiceCard`, `AudiencePanel`, `ProgrammeCardView`, `TalentCard`, `ArticleCard`, `StoryCard`, `JourneySteps`, `BridgeAiPreview`, `Hero` + `HeroVisual` |
+| Marketing cards | `StatItem`, `ServiceCard`, `AudiencePanel`, `ProgrammeCardView`, `TalentCard`, `ArticleCard`, `StoryCard`, `JourneySteps`, `BridgeAiPreview`, `Hero` + `HeroVisual`, `PartnerLogos` |
 | Forms | `components/forms/Fields.tsx`, `ApplyForm`, `DiscoveryCallForm`, `components/auth/*` (log in, create account, password reset, simulated social buttons) |
 | Dashboard frame | `components/dashboard/DashboardShell.tsx`, `app/dashboard/[role]/loading.tsx` and `error.tsx` |
 | Dashboard building blocks | `parts.tsx` (page header, panel, stat card, progress bar, empty state), `DataGrid.tsx`, `DetailDrawer.tsx`, `kit.tsx` (navy summary card, figure strip, today tabs, initials avatar, toolbar dropdown), `charts.tsx` (accessible single-series charts with "Show as table") |
@@ -167,12 +168,12 @@ Every component is reviewed on **`/components-preview`** before it is used. To a
 | Booking tool for "Book a Discovery Call" | Not specified |
 | Programme data source | Prototype: shared sample data in `/data`. Real source not specified. |
 | Login destination | Prototype (Aston, 8 Nov 2026): log in screen with email/password and simulated Google, Microsoft and LinkedIn buttons; the four sample users' emails open their dashboards with any password; simulated create-account and password-reset screens. Real login provider not specified. |
-| Approved stats, logos, testimonials, photos | Awaiting Bridge |
-| Official social accounts | Awaiting Bridge (the live footer's GitHub icon looks like a template leftover) |
+| Approved stats, logos, testimonials, photos | Partner logos supplied by Aston (11 Nov 2026), taken from each organisation's own site; Bridge to confirm each partner agrees to its logo being shown. Stats, testimonials and photos awaiting Bridge |
+| Official social accounts | Instagram supplied by Aston (11 Nov 2026): https://www.instagram.com/bridge.rw/, an icon button in the footer's Contact column. Others awaiting Bridge |
 | Analytics setup | Not specified |
 | Hosting and deployment | Prototype: Vercel (`bridge-platform-eovr`), auto-deployed from GitHub `main`. Final hosting not specified. |
 | Bridge sign-off on the green hero (Aston's Figma, 9 Nov 2026) and the navy final section | Aston to confirm with Bridge |
-| Hero map: learners across Africa (Dakar, Lagos, Cairo, Addis Ababa, Kinshasa, Johannesburg) show ambition, not current reach | Shown with Draft until Bridge approves |
+| Hero map: learners across Africa (Dakar, Lagos, Cairo, Addis Ababa, Kinshasa, Johannesburg) show ambition, not current reach | Awaiting Bridge approval (no Draft label since 11 Nov 2026) |
 
 ## 10. Definition of done (from spec 4.2.16)
 

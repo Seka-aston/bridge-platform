@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { Info } from "lucide-react";
-import { Badge } from "@/components/Badge";
 import { PageHeader } from "@/components/PageHeader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eyebrow, H3, P } from "@/components/ui/typography";
@@ -37,7 +36,7 @@ export function LegalPage({ title, intro, sections, children }: { title: string;
           <Alert>
             <Info />
             <AlertDescription className="flex flex-wrap items-center gap-2 text-foreground">
-              <Badge kind="draft" /> {legalNotice.draft}
+              {legalNotice.review}
             </AlertDescription>
           </Alert>
           <p className="mt-4 text-sm text-muted-foreground">{legalNotice.updated}</p>

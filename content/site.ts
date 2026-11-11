@@ -9,9 +9,13 @@ export const site = {
 };
 
 // Prototype mode (decided by Aston, 7 Nov 2026).
-// true: content awaiting Bridge's approval is shown with a visible "Draft" badge.
-// false (real launch): content awaiting approval is hidden entirely, never shown without the badge.
+// true: content awaiting Bridge's approval is shown on the site.
+// false (real launch): content awaiting approval is hidden entirely.
 export const prototypeMode = true;
+
+// Draft labels on content awaiting approval. Turned off by Aston on 11 Nov 2026: nothing on the
+// site says "Draft". Set to true to bring every Draft label back.
+export const showDraftLabels = false;
 
 // Badge labels (content rules 2–4 in CLAUDE.md).
 export const badgeLabels = {

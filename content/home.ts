@@ -64,6 +64,50 @@ export const heroAi = {
   label: "Bridge AI preview: ask about courses, internships and skills. Coming soon.",
 };
 
+// Partner logos, between the trust figures and the ecosystem section. Heading and list supplied
+// by Aston (11 Nov 2026). Logos are each organisation's own, from its website or Wikimedia
+// Commons, in /public/partners. Partners without a usable logo are left out for now (the TVET
+// schools, Yali Labs).
+// - mark: shows `name` beside the logo, for logos that are a symbol only (as their own sites do).
+// - invert: white logos, flipped to dark so they show on the light tile.
+export type Partner = {
+  name: string;
+  label?: string;
+  logo: { src: string; width: number; height: number };
+  mark?: boolean;
+  invert?: boolean;
+};
+const coatOfArms = { src: "/partners/rwanda-coat-of-arms.svg", width: 670, height: 732 };
+export const partners = {
+  heading: "Trusted by Partners, ESOs, Initiatives at National and Global level.",
+  pause: "Pause logos",
+  play: "Play logos",
+  // Two rows that scroll in opposite directions: public bodies and initiatives, then companies.
+  rows: [
+    [
+      { name: "UNDP", logo: { src: "/partners/undp.svg", width: 238, height: 482 } },
+      { name: "timbuktoo", logo: { src: "/partners/timbuktoo.png", width: 370, height: 160 } },
+      { name: "Ministry of ICT and Innovation", label: "MINICT", logo: coatOfArms, mark: true },
+      { name: "Ministry of Education", label: "MINEDUC", logo: coatOfArms, mark: true },
+      { name: "Rwanda TVET Board", logo: { src: "/partners/rtb.png", width: 285, height: 160 } },
+      { name: "National Cyber Security Authority", logo: { src: "/partners/ncsa.png", width: 640, height: 139 } },
+      { name: "Rwanda Energy Group", logo: { src: "/partners/reg.png", width: 233, height: 83 } },
+      { name: "Broadband Systems Corporation", logo: { src: "/partners/bsc-rwanda.png", width: 276, height: 160 } },
+      { name: "Irembo", logo: { src: "/partners/irembo.svg", width: 91, height: 25 }, invert: true },
+    ],
+    [
+      { name: "Andela", logo: { src: "/partners/andela.png", width: 609, height: 160 } },
+      { name: "Zipline", logo: { src: "/partners/zipline.svg", width: 77, height: 25 } },
+      { name: "Spiro", logo: { src: "/partners/spiro.svg", width: 59, height: 24 } },
+      { name: "iDebate Rwanda", logo: { src: "/partners/idebate-rwanda.svg", width: 421, height: 98 } },
+      { name: "Mango 4G", logo: { src: "/partners/mango-4g.png", width: 640, height: 75 } },
+      { name: "Awesomity Lab", logo: { src: "/partners/awesomity-lab.svg", width: 80, height: 80 }, mark: true, invert: true },
+      { name: "Wood Habitat", logo: { src: "/partners/wood-habitat.svg", width: 1074, height: 1074 }, mark: true },
+      { name: "Houz 54", logo: { src: "/partners/houz-54.png", width: 361, height: 160 }, invert: true },
+    ],
+  ] as Partner[][],
+};
+
 export const trust = {
   // Spec 4.2.4
   heading: "Built Around Real Learners. Connected to Industry.",
@@ -233,7 +277,7 @@ export const finalCta = {
 
 export const footer = {
   // Spec 4.2.14. Mission statement: the live bridge.co.rw footer line (live copy).
-  // TODO: official social links must come from Bridge (never invented).
+  // Social links: official accounts only, never invented.
   missionStatement: "Empowering the next generation of skilled professionals in Rwanda through training, mentorship, and career opportunities." as string | undefined,
   audienceLinks: header.nav,
   otherLinks: [
@@ -254,5 +298,8 @@ export const footer = {
     email: "bridgerwanda77@gmail.com",
     approved: false,
   } as undefined | { email?: string; phone?: string; address?: string; approved: boolean },
-  social: [] as { label: string; href: string }[],
+  // Official Instagram, supplied by Aston on 11 Nov 2026. `label` is read out by screen readers.
+  social: [
+    { label: "Bridge on Instagram (opens in a new tab)", href: "https://www.instagram.com/bridge.rw/", icon: "instagram" },
+  ] as { label: string; href: string; icon: "instagram" }[],
 };

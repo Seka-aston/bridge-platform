@@ -8,6 +8,7 @@ import { CtaBand } from "@/components/CtaBand";
 import { Hero } from "@/components/Hero";
 import { HomeSection, SectionTop } from "@/components/HomeSection";
 import { JourneySteps } from "@/components/JourneySteps";
+import { PartnerLogos } from "@/components/PartnerLogos";
 import { ProgrammeCards } from "@/components/ProgrammeCard";
 import { SectionHeading } from "@/components/SectionHeading";
 import { ServiceCard } from "@/components/ServiceCard";
@@ -61,6 +62,9 @@ export default function Home() {
           <StatList stats={trust.stats} />
         </div>
       </HomeSection>
+
+      {/* Partner logos (Aston, 11 Nov 2026) */}
+      <PartnerLogos />
 
       {/* 4. The Bridge ecosystem */}
       <HomeSection id="ecosystem" labelledBy="ecosystem-title" tone="green">

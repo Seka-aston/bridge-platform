@@ -23,7 +23,7 @@ Read this file with CLAUDE.md at the start of every session. Work on one checkpo
 - [x] Manrope loaded with `next/font` (set only in `app/layout.tsx` via `--font-brand`; Geist removed)
 - [x] Git initialised, first commit made
       (pushed to github.com/Seka-aston/bridge-platform, branch `main`; commits use g.seka@alustudent.com, which is linked to the Seka-aston GitHub account)
-- [ ] Project runs locally; Aston knows how to open it in the browser (runs; awaiting Aston's check)
+- [x] Project runs locally; Aston knows how to open it in the browser (confirmed by Aston, 11 Nov 2026)
 - [x] (Optional) Connected to GitHub and Vercel so every update gets a shareable preview link
       (Vercel project `bridge-platform-eovr` in team "lineaar's projects"; live at https://bridge-platform-eovr.vercel.app.
       Pushes to `main` publish the live site; other branches get their own preview link. Preview links only open for
@@ -65,7 +65,7 @@ Spec notes (from `Bridge 1.0.pdf`, kept out of git because the repo is public):
 - The hero eyebrow is written with a full stop in the spec ("THE FUTURE OF TVET EMPLOYABILITY."); the others have none.
 - Footer "Programmes and Resources" is treated as two links.
 - Analytics: spec 4.2.15 wants important actions trackable; no setup agreed yet.
-- [ ] Header with dropdowns and mobile menu (`components/Header.tsx` built and tested; awaiting Aston's review. Menu items are plain links until the dropdown contents from the slides arrive: add them as `children` in `content/home.ts`.)
+- [x] Header with dropdowns and mobile menu (`components/Header.tsx`; approved by Aston, 11 Nov 2026. Menu items are plain links until the dropdown contents from the slides arrive: add them as `children` in `content/home.ts`.)
 - [x] Footer
 - [x] Cards: service, audience panel, programme (with automatic Open, Upcoming, Closed and Archived status), talent profile, article, testimonial
 - [x] Stat item, journey step, CTA band, badges ("Coming soon", "Sample profile", "Draft")
@@ -507,4 +507,19 @@ Decisions (Aston, 8 Nov 2026):
 - Contrast: the Figma glow behind the headline lowered the supporting text to 3.1:1 and the amber words to 1.8:1. Fixed by deepening the gradient start slightly (`#027A48` → `#016A3F`), softening the glow and giving the glass cards a deep green tint. Now amber 3.1–3.3:1 (large text), body text 4.8:1 or more.
 - New button variant `inverse` (white, green text), shown on `/components-preview`.
 - QA: 61 pages at four widths, 0 broken links, no sideways scrolling; homepage 0 accessibility issues once the entrance animation finishes; keyboard order and focus ring checked.
+
+### 2026-11-11 — Draft labels removed, Instagram in the footer
+- Hero rebuild committed and pushed; Vercel deployed it. Aston confirmed the project runs locally and approved the header: both ticked.
+- Every "Draft" label is gone from the site (Aston's request). One switch, `showDraftLabels` in `content/site.ts`, turns them all off; setting it to `true` brings them back. The content itself still shows while `prototypeMode` is on and is still hidden at launch until Bridge approves it.
+- Notes that only existed beside a Draft label are hidden too ("Filter labels are new wording" on Programmes, the footer's "awaiting Bridge" lines). Legal pages keep their notice, reworded to "Template for Bridge's legal review…". Admin approvals and Settings wording no longer mention Draft badges.
+- Kept: the Company dashboard's "Draft" posting status ("Save as draft"), which is a real feature, not an approval label.
+- Footer: Instagram icon button (44px, outlined white on navy) in the Contact column, linking to https://www.instagram.com/bridge.rw/ in a new tab; screen readers hear "Bridge on Instagram (opens in a new tab)". The icon is drawn in the lucide line style because lucide no longer includes brand logos (no new library).
+
+### 2026-11-11 — Partner logos section
+- New section between the trust figures and "More Than Learning": "Trusted by Partners, ESOs, Initiatives at National and Global level." (Aston's heading and list; heading in semibold at Aston's request), styled after Andela's "Trusted by" band: grey logos on light tiles, two full-width rows scrolling slowly in opposite directions.
+- Logos are each organisation's own, found online and checked one by one: UNDP (Wikimedia Commons), timbuktoo, MINICT and MINEDUC (the national coat of arms with the ministry name, as on their own sites), Rwanda TVET Board, NCSA, REG, BSC, Irembo, Andela, Zipline (Wikimedia Commons), Spiro, iDebate Rwanda, Mango 4G, Awesomity Lab and Wood Habitat (symbol plus name, as on their sites), Houz 54. Margins trimmed, RTB's white background removed, large files resized; saved in `/public/partners`.
+- Left out for now (Aston: "leave the remaining"): IPRC Kigali, Muhabura Integrated Polytechnic College, SJITC Nyamirambo, ITS Kigali, SOS Kigali, World Mission High School, Glory Academy, Kivu Hills Academy, UniPod, and Yali Labs (its site only has a placeholder icon). Add them in `content/home.ts` when logo files are available.
+- Each logo is sized from its proportions so wide wordmarks and compact symbols look equally heavy. White logos (Irembo, Awesomity Lab, Houz 54) are flipped to dark for the light tiles.
+- Accessibility: logo alt text is the organisation's name; screen readers hear the list once. Rows pause on hover and keyboard focus, a Pause / Play button stops both (required for moving content), and with reduced motion the rows become a still, wrapped grid.
+- QA: homepage at 375, 768, 1024 and 1440px: 0 accessibility issues, no sideways scrolling; Tab reaches the Pause button and Enter stops the rows.
 

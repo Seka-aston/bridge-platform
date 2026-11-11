@@ -21,7 +21,7 @@ const groups: { title: string; swatches: Swatch[] }[] = [
       { token: "secondary-foreground", value: "#277A4D", use: "Text on secondary", contrast: "4.8:1", changed: "The brief's green-600 failed (3.9:1)" },
       { token: "brand-navy", value: "#1C3D6A", use: "Headings, navy sections, footer", contrast: "10.9:1 on white" },
       { token: "brand-green", value: "#3AAA6D", use: "Logo, icons, illustrations. Never small text", contrast: "2.9:1, decoration only" },
-      { token: "brand-amber", value: "#F8AC36", use: "Decorative accent, Draft label tint", contrast: "Navy text 5.7:1" },
+      { token: "brand-amber", value: "#F8AC36", use: "Decorative accent", contrast: "Navy text 5.7:1" },
     ],
   },
   {
@@ -41,7 +41,7 @@ const groups: { title: string; swatches: Swatch[] }[] = [
     title: "Feedback and charts",
     swatches: [
       { token: "destructive", value: "#B42318", use: "Errors only", contrast: "6.6:1" },
-      { token: "warning", value: "#8A5A00", use: "Draft label text", contrast: "5.9:1" },
+      { token: "warning", value: "#8A5A00", use: "Text-safe amber", contrast: "5.9:1" },
       { token: "chart-1", value: "#3F6FAE", use: "Chart series 1" },
       { token: "chart-2", value: "#2F8A58", use: "Chart series 2" },
       { token: "chart-3", value: "#D58916", use: "Chart series 3" },

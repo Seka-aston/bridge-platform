@@ -33,13 +33,12 @@ export function SharedLayout() {
         <StatusPill status="upcoming" />
         <StatusPill status="closed" />
         <StatusPill status="archived" />
-        <Badge kind="draft" />
         <Badge kind="comingSoon" />
         <Badge kind="preview" />
         <Badge kind="sampleProfile" />
       </Demo>
 
-      <Demo label="Stats" hint="Unapproved figures carry the Draft label">
+      <Demo label="Stats">
         <StatList stats={trust.stats} />
       </Demo>
 

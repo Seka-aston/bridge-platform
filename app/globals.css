@@ -283,6 +283,24 @@
   transform-origin: center;
 }
 
+/* Partner logos: each row scrolls sideways in a loop (the list is drawn twice, so moving by
+   half its width lands exactly where it started). Paused on hover, keyboard focus or the pause
+   button; reduced motion shows a still, wrapped grid instead (PartnerLogos.tsx). */
+@keyframes logo-marquee {
+  to { transform: translateX(-50%); }
+}
+.logo-marquee {
+  animation: logo-marquee 70s linear infinite;
+}
+.logo-marquee[data-reverse] {
+  animation-direction: reverse;
+}
+.logo-marquee:hover,
+.logo-marquee:focus-within,
+[data-paused] .logo-marquee {
+  animation-play-state: paused;
+}
+
 /* Turn off animation and transitions for people who ask for reduced motion. */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -292,5 +310,8 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  .logo-marquee {
+    animation: none !important;
   }
 }

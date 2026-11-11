@@ -21,7 +21,7 @@ export type NavLink = {
 export const dashboardText = {
   prototypeLabel: "Prototype · sample data",
   prototypeShort: "Prototype",
-  prototypeHint: "All dashboard wording is Draft.",
+  prototypeHint: "Dashboard wording and data are samples for the prototype.",
   skipLink: "Skip to main content",
   navLabel: "Dashboard",
   railLabel: "Dashboard shortcuts",
@@ -519,7 +519,7 @@ export const adminText = {
   },
   content: {
     title: "Content approvals",
-    description: "Everything marked Draft on the site waits here for Bridge's approval.",
+    description: "Content on the site that is waiting for Bridge's approval.",
     columns: { item: "Item", type: "Type", status: "Status" },
     types: { stat: "Statistic", programme: "Programme dates", article: "Article", contact: "Contact details" },
     status: { pending: "Awaiting approval", approved: "Approved", changes: "Changes requested" },
@@ -528,7 +528,7 @@ export const adminText = {
     searchLabel: "Search content",
     approvedToast: "Approved: {item}",
     changesToast: "Changes requested: {item}",
-    note: "Prototype: decisions are kept in this browser tab. Approved items lose their Draft badge on the public site in the same tab.",
+    note: "Prototype: decisions are kept in this browser tab only.",
   },
   reports: {
     title: "Reports",
@@ -639,7 +639,7 @@ export const settingsText = {
   admin: {
     title: "Platform",
     prototypeMode: "Prototype mode",
-    prototypeOn: "On: content awaiting approval is shown with a Draft badge. When switched off for launch, it is hidden instead.",
+    prototypeOn: "On: content awaiting approval is shown on the site. When switched off for launch, it is hidden instead.",
     prototypeHow: "Changed by a developer in content/site.ts, not from this screen.",
   },
   sampleEmail: { student: "diane@sample.example", school: "jean-paul@sample-school.example", company: "grace@sample-tech.example", admin: "eric@bridge.example" } as Record<string, string>,

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, BadgeCheck, Bold, CalendarDays, Clock, Download, Italic, LayoutGrid, List, PenLine, Plus, Sparkles, Trash2, Underline } from "lucide-react";
+import { ArrowRight, BadgeCheck, Bold, CalendarDays, Clock, Download, Italic, LayoutGrid, List, Plus, Sparkles, Trash2, Underline } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -144,10 +144,6 @@ export function Actions() {
           <Badge variant="featured">Featured</Badge>
         </Demo>
         <Demo label="Content labels" className="flex flex-wrap items-center gap-3">
-          {/* Draft: amber tint with a pencil (Aston chose option A, 8 Nov 2026). */}
-          <Badge variant="draft">
-            <PenLine data-icon="inline-start" /> Draft
-          </Badge>
           <Badge variant="preview">
             <Sparkles data-icon="inline-start" /> Coming soon
           </Badge>

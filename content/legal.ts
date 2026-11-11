@@ -6,7 +6,7 @@
 export type LegalSection = { id: string; title: string; paragraphs: string[]; list?: string[] };
 
 export const legalNotice = {
-  draft: "Draft template for Bridge's legal review. This is not legal advice and is not Bridge's official policy.",
+  review: "Template for Bridge's legal review. This is not legal advice and is not Bridge's official policy.",
   updated: "Last updated: [date to be confirmed by Bridge]",
   contents: "On this page",
 };

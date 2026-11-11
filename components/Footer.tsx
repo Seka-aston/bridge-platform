@@ -3,18 +3,20 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { Badge } from "@/components/Badge";
+import { InstagramIcon } from "@/components/InstagramIcon";
 import { Logo } from "@/components/Logo";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Eyebrow } from "@/components/ui/typography";
 import { footer, header } from "@/content/home";
-import { prototypeMode } from "@/content/site";
+import { prototypeMode, showDraftLabels } from "@/content/site";
 import { footerText as t } from "@/content/ui";
 
 /*
   Footer (spec 4.2.14). Navy. Logo and mission statement, audience links, About / Programmes /
   Resources, official contact details, official social links, legal links.
-  Missing Bridge-supplied items show a Draft placeholder line in prototype mode and nothing at
-  all otherwise. Nothing is invented.
+  Missing Bridge-supplied items show a Draft placeholder line only while Draft labels are on.
+  Nothing is invented. Social links open in a new tab, which their names say.
 */
 
 const linkClass =
@@ -27,7 +29,7 @@ async function Copyright() {
 }
 
 function Placeholder({ children }: { children: string }) {
-  if (!prototypeMode) return null;
+  if (!prototypeMode || !showDraftLabels) return null;
   return (
     <p className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
       <Badge kind="draft" /> {children}
@@ -105,12 +107,14 @@ export function Footer() {
             ) : null}
             <div className="mt-6">
               {footer.social.length > 0 ? (
-                <ul className="flex gap-4">
+                <ul className="flex gap-3">
                   {footer.social.map((s) => (
                     <li key={s.href}>
-                      <a href={s.href} className={linkClass}>
-                        {s.label}
-                      </a>
+                      <Button asChild variant="on-navy" size="icon-lg">
+                        <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}>
+                          <InstagramIcon className="size-5" />
+                        </a>
+                      </Button>
                     </li>
                   ))}
                 </ul>
